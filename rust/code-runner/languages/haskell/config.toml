@@ -1,0 +1,5 @@
+name = "haskell"
+grammar = "haskell"
+file_extensions = ["hs"]
+line_comments = ["-- "]
+block_comment = ["{- ", " -}"]

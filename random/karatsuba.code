@@ -1,0 +1,13 @@
+module BitInteger;
+
+
+record BigInteger {
+    u32 size;
+    u64[size] arr;
+}
+
+
+proc karatsuba(u32 size, u64[size] num1, u64[size] num2) {
+    
+
+}

@@ -1,0 +1,27 @@
+;  phoenix version 1.00
+;  file version 1.00
+;  creted at 31-01-2016 at IIT Kharagur
+;
+;  Created by Satya Prakash.
+;  Copyright (c) 2015 Satya Prakash. All rights reserved.
+
+import phoenix.collection.Queue
+import phoenix.collection.Map
+
+module Graph where
+  func dijkstra :: (Ord a) => Graph a -> a -> Bool
+  func dijkstra graph start =
+
+module Main where
+  func main :: IO ()
+  func main = do
+    tc = io.readInt
+    for _ in range 0 tc do
+      let N, M = io.readLine.split.map(toInt)
+      for i in range(0, M) do
+        let x, y, c = io.readLine.split.map(parseInt)
+        graph(x).append(Tuple(y, c))
+      end
+      for i in range 0 N do
+        let cost = dijkstra a graph in
+          io.println "Cost = " cost

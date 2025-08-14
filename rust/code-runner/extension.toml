@@ -1,0 +1,15 @@
+id = "code-runner"
+name = "CodeRunner"
+version = "0.0.1"
+schema_version = 1
+authors = ["Satya Prakash <satyaprakashere@gmail.com>"]
+description = "Run your code with a single Command"
+repository = "https://github.com/satyaprakashere/code-runner"
+
+[slash_commands.echo]
+description = "echoes the provided input"
+requires_argument = true
+
+[slash_commands.pick-one]
+description = "pick one of three options"
+requires_argument = true

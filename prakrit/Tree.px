@@ -1,0 +1,1205 @@
+;  phoenix version 1.00
+;  file version 1.00
+;  creted at 31-01-2016 at IIT Kharagur
+;
+;  Created by Satya Prakash.
+;  Copyright (c) 2015 Satya Prakash. All rights reserved.
+
+import phoenix.collection.Set
+import phoenix.collection.Vect
+import phoenix.collection.Queue as Q
+import phoenix/collection/Queue ; not accepted
+
+import foldl from phoenix.collection.List
+import foldl from phoenix/collection/List
+
+import phoenix.collection.Stack except {pop}
+
+module MatrixMult begin
+  protocol MatrixMult m1 m2 m2 | m1 m2 -> m3 begin ; functional dependencies
+    (*) : m1 -> m2 -> m3
+  end
+
+  protocol MatrixMult m1 m2 m2 where m1, m2, m3 <: Matrix =
+      m1 : (m : Nat) -> (n : Nat) -> a -> Type
+    | m2 : (n : Nat) -> (p : Nat) -> a -> Type
+    | m3 : (m : Nat) -> (p : Nat) -> a -> Type
+
+    | (*) : m1 -> m2 -> m3
+  end
+end
+
+module MatrixOps begin
+  protocol MatripOps mat : Nat -> Nat -> (a <= Num) -> Type | p : Nat begin
+  protocol MatripOps mat : Nat -> Nat -> a -> Type | p : Nat where a <: Num
+
+  protocol MatrixOps : (Type -> Type -> Type -> Type) -> {
+            (a -> a -> a),
+            (a -> a -> a).
+            (a -> b -> a),
+            (a -> b -> c)
+  }
+
+  protocol MatripOps mat <= MatrixMult (mat m n a) a (mat m n a)
+                            , MatrixMult (mat m n a) (mat n p a) (mat m p a) where (a <: Num) =
+      alias matrix = mat m n a
+
+    (+) : matrix -> matrix -> matrix
+    (-) : matrix -> matrix -> matrix
+    (*) : matrix -> a -> matrix
+    (*) : mat m n a -> mat n p a -> mat m p a
+
+    transpose : mat m n a -> mat n m a
+  end
+
+  protocol MatripOps(mat) <= MatrixMult(mat m n a, a, mat m n a)
+                            , MatrixMult(mat m n a, mat n p a, mat m p a) where (a <: Num) =
+      alias matrix = mat m n a
+
+    (+) : matrix -> matrix -> matrix
+    (-) : matrix -> matrix -> matrix
+    (*) : matrix -> a -> matrix
+    (*) : mat m n a -> mat n p a -> mat m p a
+
+    transpose : mat m n a -> mat n m a
+  end
+end
+
+module Matrix where
+  data Matrix m n a : Nat -> Nat -> Type -> Type where
+    Matrix = Vect m (Vect n a)
+
+  data Matrix n m a = Nil | Matrix(Vect m a, Matrix n m a)
+
+  data Matrix n m a = Nil | Matrix<Vect<m, a>, Matrix<n, m, a>>
+
+  data Matrix n m a = Nil | Matrix (Vect m a) (Matrix n m a)
+
+  data Matrix n m a = Nil | (::) (Vect m a) (Matrix n m a)
+
+  data Matrix m n Int = Vect m (Vect n Int)
+
+  type RowVector n a = Matrix 1 n a
+  type ColVector m a = Matrix m 1 a
+  type SquareMatix n a = Matrix n n a
+
+  val RowVector : Nat -> Nat -> Type -> Type
+  val RowVector n a = Matrix 1 n a
+
+  type RowVector n a = Vect n a
+  type ColVector m a = Vect m a
+  type SquareMatix n a = Matrix n n a
+
+
+  protocol Matrix mat extends MatrixOps mat where
+  protocol Matrix mat <= MatrixOps mat where
+  protocol Matrix mat <: MatrixOps mat where
+    headRow   : Mat m n a -> RowVector n a
+    headCol   : Mat m n a -> ColVector m a
+    elementAt : Mat m n a -> Fin -> Fin -> a
+  end
+
+  protocol SquareMatrixOps (a Num) => (mat : Nat -> a -> Type MatripOps) where
+
+  protocol SquareMatrixOps mat <= Matrix mat where
+    inverse : mat m n a -> Maybe (mat m n a)
+    determenent : mat m n a -> a
+  end
+end
+
+module RowVector where
+  type RowVector n a = Matrix 1 n a
+
+module Tree where
+  data Tree a = Empty | Node a (Tree a) (Tree a)
+  data Tree a = Empty
+              | Node a (Tree a) (Tree a)
+
+protocol Tree t where
+  depth : t a -> Integer
+end
+
+data CTree a = fdsjdfsd
+
+instance ctreeTree = Tree CTree where
+  depth tree = 100
+
+  @private
+  funcp fromList list
+  - func fromList list
+  + func singleton a = Tree a Empty Empty             ; func singleton : (Ord a) => a -> Tree a
+end
+
+protocol Traversal t where
+  inorderT : t a -> List[a]
+end
+
+@doc "traversal protocols implementaton for Tree"
+instance traversableTree = Traversal (Tree a) where
+  inorderT = match
+    case Empty           => Nil
+    case Node (a l r)    => l.inorderT ++ a ++ r.inorderT
+  end
+
+  inorderT Empty         = []
+  inorderT Node a l r  = l.inorderT ++ a ++ r.inorderT
+end
+
+protocol Eq a where
+    (==) : a -> a -> Bool
+    func help : String
+end
+
+module Fibonacci where
+  func fibonacci n = recFib n 0 1 where
+    func recFib 1 _ b = b
+    func recFib n a b = recFib (n-1) b (a+b)
+  end
+  func fibonacci n = recFib n 0 1 where
+    recFib = match
+      case 1 _ b => b
+      case n a b => recFib (n-1) b (a+b)
+  end
+end
+
+module BTree where
+    alias Int = Int64
+    type IntTree = Tree Int
+end
+
+module Factorial where
+  func factorial n = recFact n 1 where
+    func recfact 1 res = res
+    func recfact n res = recfact (n-1) (res*n)
+  end
+  func factorial n = recFact n 1 where
+    recfact n res = n match
+      1 = res
+      n = recfact (n-1) (res*n)
+  end
+end
+
+module Main where
+  func main = do
+    println "Enter Number: "
+    print "Fibonacci \{number} : \{fibonacci number}" where
+      number := readLine.parseInt
+
+    let number := readLine.parseInt in
+      print "Fibonacci \{number} : \{fibonacci number}"
+
+    ;number : Int64
+    ;number = readLine.parse
+    ;number := readLine.parseInt()
+
+File -> public Module :: List[P | M] | public Protocol :: List[P | M]
+Module -> pub Data | List [Data | Func | Defunc] | List[M | P]
+
+if a < 0
+  then
+    jsdfds
+    dfsdfsdfkjjj
+  else
+    fsdfs
+    fdsfs
+end
+
+if a < 0 then sfds else dsfsf
+
+
+Integer
+Nat
+
+Int64
+UInt64
+Float64
+Float128
+Int128
+UInt128
+
+Array -> fixed size array
+List -> linkedList (also an protocol)
+/*Vector -> resizable array*/
+ArrayList -> resizable list
+Set protocol with default implementation
+Map protocol with default implementation
+TreeMap
+TreeSet
+Queue
+Stack
+Heap
+Matrix
+String
+Tuple
+IO
+Iterator -> implicit
+slice operator
+range function
+algorithms
+
+match vs case of ?
+match
+case of
+match for
+switch case
+match case
+match of case
+
+n match
+  1 => 1
+  2 => 1
+  _ => 2
+
+n match
+  1, 2 => 1
+  _    => 2
+
+n match
+  1
+  2 => 1
+  _    => 2
+
+case n of
+  1 => 1
+  _ => 2
+
+for x in y
+for x in 1.to(10)
+for x in 1..10
+for x in
+
+and or not
+import List as L from Collection
+
+[List syntax]
+(tuple syntax)
+{map syntax}
+{set syntax}
+(List 1 2 3)
+(Tuple 1 "String")
+(Set 1 2 3)
+(Map (Tuple 1 2) (Tuple 3 4))
+(Map 1 2, 3 4)
+(Map {1 2} {3 4})
+(Map {1, 2} {3, 4})
+
+val res = 10 / 2
+; res = 5.0
+
+let df in sdfsd
+:Atom
+
+no == operator
+unicode-8
+
+++ for list addition
+
+IO.println
+IO.print
+
+define f = \x -> 2*2
+func f x = 2*2
+define g = \x -> let y = 2*x in y*y
+func g x = y*y where y = 2*x
+
+
+define h = \x -> do
+            sfsdf
+            fsdsf
+          end
+
+val list = [1, true, "fdsfsd"]
+; list : List[Any]
+val list = [1, 2, 3]
+
+val mutable a = 1.2f; this is comment
+; mutable allows for mutating reference on the data
+; to modify data (use mutable data struct :P)
+val b = IntMut 1.2; ? literal support ?
+val b = Integer 1.2; ? literal support ?
+
+polymorphic type, value, functon, protocol, module ?
+what is polymorphism?
+
+(define function (arg1 arg2 arg3) ()()()())
+
+(define value () ()()()())
+
+(val value ()()()())
+(func function (arg1 arg2 arg3) ()()()()())
+
+two types of functions
+1. ad-hoc (protocol)
+
+fibonacci : (Integral a) => a -> a
+
+2. simple
+
+func fibonacci : (a Integral Comparable, b <= ) => a -> a
+
+Kind Type
+define f : a -> b -> c -> f a where
+  constraint  a <= Num + Ord, b <= Num + Ord, c <= Num + Ord
+  law
+define f x y z l = (x b).c(l)
+
+
+type a : Type
+type a = Int
+
+5 : Int
+value : a
+a : Type
+
+val str : String where ; rejected
+  str = "string"
+
+val str : String = x + x where ; accepted
+  x = "haha" + "hehe"
+
+val str : String = "string" ; accepted
+
+val str : String ; accepted
+val str = "string" ; accepted
+
+val list : List Int where Int <: Num, List <: Functor
+val list : List a where a = Int; accepted
+val list = [1, 2] ; accepted
+val list = List 1 (List 2 Nil); accepted
+
+val list : List Int where ; rejected
+  list = [1, 2]
+
+; final val syntax
+; problem with where and =
+val list : List a where a = String = ["haha", x] where x = " hehe "
+; value can have different operations, tranformations
+
+func f : Int -> Int // : Type -> Type
+
+; polymorphic functions
+func f : a -> b
+func g : b -> c
+func h : a -> c
+func h = f * g
+
+func f : a -> b -> c
+func g : c -> d -> e
+func h : a -> b -> d -> e
+func h = f * g
+; functions can be composed, transofrmed
+
+func f : Type -> Type -> Type
+func f x y = x * y
+
+func f : a -> b
+
+func g : Type -> (Type -> Type)
+func g Int = define f Int Int
+
+func add : Nat -> Nat -> Nat where
+  add x y = x + y
+
+func add a : a -> a -> a where
+  add x y = x + y
+
+func fun a : a -> a where
+     fun = \x -> 2*x
+
+func yes : Type -> Type where
+     yes a = a * a
+
+func fmap : f -> f a -> f b
+func fmap f l = map f l
+
+func fmap : (a -> b) -> f a -> f b
+func fmap f x =
+
+func old (.) : (b -> c) -> (a -> b) -> (a -> c)
+
+func (.) : b -> (b -> c) -> c
+
+func (|>) : b -> (b -> c) -> c
+
+func (*) : (b -> c) -> (a -> b) -> (a -> c)
+
+func f : a -> b -> c -> d
+func m : d -> e -> f -> g
+
+func n : a -> b -> c -> e -> f -> g
+
+func o : b -> c -> d
+func o  = f a
+
+func h : b -> c -> e -> f
+func h x = f(x).g
+
+func add : a -> a -> a where a <: Num + Ord ; Constraint
+func add x y = x + y
+    @specialization
+    add : Int -> Int -> Int = x + y
+    add x y = x + y
+
+
+func mult2 = *2
+
+func mult2 where a = Int
+func mult2 x = x << 1
+
+type a = Int
+type a : Type
+
+Int | Float | Double | Long
+Int * Float * Double * Long
+
+protocol Type t where
+  - union : t -> t -> t
+  - intersection : t -> t -> t
+  - difference : t -> t -> t
+  - symmetricDifference : t -> t -> t
+  - product : t -> t -> t
+  - power : t -> t
+
+  alias (∪) = union; (+), (|) ?
+  alias (-) = symmetricDifference
+  alias (*) = product
+  alias (/) = difference
+  alias (∩) = intersection; (&) ?
+  alias (^) = power
+end
+
+alias Int = Int64
+alias Float = Float64
+
+alias IntList = List Int
+alias FloatList = List Float
+
+type SType = Int * Float | Float
+type Email = String ; same as newType
+
+let Sometype : Type = Int * Float * Double * Long
+let SomeType : Type = (Int, Float, Double, Long)
+
+type SomeType : Type
+type Sometype = Int * Long | Float | Double | Long ; accepted finally
+type Sometype = Int & Long | Float | Double | Long
+type Sometype = (Int, Long) | Float | Double | Long ; accepted
+type Sometype = Int * Long + Float + Double + Long
+type Sometype = Int * Long ∪ Float ∪ Double ∪ Long
+type Sometype = Int * Long ∪ Float ∪ Double ∪ Long
+
+Int * (List Int)
+(Int, List Int); not accepted
+
+Int * Float
+(Int, Float); not accepted
+
+func fib : Int -> Int * Int; accepted
+func fib : Int -> (Int, Int); not accepted
+
+kind SomeKind : Type -> Type; not accepted ?
+kind SomeKind : Kind -> Type; not accepted ?
+kind SomeKind : Kind -> Kind
+type SomeType : Type -> Type
+type SomeType : Kind -> Type
+type SomeType : Kind -> Kind; not accepted ?
+
+type Sometype a = List | a Int
+
+type Tree a = nil  | a * (Tree a) * (Tree a); accepted
+type Tree a = ()   | a * (Tree a) * (Tree a)
+type Tree a = Unit | a * (Tree a) * (Tree a)
+
+type : Type
+data : Kind -> Type
+kind : Kind
+; type can be composed (cartisian, disjoint) transformed, operations, subtyping
+
+data : Type -> .. -> Type
+
+protocol : Type -> ... -> Type
+
+func : Function : Value -> Value
+func : Function : Type -> Type
+func : Fuction : Kind -> Kind
+protocol : Kind -> Set Function
+
+protocol Num a where
+  (+) : a -> a -> a
+  (-) : a -> a -> a
+
+protocol Num a = (+) a a a | (-) a a a
+
+val, let, type, data, kind, Kind, protocol, func, Function
+
+val : Value
+
+let : Term (lambda) ?
+
+type ListInt = f List Int
+
+keyword : type
+keyword name a b c d =
+
+data mat : Nat -> Nat -> a -> Type where a <: Num
+data Mat m n a = Vect m (Vect n a)
+
+data Mat m n a = Vect m (Vect n a)
+
+data Tree : a -> Tree a where a <: Num
+data Tree a = Empty | Node where
+  Empty : Tree a
+  Node  : a -> Tree a -> Tree a -> Tree a
+end
+  ; Node value left right
+
+data Tree a = Empty | Node where
+  Node : a -> Tree a -> Tree a -> Tree a
+end
+
+data Tree a = Empty | Node key left right
+data Tree a = Empty | Node a (Tree a) (Tree a)
+data Tree a = Empty | Node {
+    val   : a
+    left  : (Tree a)
+    right : (Tree a)
+}
+
+data Tree : (a <: Num) => a -> Tree a where
+    Empty : Tree a
+    Node  : a -> Tree a -> Tree a -> Tree a
+;    Node {value left right} or
+;    Node (value left right)
+
+data Tree a = Empty | Node a (Tree a) (Tree a) where
+  Node key left right = ; smart constructor here
+
+data Tree a = Empty | Node {
+  - key   : a
+  + left  : (Tree a)
+  + right : (Tree a)
+}
+
+data Tree a = Empty | Node key left right where
+  - key   : a
+  + left  : (Tree a)
+  + right : (Tree a)
+end
+
+class Tree a where
+  Empty : Tree a
+  Node : a -> Tree a -> Tree a -> Tree a
+end
+
+data Tree : Type -> Type
+data Tree a where
+    Empty : Tree a
+    Node  : a -> Tree a -> Tree a -> Tree a
+end
+
+data Tree a : Tree a where
+    Empty : Tree a
+    Node  : a -> Tree a -> Tree a -> Tree a
+end
+
+data family Tree a = Empty | Tree a (Tree a) (Tree a)
+instance Tree Int = Empty | Tree Int (Tree Int) (Tree Int)
+
+protocol : Kind -> Set Function
+
+instance : Set Function
+
+data family : Kind -> Type
+
+subdata : Type
+
+protocol Num a where
+  (+) : a -> a -> a
+  (-) : a -> a -> a
+  (*) : a -> a -> a
+  (/) : a -> a -> a
+  (%) : a -> a -> a
+
+protocol (Numeric a) <: (Num a) where
+  + add : a -> a -> a
+  - (%) : a -> a -> a
+  * subtract = (-)
+
+protocol Trait a where
+  (+) : a -> a -> a
+  (-) : a -> a -> a
+
+instance protocolTraits = Trait (Set Function) where
+  (+) t1 t2 =
+
+protocol IntAdd where
+  (+) : Int -> Int -> Int
+
+protocol Add a where
+  (+) : a -> a -> a
+  (+) : a -> (a -> a)
+
+protocol IntAdd = Add Int
+
+protocol p : Protocol
+protocol p = Numeric
+
+protocol Numeric a = (Num a) with (Ord a)
+protocol Numeric a = (Num a) + (Ord a)
+protocol Numeric a = (Num a) - (Ord a)
+protocol Numeric a = (Num a) , (Ord a)
+
+extension Numeric a where
+  add = (+)
+
+func range : a -> a -> Type where a <: Num
+
+@specialization a = Nat
+func range x y = x :: if x = y then nil else range (incr x) y
+func range x y = x :: if x = y then nil else range x.incr y
+
+data Day = range 1 31
+
+data Month = Jan | Feb
+
+
+
+
+val -> actual value of type Type
+func -> function
+data ->
+type ->
+
+where -> description of unexplained terms only
+and or not xor -> logic operators
+: -> of type
+:: -> list constructor
+| -> sum types or pattern matching
+
+
+(a, b) match
+  case (1, 2) => 10
+  case (_, 3) => 11
+  otherwise   => 12
+
+case (a, b) of
+  (1, x) if x < 2   => 10
+  (_, 3)            => 11
+  otherwise         => 12
+
+case (a, b) of
+  (1, x) when x < 2   => 10
+  (_, 3)            => 11
+  otherwise         => 12
+
+match (a, b) of
+  case (1, x) | x < 2
+  case (_, 3)            => 11
+  case otherwise         => 12
+
+(a, b) match
+  (1, 2)    => 10
+  (_, 3)    => 11
+  otherwise => 12
+
+(a, b) match
+  case (1, x) if x < 2
+  case (_, 3)           => 11
+  otherwise             => 12
+
+(a, b) match
+  case (1, x) | x < 2
+  case (_, 3)           => 11
+  otherwise             => 12
+
+(a, b) match
+  (1, x) if x > 2
+  | (1, 3)          => 11
+
+func (.) : a -> (a -> b) -> b
+
+func (|>) : a -> (a -> b) -> b
+
+func (*) : (a -> b) -> (b -> c) -> (a -> c)
+
+List.map (\x -> x.value) xs
+
+xs |> List.map (\x -> x.value)
+
+xs.map(\x -> x.value)
+
+toString . print $ list
+list |> toString.print
+
+func (.) x y = y x
+
+func f x y = x * y
+
+f x y
+f (x, y)
+
+; List
+(List 1 2 3)
+
+; Tuple
+(Tuple 1 "haha" 9.8)
+(1, "haha", 9.8) ;at the compiler level not for lang
+
+; Atom
+#Yo
+
+type Tuple (List Type) = Nil | Tuple (List Type)
+type Tuple (Vect (S n) Type) = Nil | Tuple (Vect n Type)
+
+
+data List a = Nil | List a (List a)
+
+data List a = Nil | List ..
+
+protocol List l where
+  map, reduce, filter
+end
+func List .. = List (head _) (List tail _)
+
+func f : Nat -> List Int -> (Type -> Type -> Type) -> Int
+
+func f : (Type -> Set Function)
+
+data Point a = Point a a
+
+protocol Similarity a where
+  isSimilar : a -> a -> Bool = not isNotSimilar
+  isNotSimilar : a -> a -> Bool = not isSimilar
+
+
+val : Value or Set or type
+func : Function or a -> a
+type : Type
+kind : Kind
+data : Type
+protocol : Protocol
+
+val num = 5
+
+val str : String
+val str = "haha"
+
+func add : a -> a -> a
+func add x y = x + y
+
+type Nat = Z | S Nat
+
+type List a = Nil | List a (List a)
+alias (::) = List
+
+val five = S (S (S (S Z)))
+val five = Z.S.S.S.S ;this is better?
+
+func plus : Nat -> Nat -> Nat
+func plus = match
+  case Z     y => y
+  case (S x) y => S (plus x y)
+
+alias (+) = plus
+
+val list = 1 :: 2 :: Nil
+
+func reverse : List a -> List a
+func reverse = revAcc [] where
+  func revAcc : List a -> List a -> List a
+  func revAcc = match
+    case acc []        => acc
+    case acc (x :: xs) => revAcc (x :: acc) xs
+
+func isSingleton : Bool -> Type
+func isSingleton = match
+  case True  => Nat
+  case False => List Nat
+
+func mkSingle : (x : Bool) -> isSingleton x
+func mkSingle = match
+  case True -> 0
+  case False -> []
+
+func mkSingle : (x : Bool) -> isSingleton x
+func mkSingle True  = 0
+func mkSingle False = []
+
+func square x = x * x
+func square x = x ^ 2
+func square x = x ** 2
+
+func square = ** 2
+func square = _ * _
+func square = ^ 2
+
+val str = "hello" * 10
+
+type Vect : Nat -> Type -> Type
+type Vect n a = Nil | Vect a (Vect n a) where
+  Nil  : Vect Z a
+  Vect : Vect (S n) a
+
+type IsElem : a -> Vect n a -> Type
+type IsElem a v = Here | There where
+  Here  : IsElem a v
+  There : IsElem a v -> IsElem a (a::xs)
+
+data Tree a = Empty | Node a (Tree a) (Tree a)
+
+type IsElem a v = Here a v
+                | There (a, a) v (IsElem a v)
+
+type List a = Nil | (::) a (List a)
+
+val list : List Type
+val list = Int :: Float :: Nil
+
+data List : a -> Type
+data List : Type -> Type
+data List a = Nil | (::) a (List a)
+
+data Maybe : a -> b -> Type
+data Maybe : Type -> Type -> Type
+data Maybe a b = Left a | Right b
+
+type List a = Nil | a * (List a)
+type List a = ()  | a * (List a)
+
+type Maybe a b = a | b
+
+x match
+  case x : Int    => x
+  case y : String => y
+
+data Maybe a b = Left a | Right b
+data Maybe a b = Left | Right where
+  Left : a -> Maybe a b
+  Right : b -> Maybe a b
+
+protocol Monad : (Type -> Type) -> Type
+protocol Monad m <: Applicative m = add | sub where
+  add : a -> a -> a
+  sub : a -> a -> a
+
+
+val num = 5 + 7 * 6
+val num = 5.(add 7.(mult 6))
+val num = 7.(mult 6).(add 5)
+
+val num = 5.add(7.mult(6))
+val num = 7.mult(6).add(5)
+
+val str = arg.toString.(add "haha")
+
+
+func (*) : (a -> b) -> (b -> c) -> (a -> c)
+func f g = g $ f
+
+func (.) : a -> (a -> b) -> b
+
+
+data List a = Nil | (:) a (List a)
+
+data List a = Nil | (:) (head : a) (tail : List a)
+
+protocol List l =
+  head : l a -> Maybe a
+  tail : l a -> Maybe (l a)
+
+  head list = list match
+    Nil => Nothing
+    (:) => Just list.head
+
+  tail list = list match
+    Nil => Nothing
+    (:) => Just list.tail
+
+protocol Actor m where
+
+func add x y = x + y
+
+func addFive = add 5
+
+func addNum x = add x where
+    func add x y = x + y
+
+func isEven x = if x = 0 then True else isOdd (x-1)
+
+func isOdd x = if x = 1 then True else isEven (x-1)
+
+func modifyFunc f =
+
+func addFive : Int -> Int
+func add : Int -> Int -> Int
+
+protocol Function f : a -> b where
+  range : f -> b
+  image : f -> b
+  domain : f -> a
+  inverse : b -> a
+  injective? : f -> Bool
+  surjective? : f -> Bool
+
+add.range = Int
+
+data List a = Nil | (:) a (List a)
+
+data List a = Nil | (:) head tail
+
+data List a : Type -> Type where
+  Nil : List a
+  (:) : a -> List a -> List a
+
+data instance List a = Nil | (:) head tail
+data instance List a =
+  values : Array a
+  (:) x xs = xs.values.append x
+
+  init = values
+
+type Either a b = a | b
+data Either a b = Left a | Right b
+
+laws for functions
+func add : Int -> Int -> Int
+  law add a b = add b a
+  law add a (add b c) = add b (add a c)
+
+mutable val str = "String"
+let mutable str = "String"
+var str = "String"
+
+let str = "String"
+val str = "String"
+
+List -> [1, 2, 3, 4, 5]
+Tuple -> (1, 2, 3, 4)
+Map -> [(1, 2), (3, 4)] ; rejected
+Set -> no syntax
+
+(val hello-world
+  (println "Hello World!"))
+
+(def hello-world []
+  (println "Hello World!"))
+
+
+protocol Equality e =
+  (=) : e -> e -> True
+
+protocol Equality a b =
+  (=) : a -> b -> True
+
+protocol Data a =
+
+protocol Function a =
+
+protocol Protocol a =
+
+protocol Type a =
+
+protocol Value a =
+
+protocol Law a =
+
+val str
+type Int
+term t
+
+term = val | type | func | protocol
+
+val name = term
+val f term term = term
+
+type name = term
+data name term = term
+
+protocol name term = term
+
+val str : String
+
+func add : Nat -> Nat
+func add : a -> a -> a where a <: Num
+func add : (Num a) => a -> a -> a
+
+type IntList : List Int
+type List : Type -> Type
+type List : a -> Type
+
+protocol p : Type -> Function
+protocol p : a -> (b -> c)
+
+protocol Num a =
+  add : a -> a -> a
+  | sub : a -> a -> a
+  | eq? : a -> a -> Bool
+
+func f : Num -> Int -> Num a
+func f x =
+
+func fac 0 = 1
+  |  fac n = n * fac (n-1)
+
+func fact 0 = 1
+  |  fact n = n * fact (n-1) if n > 0 else throw "Negative Arguement"
+
+func fact n = fac n if n > 0
+                    else Nothing where
+  func fac 0 = 1
+    |  fac n = n * fac (n-1)
+
+func fact n = if n > 0
+              then fac n
+              else throw "Negative Arguement" where
+    func fac 0 = 1
+      |  fac n = n * fac (n-1)
+
+func fact n | n < 0 = throw "Negative Arguement"
+  |  fact           = fac where
+    func fac 0 = 1
+      |  fac n = n * fac (n-1)
+
+func fact n | n > -1 = fac n
+  |  fact _ = throw "Negative Arguement" where
+    func fac 0 = 1
+      |  fac n = n * fac (n-1)
+
+func fact = match
+  case n | n > -1 = fac
+  case _          = throw "Negative Arguement" where
+    func fac 0 = 1
+      |  fac n = n * fac (n-1)
+
+func fibonacci (0, 1) (a = 0) (b = 0) = a
+  |  fibonacci n a b = fibonacci (n-1) (a+b) a
+
+val x : Int
+val x = 5
+
+type ADD : a -> a -> a
+
+protocol instances are function values
+
+protocol Value v where
+protocol Type t where
+protocol Function f where
+protocol Kind k where
+protocol Protocol p where
+protocol Term t where
+
+data List a = Nil | (::) a (List a) {
+  head : List a -> a
+  tail : List a -> List a
+}
+
+protocol List l = head : List a -> a
+                | tail : List a -> List a
+
+
+data List a = Nil | (::) a * (List a)
+
+data List a = Nil
+            | (::) a (List a)
+
+declaration, type, definition ?
+declaration is type, definition ?
+
+data is declaration or definition ?
+should everything must have default definition ?
+should data and module have ?
+
+data List a =
+  Nil
+  | (::) a (List a)
+
+data Matrix a = List (List a) deriving
+  MatrixOps (Matrix a)
+
+val double = (List 1 2 3 4).(map 2*)
+val doubles = List.(range 1 100).(map 2*)
+
+val doubles = 2*x where x <- List.range 1 100
+
+val double <- 2*x
+
+func double : Stream a -> Stream a
+func double y = 2 * x where x <- y
+
+func double list = do
+  x <- list
+  2 * x
+end
+
+
+[1 2 4 5] -> List.(from 1 2 3 4) -> (List 1 2 3 4) -> (1 2 3 4)
+
+(1, "String") -> Tuple.(from 1 "String") -> (Tuple 1 "String")
+
+{1 2 3 4} -> Set.(from 1 2 3 4) -> (Set 1 2 3 4)
+
+{1 "String", 2 "haha"} -> Map.(from (1, "String") (2, "haha"))
+                       -> Map.(from (Tuple 1 "String") (Tuple 2 "haha"))
+                       -> (Map (1 "String")
+                               (2 "haah"))
+
+
+data Mat a = Nil | (::) (Vect a) (Mat a)
+
+data Mat a = Nil | (::) (Vect a) (Mat a)
+
+func add : Num a => Mat a -> Mat a -> Mat a
+func add m1 m2 = match
+  case Nil _ => Nil
+  case (v1 :: m1) (v2 :: m2) => v1.(zipWith (+) v2) :: m1.add(m2)
+
+func multVect : Num a => [a] -> Mat a -> Vect a
+func multVect (x : []) (v1 :: m1) = v1.(map (*) x)
+func multVect (x : xs) (v1 :: m1) = v1.(map (*) x).(zipWith (+) xs.(multVect m1))
+
+func multVect (x : xs) (v1 :: m1) = v1 |> map (*) x |> zipWith (+) (multVect m1 xs)
+
+func mult : Num a => Mat a -> Mat a -> Mat a
+func mult Nil _ = Nil
+func mult _ Nil = Nil
+func mult (v1 :: m1) m2 = v1 * m2 :: m1 * m2
+
+
+
+
+data Mat a = public Nil
+          | public (Vect a) (Mat a)
+          | private Vect (Vect a)
+
+
+data Mat a where
+  Nil : Mat a
+  Mat : Cons (head : Vect a) (tail : Mat a)
+
+data List a = Nil
+   | Cons a (List a)
+
+module List a =
+    data Nil : List a
+      | Cons : (head : a) -> (tail : List a) -> List a
+
+module List a =
+    data Nil : List a
+    data Cons : (head : a) -> (tail : List a) -> List a where
+      Cons.rep : Array a
+      Cons.rep = tail.rep.prepend head
+      Cons.head <- Cons.rep head
+      Cons.tail <- Cons.rep tail
+
+actor Human =
+  data = 
+
+
+
+testcases <- readInt
+
+
+Float to Integer conversion
+* 1.3 : 1
+* 1.3 : 2
+*

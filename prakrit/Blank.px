@@ -1,0 +1,7 @@
+protocol Black a where
+    blank? : a -> bool
+end
+
+protocol Point a d where
+
+end

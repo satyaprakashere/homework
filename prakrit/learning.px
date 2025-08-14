@@ -1,0 +1,43 @@
+func factorial : a -> a where a <: Integral
+func factorial n = fact (n-1) n ; accepted ?
+func factorial n = fact(n-1, n)
+
+func fact : a -> a -> a
+func fact n res = n match
+  case 1 => res
+  case _ => fact (n-1) res*n
+
+func fibonacci : a -> a where a <: Integral
+func fibonacci = match
+  case 0, 1 => 1
+  case _    => fibonacci (n-1) + fibonacci (n-2)
+
+func fibonacci n | n < 2   = 1
+               | otherwise = fibonacci (n-1) + fibonacci (n-2)
+
+func fibs : List Integer
+func fibs = 1::1::zipWith (+) fibs (tail fibs)
+
+func fibonacci : Integer -> (Integer, Integer)
+func fibonacci = match
+  case m if m < 10 => fibsimple
+  case m           => fibnext (n, r) (fibonacci n) where (n , r) = quotRem m 3
+
+func fibnext : (Integer, Integer) -> (Integer, Integer) -> (Integer, Integer)
+
+func fibnext : (a, a) -> (a, a) -> (a, a) where a = Integer
+func fibnext (n,r) (f,g) = r match
+       case 0 => (a,b)    ; 3n  ,3n+1
+       case 1 => (b,c)    ; 3n+1,3n+2
+       case 2 => (c,d)    ; 3n+2,3n+3   (*)
+  where
+      a = 5*f^3 + if even n then 3*f else (- 3*f) ; 3n
+      d = 5*g^3 + if even n then (- 3*g) else 3*g ; 3(n+1)   (*)
+      b = g^3 + 3 * g * f^2 - f^3               ; 3n+1
+      c = g^3 + 3 * g^2 * f + f^3               ; 3n+2
+
+
+
+
+
+

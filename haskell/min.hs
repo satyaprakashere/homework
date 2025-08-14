@@ -1,0 +1,10 @@
+module Main where
+
+import Data.List
+
+mins = head.sort
+
+main :: IO ()
+main = do
+    print $ mins [43,67,3,4,43,5]
+    print $ rem (sum [1..100000000]) 34578435
