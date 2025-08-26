@@ -28,6 +28,7 @@ pub const InstructionPointer = struct {
 pub const Chunk = struct {
     count: u32,
     capacity: u32,
+    allocator: std.mem.Allocator,
     code: std.ArrayList(u8),
     constants: std.ArrayList(base.Num),
 
@@ -35,29 +36,30 @@ pub const Chunk = struct {
         return Chunk {
             .count = 0,
             .capacity = 1024,
+            .allocator = allocator,
             .code = try std.ArrayList(u8).initCapacity(allocator, 1024),
-            .constants = std.ArrayList(base.Num).init(allocator),
+            .constants = try std.ArrayList(base.Num).initCapacity(allocator, 1024)
         };
     }
 
     pub fn deinit(self: *Chunk) void {
-        self.code.deinit();
         self.count = 0;
         self.capacity = 0;
-        self.constants.deinit();
+        self.code.deinit(self.allocator);
+        self.constants.deinit(self.allocator);
     }
 
     pub fn writeChunk(self: *Chunk, code: OpCode) !void {
         if (self.count == self.capacity) {
             try growChunk(self);
         }
-        try self.code.append(@intFromEnum(code));
+        try self.code.append(self.allocator, @intFromEnum(code));
         self.count += 1;
     }
 
     pub fn growChunk(self: *Chunk) !void {
         const newCapacity = self.capacity + self.capacity / 2;
-        try self.code.resize(newCapacity);
+        try self.code.resize(self.allocator, newCapacity);
         self.capacity = newCapacity;
     }
 
@@ -77,13 +79,17 @@ pub const Chunk = struct {
             OpCode.CONSTANT => {
                 std.debug.print("CONSTANT\n", .{});
             },
+            OpCode.ADD => std.debug.print("ADD\n", .{}),
+            OpCode.SUB => std.debug.print("SUB\n", .{}),
+            OpCode.MUL => std.debug.print("MUL\n", .{}),
+            OpCode.DIV => std.debug.print("DIV\n", .{}),
             OpCode.NIL => std.debug.print("Invalid Operation \n", .{}),
         }
         return offset + 1;
     }
 
     pub fn addConstant(self: *Chunk, value: base.Num) !usize{
-        try self.constants.append(value);
+        try self.constants.append(self.allocator, value);
         return self.constants.items.len-1;
     }
 };

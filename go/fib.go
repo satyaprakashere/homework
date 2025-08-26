@@ -1,3 +1,5 @@
+//go:build ignore
+
 package main
 
 import "fmt"
@@ -14,8 +16,6 @@ func fib(n uint64) uint64 {
 func fibH(a, b, n uint64) uint64 {
 	if n == 0 {
 		return a
-	} else if n == 1 {
-		return b
 	} else {
 		return fibH(b, a+b, n-1)
 	}

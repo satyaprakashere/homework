@@ -1,2 +1,2 @@
 pub const CODE = enum { RETURN, CONSTANT, NIL,
-    ADD, SUBTRACT, MULTIPLY, DIVIDE};
+    ADD, SUB, MUL, DIV};
