@@ -20,12 +20,10 @@ match pattern = map fst . filter (valid . snd) . scanl step (0, root)
 root = build Null pat
 
 step (length, state) token = (length + 1, op state token)
-op state token = case state of
-                  Null                   -> root
-                  Node [] left _         -> op left token
-                  Node (x:xs) left right -> if x /= token
-                                             then op left token
-                                             else right
+   op state token = case state of
+      Null                   -> root
+      Node [] left _         -> op left token
+      Node (x:xs) left right -> if x /= token then op left token else right
 
 build left pattern = case pattern of
                         []   -> Node [] left Null

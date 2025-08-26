@@ -9,13 +9,13 @@ import Data.Function (fix)
 -- numDigits
 numDigits :: Integer -> Integer
 numDigits n
-  | n < 99999999999 = n
-  | otherwise = toInteger . length $ show n
+    | n < 99999999999 = n
+    | otherwise = toInteger . length $ show n
 
 main :: IO ()
 main = do
-  --  print $ rem (fibss 345383 0 1) 100000000
-  print $ take 100 fibsLinearTM
+    --  print $ rem (fibss 345383 0 1) 100000000
+    print $ take 100 fibsLinearTM
 
 fibss 2 sn1 sn2 = sn1 + sn2
 fibss n sn1 !sn2 = fibss (n - 1) sn2 (sn1 + sn2)

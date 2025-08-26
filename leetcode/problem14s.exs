@@ -39,3 +39,8 @@ defmodule LongestCommonPrefix do
     end
   end
 end
+
+#------------------------------------------------------------------------------#
+
+IO.puts("Hello World!")
+IO.puts(LongestCommonPrefix.find(["Hello", "Haha"]))

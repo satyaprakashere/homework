@@ -11,6 +11,7 @@ class Problem2 {
     }
 
     tailrec fun addTwoNumbersH(l1: ListNode?, l2: ListNode?, res: ListNode?) {
+        // return when l1 == null && l2 == null && carry == 0
         if (l1 == null && l2 == null && carry == 0) {
             return
         }
@@ -19,6 +20,7 @@ class Problem2 {
         carry = sum / 10
         res?.next = ListNode(sum % 10)
 
+        // goto addTwoNumbersH(l1?.next, l2?.next, res?.next)
         return addTwoNumbersH(l1?.next, l2?.next, res?.next)
     }
 }

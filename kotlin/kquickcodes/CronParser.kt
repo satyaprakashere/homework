@@ -10,12 +10,12 @@ data class CronExpression(
 )
 
 
-public class CronParser {
+class CronParser {
     companion object {
         private val fieldNames =
                 listOf("minute", "hour", "day of month", "month", "day of week", "command")
         private val exprRange = listOf(0..59, 0..23, 1..31, 1..12, 1..7)
-        
+
         @JvmStatic
         fun main(args: Array<String>) {
             // fieldNames.
@@ -29,22 +29,22 @@ public class CronParser {
             }
         }
     }
-    
+
     fun toFieldMap(cron: CronExpression): Map<String, String> {
         val exp =
                 listOf(cron.minute, cron.hour, cron.dayOfMonth, cron.month, cron.dayOfWeek).map {
                     x -> x.toString().removePrefix("[").removeSuffix("]").replace(",", "")
                 } + cron.command
-        
+
         return fieldNames.map { it.padEnd(14) }.zip(exp).toMap()
     }
-    
+
     fun parse(expr: String): CronExpression {
         val parts = expr.trim().split("\\s+".toRegex())
-        
+
         val command = parts.subList(5, parts.size).joinToString("")
-        // require(parts.size == 6) { "Invalid cron expression: $expr" }
-        
+        require(parts.size in 5..6) { "Invalid cron expression: $expr" }
+
         return CronExpression(
                 expandCronField(parts[0], exprRange[0]),
                 expandCronField(parts[1], exprRange[1]),
@@ -54,7 +54,7 @@ public class CronParser {
                 command,
         )
     }
-    
+
     private fun validate(expr: CronExpression) {
         assert(expr.minute.all { it in exprRange[0] })
         assert(expr.hour.all { it in exprRange[1] })
@@ -62,7 +62,7 @@ public class CronParser {
         assert(expr.month.all { it in exprRange[3] })
         assert(expr.dayOfWeek.all { it in exprRange[4] })
     }
-    
+
     private fun expandCronField(
             expr: String,
             range: IntRange,
@@ -74,20 +74,20 @@ public class CronParser {
                         val step = expr.removePrefix("*/").toInt()
                         range.filter { it % step == 0 }
                     }
-                    expr.contains(",") -> expr.split(",").map { it.toInt() }
-                    expr.contains("-") -> {
+                    "," in expr -> expr.split(",").map { it.toInt() }
+                    "-" in expr -> {
                         val (start, end) = expr.split("-").map { it.toInt() }
                         (start..end).toList()
                     }
                     else ->
-                            if (range.contains(expr.toInt())) {
+                            if (expr.toInt() in range) {
                                 listOf(expr.toInt())
                             } else {
                                 listOf()
                             }
                 }
-        
-        if (result.isEmpty()) throw IllegalArgumentException("Invalid cron expression: $expr")
+
+        check(result.isNotEmpty()) { "Invalid cron expression: $expr" }
         return result
     }
 }

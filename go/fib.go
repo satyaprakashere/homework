@@ -4,7 +4,7 @@ import "fmt"
 
 func main() {
 	fmt.Println("hello world")
-	fmt.Println(fib(98))
+	fmt.Println(fibI(987654321))
 }
 
 func fib(n uint64) uint64 {
@@ -19,4 +19,17 @@ func fibH(a, b, n uint64) uint64 {
 	} else {
 		return fibH(b, a+b, n-1)
 	}
+}
+
+func fibI(n uint32) uint64 {
+	if n < 2 {
+		return uint64(n)
+	}
+
+	var a, b uint64 = 0, 1
+
+	for i := 2; i <= int(n); i++ {
+		a, b = b, a+b
+	}
+	return b
 }

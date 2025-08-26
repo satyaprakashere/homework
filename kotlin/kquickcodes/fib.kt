@@ -2,7 +2,6 @@
 fun fib (num: UInt) : ULong {
     tailrec fun fibH(n: UInt, a: ULong, b: ULong) : ULong {
         return if (n == 0u) a
-            else if (n == 1u) b
             else fibH(n - 1u, b, a + b)
     }
     return fibH(num, 0u, 1u)

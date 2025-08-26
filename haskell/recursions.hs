@@ -9,10 +9,3 @@ main = do
 
 compos h g argk = h (fmap (\f -> f argk) g)
 
--- applyN :: (a -> b) -> [a] -> b
--- applyN f (x:xs) = applyN (f x) xs
--- applyN f []     = fgh
-
--- Usage:
--- f x y z = x + y * z
--- applyN f [2,3,4]  -- 14
