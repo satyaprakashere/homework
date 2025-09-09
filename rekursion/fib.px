@@ -1,0 +1,2 @@
+fib n = fibH 0 1 n where
+	fibH a b n = fibH(b, a+b, n-1) when n > 0 otherwise a

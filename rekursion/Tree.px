@@ -119,7 +119,19 @@ protocol Tree t where
   depth : t a -> Integer
 end
 
-data CTree a = fdsjdfsd
+type CTree a {
+  Leaf val        : a
+  Node left right : (CTree a, CTree a)
+}
+
+Tree a = union {
+  Leaf val        : a
+  Node left right : (CTree a, CTree a)
+}
+
+Point = record {
+  x , y : Int
+}
 
 instance ctreeTree = Tree CTree where
   depth tree = 100
@@ -1203,3 +1215,14 @@ Float to Integer conversion
 * 1.3 : 1
 * 1.3 : 2
 *
+
+
+call fiH(0, 1, n) {
+  
+}
+
+func fib : define function
+fun fibH : define function and run
+fn fibI  : anonymous function definition
+
+defrun fibH

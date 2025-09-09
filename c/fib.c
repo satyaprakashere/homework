@@ -15,5 +15,14 @@ ulong fib(uint n) {
 int main() {
     int n = 987654321;
     printf("fib(%u) = %lu \n", n, fib(n));  // Output: fib(10) = 55
-    return 0;
+
+    int x[3] = {1, 2, 4};
+    printf("%d", x[1]);
+
+    int size = 0;
+    scanf("%d", &size);
+
+    int y[size];
+
+    printf("%d", y[1]);
 }

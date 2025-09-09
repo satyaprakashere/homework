@@ -8,7 +8,7 @@ def bfs(tree):
         q.put(tree)
 
     while(not q.empty()):
-        node = q.get(0)
+        node = q.get()
         if node.value is not None:
             print(node.value)
         if node.left is not None:

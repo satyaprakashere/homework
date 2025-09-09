@@ -3,7 +3,7 @@ package objc_test
 import NS "core:sys/darwin/Foundation"
 import MTL "vendor:darwin/Metal"
 import CA "vendor:darwin/QuartzCore"
-	
+
 import SDL "vendor:sdl2"
 
 import "core:fmt"
@@ -15,9 +15,9 @@ metal_main :: proc() -> (err: ^NS.Error) {
 	SDL.Init({.VIDEO})
 	defer SDL.Quit()
 
-	window := SDL.CreateWindow("Metal in Odin", 
-		SDL.WINDOWPOS_CENTERED, SDL.WINDOWPOS_CENTERED, 
-		854, 480, 
+	window := SDL.CreateWindow("Metal in Odin",
+		SDL.WINDOWPOS_CENTERED, SDL.WINDOWPOS_CENTERED,
+		854, 480,
 		{.ALLOW_HIGHDPI, .HIDDEN, .RESIZABLE},
 	)
 	defer SDL.DestroyWindow(window)
@@ -71,7 +71,7 @@ metal_main :: proc() -> (err: ^NS.Error) {
 	}
 	`
 	program_library := device->newLibraryWithSource(NS.AT(program_source), compile_options) or_return
-	
+
 	vertex_program := program_library->newFunctionWithName(NS.AT("vertex_main"))
 	fragment_program := program_library->newFunctionWithName(NS.AT("fragment_main"))
 	assert(vertex_program != nil)
@@ -104,7 +104,7 @@ metal_main :: proc() -> (err: ^NS.Error) {
 	for quit := false; !quit;  {
 		for e: SDL.Event; SDL.PollEvent(&e) != false; {
 			#partial switch e.type {
-			case .QUIT: 
+			case .QUIT:
 				quit = true
 			case .KEYDOWN:
 				if e.key.keysym.sym == .ESCAPE {
@@ -126,7 +126,7 @@ metal_main :: proc() -> (err: ^NS.Error) {
 		color_attachment->setStoreAction(.Store)
 		color_attachment->setTexture(drawable->texture())
 
-		
+
 		command_buffer := command_queue->commandBuffer()
 		render_encoder := command_buffer->renderCommandEncoderWithDescriptor(pass)
 

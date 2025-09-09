@@ -1,11 +1,11 @@
 
 # Write a function to calculate factorial and fibonacci
 
-# def main():
-# 	print("hello")
+def main():
+	print("hello")
 
-# if __name__ == '__main__':
-# 	main()
+if __name__ == '__main__':
+	main()
 
 print("hello")
 

@@ -12,7 +12,6 @@ pub fn build(b: *std.Build) void {
     // exe.addCSourceFile(.{ .file = b.path("lib/memory.c") });
     // exe.addIncludePath(b.path("lib"));
     // exe.linkLibC();
-
     // const graph = b.dependency(
     //     "graph",
     //     .{ .target = target, .optimize = optimize },

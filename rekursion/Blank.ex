@@ -1,3 +1,3 @@
 defprotocol Black do
-    func blank? : a -> bool
+    def blank? : a -> bool
 end

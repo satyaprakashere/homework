@@ -1,4 +1,4 @@
-module main
+module Main
 
 data FormatString : List Char -> Type -> Type where
   Empty : FormatString [] String

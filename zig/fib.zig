@@ -16,6 +16,6 @@ fn fibH(a: nat, b: nat, n: nat) nat {
     if (n == 0) {
         return a;
     } else {
-        return @call(.always_tail, fibH, .{ b, (a +% b), n - 1});
+        return @call(.always_tail, fibH, .{ b, (a +% b), n - 1 });
     }
 }
