@@ -21,9 +21,9 @@ func fibH(a, b, n uint64) uint64 {
 	}
 }
 
-func fibI(n uint32) uint64 {
+func fibI(n uint64) uint64 {
 	if n < 2 {
-		return uint64(n)
+		return n
 	}
 
 	var a, b uint64 = 0, 1

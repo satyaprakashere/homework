@@ -1,0 +1,1 @@
+(require-module (srfi 1)) ; loads the module

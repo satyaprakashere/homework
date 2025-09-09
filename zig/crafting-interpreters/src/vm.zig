@@ -23,7 +23,6 @@ pub const VM = struct {
 
     pub fn deinit(self: *VM) void {
         self.stack.deinit(self.allocator);
-        self.chunk.deinit();
     }
 
     pub fn interpret(self: *VM, chunk: *Chunk) InterpretResult {

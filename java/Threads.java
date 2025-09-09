@@ -8,12 +8,12 @@ void main() throws InterruptedException, ExecutionException {
     });
 
     myThread.join();
-    
+
     final var executor = Executors.newVirtualThreadPerTaskExecutor();
-    
+
     final var res = executor.submit(() -> List.of(1, 2, 3));
-    
+
     println(String.format("res : %s", res.get()));
-    
+
     executor.shutdown();
 }
