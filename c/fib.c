@@ -13,7 +13,7 @@ ulong fib(uint n) {
 }
 
 int main() {
-    int n = 98765432;
-    printf("fib(%d) = %ld \n", n, fib(n));  // Output: fib(10) = 55
+    int n = 987654321;
+    printf("fib(%u) = %lu \n", n, fib(n));  // Output: fib(10) = 55
     return 0;
 }

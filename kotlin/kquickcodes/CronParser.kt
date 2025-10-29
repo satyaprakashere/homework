@@ -63,31 +63,24 @@ class CronParser {
         assert(expr.dayOfWeek.all { it in exprRange[4] })
     }
 
-    private fun expandCronField(
-            expr: String,
-            range: IntRange,
-    ): List<Int> {
-        val result =
-                when {
-                    expr == "*" -> range.toList()
-                    expr.startsWith("*/") -> {
-                        val step = expr.removePrefix("*/").toInt()
-                        range.filter { it % step == 0 }
-                    }
-                    "," in expr -> expr.split(",").map { it.toInt() }
-                    "-" in expr -> {
-                        val (start, end) = expr.split("-").map { it.toInt() }
-                        (start..end).toList()
-                    }
-                    else ->
-                            if (expr.toInt() in range) {
-                                listOf(expr.toInt())
-                            } else {
-                                listOf()
-                            }
+    private fun expandCronField(expr: String, range: IntRange): List<Int> {
+        return when {
+            expr == "*" -> range.toList()
+            expr.startsWith("*/") -> {
+                val step = expr.removePrefix("*/").toInt()
+                range.filter { it % step == 0 }
+            }
+            "," in expr -> expr.split(",").map { it.toInt() }
+            "-" in expr -> {
+                val (start, end) = expr.split("-").map { it.toInt() }
+                (start..end).toList()
+            }
+            else ->
+                if (expr.toInt() in range) {
+                    listOf(expr.toInt())
+                } else {
+                    listOf()
                 }
-
-        check(result.isNotEmpty()) { "Invalid cron expression: $expr" }
-        return result
+        }
     }
 }

@@ -1,7 +1,8 @@
 //go:build ignore
 package main
 
-import ("fmt"
+import (
+	"fmt"
 	"strings"
 )
 

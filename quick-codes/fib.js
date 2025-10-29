@@ -9,4 +9,5 @@ function fibonacci(n) {
     }
     return curr;
 }
+
 console.log(fibonacci(98765432)); // Output: 55

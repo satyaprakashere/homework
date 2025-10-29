@@ -1,5 +1,7 @@
+
 enum Color { RED, GREEN, BLUE }
 
 void main() {
-    System.out.println("Hello There!");
+    IO.println("Hello There!");
+    var set = Set.of("a");
 }

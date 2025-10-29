@@ -4,19 +4,12 @@ import java.io.*;
 import javax.swing.*;
 import java.awt.*;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-
 // Main class
 public class GFG {
 
     // Main driver method
     public static void main(String[] args)
     {
-        try {
-            UIManager.setLookAndFeel(new FlatDarkLaf());
-        } catch (Exception ex) {
-            System.err.println("Failed to initialize dark theme");
-        }
         
         // Creating instance of JFrame
         JFrame frame = new JFrame();

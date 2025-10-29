@@ -12,7 +12,8 @@ class Solution {
         for (var point : queries) {
             shortestDistance[point[0]][point[1]] = 1;
             for(int i = 0; i < point[0] ; ++i) {
-                shortestDistance[i][point[1]] = Math.min(shortestDistance[i][point[0]] + 1 , shortestDistance[i][point[1]]);
+                shortestDistance[i][point[1]] = Math.min(
+                    shortestDistance[i][point[0]] + 1 , shortestDistance[i][point[1]]);
                shortestDistance[i][n-1] = Math.min(shortestDistance[i][point[1]] + shortestDistance[point[1]][n-1] , shortestDistance[i][n-1]);
             }
             for(int i = point[1]; i < n ; ++i) {

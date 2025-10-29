@@ -63,4 +63,3 @@ if __name__ == "__main__":
 	start_date = datetime.now(timezone.utc)
 	generate_tithi_list(start_date, years=10, output_file='tithi_list.csv')
 	print("Tithi list for the next 10 years has been saved to tithi_list.csv")
-	

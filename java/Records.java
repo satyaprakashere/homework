@@ -23,14 +23,14 @@ final class Cat extends Animal {
 }
 
 void main() {
-    println("Hello, World!");
-    println("Welcome to Java!");
+    IO.println("Hello, World!");
+    IO.println("Welcome to Java!");
 
     final var pair = new Pair<>(1, 2);
-    println(pair.x());
-    println(pair.y());
-    println(pair);
+    IO.println(pair.x());
+    IO.println(pair.y());
+    IO.println(pair);
 
     final var animal = new Dog();
-    println(animal.sound());
+    IO.println(animal.sound());
 }
