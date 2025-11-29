@@ -41,6 +41,16 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
+
+    @import("zgpu").addLibraryPathsTo(exe_mod);
+
+    const zgpu = b.dependency("zgpu", .{});
+    exe_mod.root_module.addImport("zgpu", zgpu.module("root"));
+
+    if (target.result.os.tag != .emscripten) {
+      exe_mod.linkLibrary(zgpu.artifact("zdawn"));
+    }
+
     // Modules can depend on one another using the `std.Build.Module.addImport` function.
     // This is what allows Zig source code to use `@import("foo")` where 'foo' is not a
     // file path. In this case, we set up `exe_mod` to import `lib_mod`.

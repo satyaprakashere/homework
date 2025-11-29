@@ -6,12 +6,15 @@ const triangle = @import("triangle.zig");
 
 
 pub fn main() !void {
-    var stdout = std.fs.File.stdout();
+    var buffer = [1024]u8{};
+    var stdout_writer = std.fs.File.stdout().writer(&buffer);
+    var stdout = &stdout_writer.interface;
 
     std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-    try stdout.writeAll("Run `zig build test` to run the tests.\n");
+    try stdout.print("Run `zig build test` to run the tests.\n");
     try triangle.run();
 
+    stdout.flush();
 }
 
 test "simple test" {

@@ -9,6 +9,8 @@ import (
 func main() {
 	a := app.New()
 	w := a.NewWindow("Hello")
+	w.SetFullScreen(true)
+
 
 	hello := widget.NewLabel("Hello Fyne!")
 	w.SetContent(container.NewVBox(
@@ -20,4 +22,3 @@ func main() {
 
 	w.ShowAndRun()
 }
-

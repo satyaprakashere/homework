@@ -16,9 +16,8 @@ func fib(n uint64) uint64 {
 func fibH(a, b, n uint64) uint64 {
 	if n == 0 {
 		return a
-	} else {
-		return fibH(b, a+b, n-1)
 	}
+	return fibH(b, a+b, n-1)
 }
 
 func fibI(n uint64) uint64 {
@@ -27,7 +26,6 @@ func fibI(n uint64) uint64 {
 	}
 
 	var a, b uint64 = 0, 1
-
 	for i := 2; i <= int(n); i++ {
 		a, b = b, a+b
 	}

@@ -1,17 +1,19 @@
 //go:build ignore
 package main
 
+type Error struct {}
+
 type Either struct {
     left interface{}
     right Error
 }
 
 func leftEither(value interface{}) Either {
-    return Either(left: value)
+    return Either{value, nil}
 }
 
 func rightEither(error Error) Either {
-    return Either(right: error)
+    return Either{nil, error}
 }
 
 func (e Either) isError() bool {
@@ -20,13 +22,13 @@ func (e Either) isError() bool {
 
 func (e Either) orElse(value interface{}) Either {
     if e.left == nil {
-        return Either(left: value, right: nil)
+        return Either{left: value, right: nil}
     }
 
     return e
 }
 
-func (e Either) map(f func(v interface{}) Either) Either {
+func (e Either) fmap(f func(v interface{}) Either) Either {
     if e.isError() {
         return e;
     }
@@ -36,7 +38,7 @@ func (e Either) map(f func(v interface{}) Either) Either {
 
 func (e Either) get() (interface{}, error) {
     if e.left == nil && e.right == nil {
-        return nil, // return some generic error : Error.New("Invalid Either instance);
+        return nil, nil // return some generic error : Error.New("Invalid Either instance);
     }
     return e.left, e.right
 }

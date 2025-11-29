@@ -8,5 +8,6 @@ T add(T a, T b) {
 }
 
 int main(int argc, char *argv[]) {
-	cout << add(8, 9);
+	println("Hello There!");
+	cout << add(8, 9) << endl;
 }

@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-void main() throws InterruptedException, ExecutionException {
-    final var myThread = Thread.ofVirtual().start(() -> {
-        IO.println("Hello Virtual Threads!");
-        final var thread = Thread.ofVirtual().start(() -> {
-            IO.println("Hello Virtual Threads2!");
-        });
-        try {
-            thread.join();
-        } catch (Exception e) {}
-=======
 import java.lang.Thread;
 import java.util.concurrent.*;
 import java.util.List;
@@ -22,8 +11,7 @@ void main() throws Exception {
 
 void testRandom() throws InterruptedException, ExecutionException {
     final var myThread = Thread.ofVirtual().start(() -> {
-        println("Hello Virtual Threads!");
->>>>>>> 1cda8b4 ([update] changes from mac mini for sept 2025)
+        IO.println("Hello Virtual Threads!");
     });
     
     myThread.join();
@@ -41,7 +29,7 @@ void testVirtualThreads() {
     IntStream.range(0, 100000).forEach((i) -> {
         try {
             Thread.ofVirtual().start(() -> {
-                println("Hello There! from thread " + i);
+                IO.println("Hello There! from thread " + i);
             }).join();
         } catch (Exception e) {}
     });

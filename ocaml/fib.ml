@@ -14,6 +14,6 @@ let fib_tail n =
 
 (* or tail-recursive call *)
 let () =
-  let n = 9876543 in
+  let n = 98765432 in
   Printf.printf "fib_tail(%d) = %d\n" n (fib_tail n)
 ;;

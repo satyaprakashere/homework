@@ -3,7 +3,7 @@ module Main where
 
 import Data.Kind
 
-import Data.List
+--import Data.List
 import Data.Either
 
 --class Fix f where

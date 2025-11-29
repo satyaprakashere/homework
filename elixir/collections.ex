@@ -12,6 +12,7 @@ defmodule Collections do
 	def testSet() do
 		set = MapSet.new()
 		set = MapSet.put(set, 4)
+#		recur ()
 		set = MapSet.put(set, 2)
 		IO.inspect(set)
 	end

@@ -28,10 +28,10 @@ func startServer(port int) {
 
 func main() {
     startPort := 8000
-    endPort := 8999 // 10000 servers
+    count := 1000 // 10000 servers
 
-    for port := startPort; port <= endPort; port++ {
-        startServer(port)
+    for port := range(count) {
+        startServer(startPort + port)
     }
 
     // Keep the main goroutine alive

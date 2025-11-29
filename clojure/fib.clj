@@ -1,4 +1,4 @@
-(ns fib)
+;(ns fib)
 
 (defn -main [& _]
   (println "Hello, World!"))

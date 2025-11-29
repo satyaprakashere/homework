@@ -1,3 +1,7 @@
 fn main() {
-	testArrays();
+	testArrays()
+}
+
+fn testArrays() {
+	println!("HEllo There!@")
 }

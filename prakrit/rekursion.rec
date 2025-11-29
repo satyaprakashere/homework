@@ -1,0 +1,128 @@
+//go:build ignore
+package main
+
+func main() {
+  hello := "World!"
+  
+}
+
+func fib n, a(0), b(0) {
+  a when n < 1 else recur (n -= 1, a = b, b = a+b)
+}
+
+func fib n, a(0), b(0) {
+  a when n < 1 else recur (n -= 1, a = b, b = a+b) {
+    
+  }
+}
+
+func fib n, a(0), b(0) = a when n < 1 else {
+  recur (n -= 1, a = b, b = a+b)
+}
+
+func fib n, a(0), b(0) = {
+  if n = 0 return a
+  
+  recur (n -= 1, a = b, b = a+b)
+}
+
+func fib n, a(0), b(0) = a when n < 1
+  else recur (n -= 1, a = b, b = a+b)
+  
+//func fib n, a(0), b(0) = a when n < 1
+//else recur (n -= 1, a = b, b = a+b)
+
+func fact n = n * fact(n-1)
+
+func fact n = 1 when n = 1 else recur (n-=1) { x in
+  n * x
+}
+
+func fib n a(0) b(0) {
+  if n = 0 return a
+  
+  recur {
+    n <- n-1
+    a <- b
+    b <- a+b
+  }
+}
+
+func fib :: Int -> Int
+func fib n a(0) b(0) {
+  if n = 0 return a
+  
+  recur {
+    n : n-1
+    a : b
+    b : a+b
+  }
+}
+
+func fib :: Int(num) -> Int
+
+func fib unique n, a(0), b(0) {
+  if n is 0 return a
+  
+  c = add (a, b) // no call like keyword needed for function call which uses a single stack
+  recur (n-=1, a= b, b= a+b)
+}
+
+func fib :: Int(num) -> Int
+func fib n a(0) b(0) do
+  if n is 0 return a
+  
+  recur
+    n = n-1
+    a = b
+    b = add (a, b)
+  end
+end
+
+func fib :: Int(num) -> Int
+func fib n a(0) b(0) do
+  if n is 0 return a
+  
+  c = add (a, b)
+  recur (n-=1, a= b, b= a+b)
+end
+
+func fib :: Int(num) -> Int
+func fib n a(0) b(0) do
+  unless n > 0 return a
+  
+  call add (a, b)
+  recur (n -= 1, a = b, b = a+b)
+end
+
+add = (+)
+subtract = (-)
+square x = x * x
+sum_square a b = sum <| square(a) + square(b) // top down : good for breaking down problems, not computing
+varga_yogah a b = varga(a) + varga(b) |> yoga //bottom up computation : right way
+
+main = fib (num: 10)
+
+++ -- // operator overloading for types which follow discrete structures
+Int and Integer, Natural, NegInteger, Rational, Complex
+Float and Float64(1..1024)
+
+func fact n = n * recur (n-1)
+func fact n = n * recur 1 (n-1)
+
+func fact n = recur 1 { acc, n in
+  acc * n
+}
+
+func fact n = recur acc(1) { n in
+  acc = acc * n
+  n = n-1
+}
+
+func zip x y f = recur i(0) j(0) z {
+  z := make (x.type, size: min(x.size, y.size))
+  
+  if i >= x.size || i >= y.size return z
+  
+  z[i] = f (x[i], y[i])
+}

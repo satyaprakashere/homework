@@ -1,7 +1,6 @@
 class Solution {
     func threeSum(_ nums: [Int]) -> [[Int]] {
         var result:Set<[Int]> = Set.init()
-
         let sorted = nums.sorted()
 
         for (i, num) in sorted.enumerated().dropLast(2) {
@@ -19,6 +18,7 @@ class Solution {
                 }
                 sum = sorted[j] + sorted[k] + num
             }
+
             if (sum == 0 && j != k) {
                 result.insert([sorted[i], sorted[j], sorted[k]])
             }
