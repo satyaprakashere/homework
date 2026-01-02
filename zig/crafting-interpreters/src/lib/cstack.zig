@@ -1,9 +1,10 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 
 pub fn main() !void {
     const gpa = std.heap.page_allocator;
 
-    var stack = Stack(i32).init(gpa);
+    var stack = try Stack(i32).initCapacity(gpa, 1000);
     defer stack.deinit();
 
     try stack.pushSlice(&[3]i32{ 10, 20, 30 });
@@ -28,26 +29,23 @@ fn testPop(stack: *Stack(i32)) void {
 
 pub fn Stack(comptime T: type) type {
     return struct {
+        allocator: Allocator,
         list: std.ArrayList(T),
 
-        pub fn init(allocator: std.mem.Allocator) Stack(T) {
-            return Stack(T){ .list = std.ArrayList(T).init(allocator) };
-        }
-
-        pub fn initCapacity(allocator: std.mem.Allocator, comptime capacity: usize) Stack(T) {
-            return Stack(T){ .list = std.ArrayList(T).initCapacity(allocator, capacity) };
+        pub fn initCapacity(allocator: Allocator, comptime capacity: usize) Allocator.Error!Stack(T) {
+            return Stack(T){ .allocator = allocator, .list = try std.ArrayList(T).initCapacity(allocator, capacity) };
         }
 
         pub fn deinit(self: *Stack(T)) void {
-            self.list.deinit();
+            self.list.deinit(self.allocator);
         }
 
         pub fn push(self: *Stack(T), value: T) !void {
-            try self.list.append(value);
+            try self.list.append(self.allocator, value);
         }
 
         pub fn pushSlice(self: *Stack(T), value: []const T) !void {
-            try self.list.appendSlice(value);
+            try self.list.appendSlice(self.allocator, value);
         }
 
         pub fn pop(self: *Stack(T)) ?T {

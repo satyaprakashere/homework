@@ -35,8 +35,6 @@ pub fn ModArray(comptime T: type) type {
     };
 }
 
-pub fn main() void {}
-
 test "ModArray" {
     var array = ModArray(i32).initCapacity(16);
     defer array.deinit();

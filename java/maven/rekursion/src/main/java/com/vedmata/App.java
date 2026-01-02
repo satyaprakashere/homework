@@ -1,11 +1,7 @@
 package com.vedmata;
 
-/**
- * Hello world!
- *
- */
 public class App {
-    public static void main() throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         IO.println( "Hello World!" );
         Concurrency.testLightThreads();
     }

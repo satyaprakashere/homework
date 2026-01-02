@@ -1,27 +1,25 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 
 pub fn Queue(comptime T: type) type {
     return struct {
+        allocator: Allocator,
         list: std.ArrayList(T),
 
-        pub fn init(allocator: std.mem.Allocator) Queue(T) {
-            return Queue(T){ .list = std.ArrayList(T).init(allocator) };
-        }
-
-        pub fn initCapacity(allocator: std.mem.Allocator, comptime capacity: usize) Queue(T) {
-            return Queue(T){ .list = std.ArrayList(T).initCapacity(allocator, capacity) };
+        pub fn initCapacity(allocator: std.mem.Allocator, comptime capacity: usize) Allocator.Error!Queue(T) {
+            return Queue(T){ .allocator = allocator, .list = try std.ArrayList(T).initCapacity(allocator, capacity) };
         }
 
         pub fn deinit(self: *Queue(T)) void {
-            self.list.deinit();
+            self.list.deinit(self.allocator);
         }
 
         pub fn enqueue(self: *Queue(T), value: T) !void {
-            try self.list.append(value);
+            try self.list.append(self.allocator, value);
         }
 
         pub fn enqueueSlice(self: *Queue(T), value: []const T) !void {
-            try self.list.appendSlice(value);
+            try self.list.appendSlice(self.allocator, value);
         }
 
         pub fn dequeue(self: *Queue(T)) !T {
@@ -48,4 +46,16 @@ pub fn Queue(comptime T: type) type {
 
         pub const err = error{emptyEqueue};
     };
+}
+
+test "testing queue" {
+    var queue = try Queue(i32).initCapacity(std.testing.allocator, 1000);
+    defer queue.deinit();
+
+    try queue.enqueue(1);
+    try queue.enqueueSlice(&[2]i32{ 2, 3 });
+
+    try std.testing.expect(try queue.dequeue() == 1);
+    try std.testing.expect(try queue.dequeue() == 2);
+    try std.testing.expect(try queue.dequeue() == 3);
 }

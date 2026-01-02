@@ -1,14 +1,22 @@
-(print("Hello, World!"))
+(println "Hello, World!")
 
-(func (fib n)
-  (if (eq n 0) ret(0))
-  (if (eq n 1) ret(1))
-  (add fib(n - 1) fib(n - 2)))
+(function (fib n)
+  (if (lessThan n 2) n)
+  (add (call fib (subtract n 1))
+       (call fib (subtract n 2))))
+
+(function (fibH n a b)
+    (if   (equal n 0) a)
+    (recur (subtract n 1) b (add a b)))
+
+(function (fib n)
+    (call fibH n 0 1))
 
 (val x 10)
 ; (var y 20) XXX
 (Array 1 2 3 4)
 (arrayOf 1 2 3 4)
+
 [1 2 3 4]
 (List 1 2 3 4 5)
 (listOf 1 2 3 4 5)

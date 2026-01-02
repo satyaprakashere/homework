@@ -6,5 +6,4 @@ pub fn main() !void {
     const stdout = &stdout_writer.interface;
 
     try stdout.writeAll("Hello There!");
-
 }

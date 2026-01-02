@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const nat = u64;
+const nat = u32;
 
 pub fn main() !void {
     const n = 987654321;

@@ -83,7 +83,8 @@ pub const Chunk = struct {
             OpCode.SUB => std.debug.print("SUB\n", .{}),
             OpCode.MUL => std.debug.print("MUL\n", .{}),
             OpCode.DIV => std.debug.print("DIV\n", .{}),
-            OpCode.NIL => std.debug.print("Invalid Operation \n", .{}),
+            OpCode.NIL => std.debug.print("Nil Operation \n", .{}),
+            else     => std.debug.print("Invalid Operation \n", .{}),
         }
         return offset + 1;
     }

@@ -1,4 +1,5 @@
 const std = @import("std");
+const Allocator = std.mem.Allocatorl;
 
 pub const Num = i64;
 pub const NumArray = []Num;
@@ -19,10 +20,10 @@ pub fn freeNumArray(array: NumArray) void {
 pub fn map(
     comptime T: type,
     comptime U: type,
+    allocator: Allocator,
+    f: *const fn (T) U,
     input: []const T,
-    f: fn (T) U,
 ) []U {
-    const allocator = std.heap.page_allocator;
     var output = allocator.alloc(U, input.len) catch unreachable;
 
     for (input, 0..) |item, i| {
@@ -51,8 +52,8 @@ pub fn FnClosure(comptime R: type, Ctx: type) type {
         ctx: *const Ctx,
         func: fn (comptime type, comptime type, *const Ctx, fn (Ctx) R) R,
 
-        pub fn init(ctx: *const Ctx, func: fn (comptime type, *const Ctx, fn (Ctx) R) R) Closure(R, Ctx) {
-            return Closure(Ctx){ .ctx = ctx, .func = func };
+        pub fn init(ctx: *const Ctx, func: fn (comptime type, *const Ctx, fn (Ctx) R) R) FnClosure(R, Ctx) {
+            return FnClosure(Ctx){ .ctx = ctx, .func = func };
         }
 
         pub fn call(self: @This(), args: fn (Ctx) R) R {
@@ -61,12 +62,13 @@ pub fn FnClosure(comptime R: type, Ctx: type) type {
     };
 }
 
+
 pub fn recursive(comptime T: type, comptime U: type) type {
     return struct {
         func: fn (comptime type, comptime type, T, []U(T)) U(T),
 
         pub fn init(func: fn (comptime type, comptime type, T, []U(T)) U(T)) Closure(T, U) {
-            return Closure(T){ .func = func };
+            return Closure(T) { .func = func };
         }
 
         pub fn call(self: @This(), x: T, args: []U(T)) U(T) {
