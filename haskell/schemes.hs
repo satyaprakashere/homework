@@ -7,23 +7,24 @@
 
 module Main where
 
+import Data.Kind
 import Debug.Trace
 
 main = do
-    print "Hello world"
-    --  print $ refold addlasttwo multiply (1, 2, 6) -- product of fibonacci
-    print (unfold decrease 6 :: [Integer]) -- list thourough expansion
-    print $ toList (anaf decrease 6) -- list thourough expansion
-    print $ fold multiply [1, 2, 3, 4, 5, 6] -- Factorial thourough product
-    print $ fold multiply [] -- Factorial thourough product
-    print $ dissolve multiply2 [1, 2, 3, 4, 5, 6] -- Factorial thourough product
-    print $ dissolveWith multH multiply [1, 2, 3, 4, 5, 6] -- Factorial thourough product
-    --  print $ (refold' decrease multiply 6 :: Integer) -- factorial through expansion and contraction
-    print $ refold decrease multiply 5 -- factorial through expansion and contracion
-    --  print $ (refold' decrease multiply 6 :: Integer) -- factorial through expansion and contraction
-    print $ take 100 (unfold addlasttwo (0, 1) :: [Integer]) -- fibonacci
-    print $ takeWhile (< 100) (unfold endsWith9 9 :: [Integer])
-    print $ refold decrease multiply 5
+  print "Hello world"
+  --  print $ refold addlasttwo multiply (1, 2, 6) -- product of fibonacci
+  --  print (unfold decrease 6 :: [Integer]) -- list thourough expansion
+  --  print $ toList (anaf decrease 6) -- list thourough expansion
+  --  print $ fold multiply [1, 2, 3, 4, 5, 6] -- Factorial thourough product
+  --  print $ fold multiply [] -- Factorial thourough product
+  --  print $ dissolve multiply2 [1, 2, 3, 4, 5, 6] -- Factorial thourough product
+  --  print $ dissolveWith multH multiply [1, 2, 3, 4, 5, 6] -- Factorial thourough product
+  --  --  print $ (refold' decrease multiply 6 :: Integer) -- factorial through expansion and contraction
+  --  print $ refold decrease multiply 5 -- factorial through expansion and contracion
+  --  --  print $ (refold' decrease multiply 6 :: Integer) -- factorial through expansion and contraction
+  --  print $ take 100 (unfold addlasttwo (0, 1) :: [Integer]) -- fibonacci
+  --  print $ takeWhile (< 100) (unfold endsWith9 9 :: [Integer])
+  print $ refold decrease multiply 1000
 
 multiply :: (Num b) => Algebra (List b) b
 multiply Nil = 1
@@ -50,21 +51,21 @@ endsWith9 n = Cons n (n + 10)
 
 ------------------------- Abstraction ----------------------
 
-type family Base t :: * -> *
+type family Base t :: Type -> Type
 
 class (Functor (Base t)) => Recursive t where
-    project :: t -> Base t t
+  project :: t -> Base t t
 
 class (Functor (Base t)) => Corecursive t where
-    embed :: Base t t -> t
+  embed :: Base t t -> t
 
 instance Recursive [a] where
-    project [] = Nil
-    project (x : xs) = Cons x xs
+  project [] = Nil
+  project (x : xs) = Cons x xs
 
 instance Corecursive [a] where
-    embed Nil = []
-    embed (Cons x xs) = x : xs
+  embed Nil = []
+  embed (Cons x xs) = x : xs
 
 newtype Fix f = Fix {unFix :: f (Fix f)}
 

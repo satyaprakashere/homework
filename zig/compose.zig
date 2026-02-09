@@ -72,7 +72,6 @@ fn compose(comptime h: anytype, comptime gs: anytype) type {
 
                 const val = g.*(@as(g_rtype.?, x));
                 argsV[i] = val;
-
             }
 
             // Call h with the results of g functions
@@ -80,6 +79,7 @@ fn compose(comptime h: anytype, comptime gs: anytype) type {
         }
     };
 }
+
 fn buildTuple(comptime types: []const type) type {
     comptime var fields: [types.len]std.builtin.Type.StructField = undefined;
     inline for (types, 0..) |T, i| {
@@ -91,12 +91,9 @@ fn buildTuple(comptime types: []const type) type {
             .alignment = 0,
         };
     }
-    return @Type(.{ .@"struct" = .{
-        .layout = .auto,
-        .fields = &fields,
-        .decls = &[_]std.builtin.Type.Declaration{},
-        .is_tuple = true
-    }, });
+    return @Type(.{
+        .@"struct" = .{ .layout = .auto, .fields = &fields, .decls = &[_]std.builtin.Type.Declaration{}, .is_tuple = true },
+    });
 }
 
 // Example usage

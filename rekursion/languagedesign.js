@@ -18,3 +18,14 @@ function fibonacci(n, a=0, b=1) {
 }
 
 function fibonacci(n) = unfold(0, 1, addLastTwo).take(n)
+
+with ac = 1
+function fibonacci(n) {
+    if n is 1 { ac }
+} recur (n-1) {
+    ac * n
+}
+
+function fibonacci(n) = recur (n-1) {
+    * n
+}

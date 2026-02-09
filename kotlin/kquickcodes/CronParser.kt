@@ -9,7 +9,6 @@ data class CronExpression(
     val command: String
 )
 
-
 class CronParser {
     companion object {
         private val fieldNames =

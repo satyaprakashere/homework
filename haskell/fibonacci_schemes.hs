@@ -1,8 +1,8 @@
-{-# LANGUAGE BangPatterns, DeriveFunctor, TypeFamilies, TypeSynonymInstances, FlexibleContexts, FlexibleInstances, AllowAmbiguousTypes #-}
+{-# LANGUAGE BangPatterns, DeriveFunctor, TypeFamilies, FlexibleContexts, FlexibleInstances, AllowAmbiguousTypes #-}
 
 module Main where
 
-import Debug.Trace
+import Debug.Trace ()
 
 fst3 (a, _, _) = a
 
@@ -18,7 +18,7 @@ fibonacciH1 n = fst3 . hylo'' coAlgH1 algH1 $ (0,1,n)
 
 -- hylo using composition with lazy evaluation
 hylo'' :: Functor f => CoAlgebra f a -> Algebra f b -> a -> b
-hylo'' f g = g . (fmap (cata g)).(fmap (ana f)) . f
+hylo'' f g = g . fmap (cata g . ana f) . f
 
 newtype Fix f = Fix { unfix :: f (Fix f)}
 type Mu = Fix
@@ -36,7 +36,7 @@ algH (Cons _ (b, c, n)) = (b, c, n)
 
 coAlgH :: (Num a, Ord a, Show a) => CoAlgebra (ListF a) (a, a, Int)
 coAlgH (x, _, 0) = Nil x
-coAlgH (x, !y, n) = Cons x (y, x+y, (n-1))
+coAlgH (x, !y, n) = Cons x (y, x+y, n-1)
 --coAlgH (x, y, n) | trace ("(x, y) = (" ++ show x ++ ", " ++ show y ++ ")") False = undefined
 
 
@@ -57,7 +57,7 @@ algH1 (Cons _ (b, c, n)) = (b, c, n)
 coAlgH1 :: (Num a, Ord a, Show a) => CoAlg [a] (a, a, Int)
 --coAlgH1 (x, y, n) | trace ("coalgebra (x, y) = (" ++ show x ++ ", " ++ show y ++ ")") False = undefined
 coAlgH1 (x, _, 0) = Nil x
-coAlgH1 (x, !y, n) = Cons x (y, x+y, (n-1))
+coAlgH1 (x, !y, n) = Cons x (y, x+y, n-1)
 
 --hylo :: Functor f => CoAlg f a -> Alg f b -> a -> b -- doesn't work
 --hylo' f g = g . fmap (hylo f g) . f  -- no mention of Fix!
@@ -79,11 +79,10 @@ instance Recursive [a] where
     project [] = undefined
     project [a] = Nil a
     project (x:xs) = Cons x xs
-    
+
 instance CoRecursive [a] where
     embed (Nil a) = [a]
-    embed (Cons x xs) = (x:xs)
-    
+    embed (Cons x xs) = x:xs
 
 --data PairF a r = PairF r deriving (Show, Functor)
 --type Pair a = Fix (PairF a)
@@ -119,7 +118,6 @@ coAlg (x, y) = Cons x (y, x+y)
 alg :: (Eq a, Num a) => Algebra (ListF a) (a, a)
 alg (Nil _) = undefined -- unnecessary
 alg (Cons _ (b, c)) = (b, c)
-
 
 data FreeM f a = Pure a | FreeM a (f (FreeM f a)) deriving (Functor)
 data CofreeM f a = a :< (f (CofreeM f a))

@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, DeriveFunctor, TypeFamilies, TypeSynonymInstances, FlexibleContexts, FlexibleInstances, AllowAmbiguousTypes #-}
+{-# LANGUAGE BangPatterns, DeriveFunctor, TypeFamilies, FlexibleContexts, FlexibleInstances, AllowAmbiguousTypes #-}
 module Main where
 
 import Data.Kind
@@ -52,6 +52,7 @@ factOG 1 = 1
 factOG n = n * factOG (n-1)
 
 --factorial :: Num a => a -> a
+factorial :: (Num a, Enum a) => a -> a
 factorial n = product [1..n]
 
 anaL :: (b -> ListF a b) -> b -> List a
@@ -76,7 +77,7 @@ unbox (Fix (Cons a r)) = a : unbox r
 
 main :: IO ()
 main = do
-    print $ rem ((head. drop 35383) fibonacci) 999999999
+    print $ rem ((!! 35383) fibonacci) 999999999
 --	putStrLn "Hello World"
 --	print $ foldls (+) 0 [1..123456736]
 --	print $ fmap

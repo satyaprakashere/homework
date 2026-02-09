@@ -1,10 +1,7 @@
 //go:build ignore
 package main
 
-import (
-	"fmt"
-	"strings"
-)
+import ("fmt"; "strings")
 
 func isValid(s string) bool {
 	stack := []rune {}

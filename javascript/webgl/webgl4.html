@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hacker News Canvas Clone</title>
+    <style>
+        body { margin: 0; font-family: monospace; background: #f6f6ef; }
+        canvas { display: block; width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <canvas id="hn-canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('hn-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+        
+        // Random data generators
+        const titles = [
+            'Show HN: ', 'Ask HN: ', 'Tell HN: '
+        ];
+        const subjects = [
+            'AI agent that codes itself', 'New Rust framework 10x faster',
+            'Quantum computing breakthrough', 'WebAssembly in the browser',
+            'Linux kernel exploit fixed', 'React 19 released',
+            'Self-hosted HN clone', 'GPU programming simplified'
+        ];
+        const users = ['pg', 'norvig', 'spaceman', 'daniel', 'jrandomhacker'];
+        const domains = ['github.com', 'news.ycombinator.com', 'medium.com'];
+        
+        function randomInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+        function randomScore() { return randomInt(1, 500); }
+        function randomComments() { return randomInt(0, 200); }
+        function randomTimeAgo() {
+            const mins = randomInt(1, 1440);
+            return mins === 1 ? '1 min' : `${mins} mins`;
+        }
+        
+        function generateStory(y) {
+            const isAsk = Math.random() < 0.3;
+            const title = titles[randomInt(0, titles.length)] + subjects[randomInt(0, subjects.length)];
+            const user = users[randomInt(0, users.length)];
+            const score = randomScore();
+            const comments = randomComments();
+            const time = randomTimeAgo();
+            const hasUrl = !isAsk && Math.random() < 0.7;
+            const domain = hasUrl ? domains[randomInt(0, domains.length)] : '';
+            
+            return { title, user, score, comments, time, domain, hasUrl, y };
+        }
+        
+        let stories = [];
+        function generateStories() {
+            stories = [];
+            let y = 40;
+            for (let i = 0; i < 50 && y < canvas.height - 20; i++) {
+                stories.push(generateStory(y));
+                y += 50;
+            }
+        }
+        
+        function draw() {
+            ctx.fillStyle = '#f6f6ef';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = '14px monospace';
+            ctx.textBaseline = 'top';
+            ctx.fillStyle = '#000';
+            
+            // Header
+            ctx.fillStyle = '#828282';
+            ctx.font = '24px monospace';
+            ctx.fillText('Hacker News', 20, 10);
+            ctx.font = '14px monospace';
+            ctx.fillText('(random data)', 200, 20);
+            
+            // Stories
+            stories.forEach(story => {
+                let x = 20;
+                
+                // Rank
+                ctx.fillStyle = '#828282';
+                ctx.font = 'bold 14px monospace';
+                const rank = stories.indexOf(story) + 1;
+                ctx.fillText(`${rank}. `, x, story.y);
+                x += 30;
+                
+                // Title
+                ctx.fillStyle = story.hasUrl ? '#000080' : '#000';
+                ctx.font = `${story.hasUrl ? 'bold ' : ''}14px monospace`;
+                ctx.fillText(story.title, x, story.y);
+                
+                // Domain
+                if (story.domain) {
+                    x += ctx.measureText(story.title).width + 10;
+                    ctx.fillStyle = '#828282';
+                    ctx.font = 'italic 12px monospace';
+                    ctx.fillText(`(${story.domain})`, x, story.y + 2);
+                }
+                
+                // Info line
+                x = 20;
+                ctx.fillStyle = '#828282';
+                ctx.font = '12px monospace';
+                const infoY = story.y + 28;
+                ctx.fillText(`${story.score} points by ${story.user} ${story.time} ago`, x, infoY);
+                
+                if (story.comments > 0) {
+                    const commentsText = ` | ${story.comments} comments`;
+                    x += ctx.measureText(`${story.score} points by ${story.user} ${story.time} ago`).width;
+                    ctx.fillText(commentsText, x, infoY);
+                }
+            });
+        }
+        
+        function animate() {
+            generateStories();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        // Remove the animate() function entirely, replace with:
+        generateStories();
+        draw();
+        
+        // Add this to only re-render on resize
+        window.addEventListener('resize', () => {
+            resize();
+            generateStories();
+            draw();
+        });
+    </script>
+</body>
+</html>

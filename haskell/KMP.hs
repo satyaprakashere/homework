@@ -26,8 +26,8 @@ step (length, state) token = (length + 1, op state token)
       Node (x:xs) left right -> if x /= token then op left token else right
 
 build left pattern = case pattern of
-                        []   -> Node [] left Null
-                        x:xs -> Node pattern left (build (op left x) xs)
+    []   -> Node [] left Null
+    x:xs -> Node pattern left (build (op left x) xs)
 
 refold :: Functor s => (s b -> b) -> (a -> s a) -> a -> b
 refold f g = go where go a = f (fmap go (g a))
@@ -63,14 +63,14 @@ type List a = Fix (ListF a)
 -- output:
 --    an array of integers, P (positions in S at which W is found)
 --    an integer, nP (number of positions)
---    
+--
 -- define variables:
 --    an integer, j ← 0 (the position of the current character in S)
 --    an integer, k ← 0 (the position of the current character in W)
 --    an array of integers, T (the table, computed elsewhere)
---    
+--
 -- let nP ← 0
--- 
+--
 -- while j < length(S) do
 --    if W[k] = S[j] then
 --       let j ← j + 1

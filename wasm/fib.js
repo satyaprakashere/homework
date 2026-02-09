@@ -11,3 +11,10 @@ function fibonacci(n) {
 }
 
 console.log(fibonacci(98765432)); // Output: 55
+
+const fs = require('node:fs');
+const wasmBuffer = fs.readFileSync('fib.wasm');
+WebAssembly.instantiate(wasmBuffer).then(({ instance }) => {
+  const { add } = instance.exports;
+  console.log(fib(987)); // 11
+});

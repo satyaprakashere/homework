@@ -3,7 +3,7 @@ func printHello() {
 }
 
 func fact(n: Int) -> Int128 {
-    return reduce
+    return 0
 }
 
 printHello()

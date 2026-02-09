@@ -7,7 +7,7 @@ const Chunk = RChunk.Chunk;
 pub fn main() !void {
     std.debug.print("Hello, There! Welcome to Rekursion bytecode interpreter\n", .{});
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    const allocator= gpa.allocator();
+    const allocator = gpa.allocator();
 
     var chunks = try Chunk.init(allocator);
     defer chunks.deinit();

@@ -1,8 +1,8 @@
-module Main where
-
 {-# LANGUAGE RankNTypes #-}
 
-import Numeric.FFT (fft, ifft)
+module Main where
+
+import Math.FFT (fft, ifft)
 import Data.Complex (Complex(..), realPart)
 import Numeric.LinearAlgebra (Vector, fromList, toList)
 import Control.Applicative (liftA2)

@@ -10,7 +10,7 @@ public class ListNode {
 class Solution {
     var carry = 0
     func addTwoNumbers(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
-        if l1 == nil && l2 == nil && carry == 0 {
+        guard l1 != nil || l2 != nil || carry != 0 else {
             return nil
         }
         

@@ -32,9 +32,7 @@ main = do
 --  print (fibm 333)
 --  print (fibc 333)
 
-
 ----------------------Rough Work---------------------------
-
 
 newtype Mu f = In {out :: f (Mu f)}
 type Fix = Mu
@@ -51,22 +49,17 @@ ana f = In. fmap (ana f) . f
 hylo :: Functor f => (a -> f a) -> (f b -> b) -> a -> b
 hylo f g = g . fmap (hylo f g) . f  -- no mention of Fix!
 
-
 fastExp :: Int -> Matrix Integer -> Matrix Integer
-fastExp n mat = (fst3.head) . dropWhile ((/=0).trd) $ (iterate op (identity 2, mat, n))
+fastExp n mat = (fst3.head) . dropWhile ((/=0).trd) $ iterate op (identity 2, mat, n)
     where
-        op (x, a, b) = case even b of
-            True  -> (x, a*a, div b 2)
-            False -> (x*a, a, b-1)
-            
+        op (x, a, b) = if even b then (x, a*a, div b 2) else (x*a, a, b-1)
+
 fastExp2 n mat = fst3 $ hylo f g (identity 2, mat, n)
     where
-        f = (take 1) . (iterate op) :: (Matrix Integer, Matrix Integer, Int) -> [(Matrix Integer, Matrix Integer, Int)]
-        op (x, a, b) = case even b of
-            True  -> (x, a*a, div b 2)
-            False -> (x*a, a, b-1)
+        f = take 1 . iterate op :: (Matrix Integer, Matrix Integer, Int) -> [(Matrix Integer, Matrix Integer, Int)]
+        op (x, a, b) = if even b then (x, a*a, div b 2) else (x*a, a, b-1)
         g = head . dropWhile ((/=0).trd) :: [(Matrix Integer, Matrix Integer, Int)] -> (Matrix Integer, Matrix Integer, Int)
-        
+
 fst3 (a, _, _) = a
 trd (_,_,c) = c
 
@@ -74,17 +67,17 @@ digitCount :: Integer -> Int
 digitCount = go 1 . abs
     where
         go ds n = if n >= 10 then go (ds + 1) (n `div` 10) else ds
-        
+
 fibc n = round $ phi ** fromIntegral n / sq5
     where
         sq5 = sqrt 5 :: Double
         phi = (1 + sq5) / 2
-        
+
 fibs n = fib 1 0 n where
     fib res x 0 = x
     fib res x 1 = res
     fib !res x n = fib (res+x) res (n-1)
-    
+
 refold :: Functor s => (s b -> b) -> (a -> s a) -> a -> b
 refold f g = go where go a = f (fmap go (g a))
 

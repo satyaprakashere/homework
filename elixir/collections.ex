@@ -8,7 +8,7 @@ defmodule Collections do
 		map = %{1=>"Hello", 2=>"There"}
 		IO.inspect(map)
 	end
-	
+
 	def testSet() do
 		set = MapSet.new()
 		set = MapSet.put(set, 4)

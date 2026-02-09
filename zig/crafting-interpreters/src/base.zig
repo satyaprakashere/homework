@@ -62,13 +62,12 @@ pub fn FnClosure(comptime R: type, Ctx: type) type {
     };
 }
 
-
 pub fn recursive(comptime T: type, comptime U: type) type {
     return struct {
         func: fn (comptime type, comptime type, T, []U(T)) U(T),
 
         pub fn init(func: fn (comptime type, comptime type, T, []U(T)) U(T)) Closure(T, U) {
-            return Closure(T) { .func = func };
+            return Closure(T){ .func = func };
         }
 
         pub fn call(self: @This(), x: T, args: []U(T)) U(T) {
