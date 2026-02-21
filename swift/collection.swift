@@ -27,6 +27,7 @@ func testArraySlice(arr: Array<Int>) -> ArraySlice<Int> {
     for (i, e) in slice.enumerated() {
         print("Slice elem at ", i, " = ", e)
     }
+    
     return slice
 }
 

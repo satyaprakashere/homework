@@ -51,6 +51,7 @@ class Renderer: NSObject, MTKViewDelegate {
     
     init?(metalView: MTKView) {
         super.init()
+      // guard let device = MTLCreateSystemDefaultDevice() orElse return
         guard let device = MTLCreateSystemDefaultDevice() else { return nil }
         self.device = device
         metalView.device = device

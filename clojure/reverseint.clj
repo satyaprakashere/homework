@@ -2,15 +2,12 @@
   (project [node])  ; Defines how to decompose a structure
   (embed [node]))   ; Defines how to reassemble a structure
 
-(extend-protocol Recursive
-  java.lang.Long
+(extend-type Long
+  Recursive
   (project [n]
     (if (zero? n)
       nil
-      [(mod n 10) (quot n 10)])))  ; Extracts digits (last digit first)
-
-(extend-protocol Recursive
-  java.lang.Long
+      [(mod n 10) (quot n 10)]))  ; Extracts digits (last digit first)
   (embed [digits]
     (reduce (fn [acc x] (+ (* acc 10) x)) 0 digits)))  ; Constructs number from digits
 

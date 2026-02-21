@@ -1,4 +1,4 @@
-package objc_test
+package main
 
 import NS "core:sys/darwin/Foundation"
 import MTL "vendor:darwin/Metal"
@@ -9,15 +9,26 @@ import SDL "vendor:sdl2"
 import "core:fmt"
 import "core:os"
 
+main :: proc() {
+	err := metal_main()
+	if err != nil {
+		fmt.eprintln(err->localizedDescription()->odinString())
+		os.exit(1)
+	}
+}
+
 metal_main :: proc() -> (err: ^NS.Error) {
 	SDL.SetHint(SDL.HINT_RENDER_DRIVER, "metal")
 	SDL.setenv("METAL_DEVICE_WRAPPER_TYPE", "1", 0)
 	SDL.Init({.VIDEO})
 	defer SDL.Quit()
 
-	window := SDL.CreateWindow("Metal in Odin",
-		SDL.WINDOWPOS_CENTERED, SDL.WINDOWPOS_CENTERED,
-		854, 480,
+	window := SDL.CreateWindow(
+		"Metal in Odin",
+		SDL.WINDOWPOS_CENTERED,
+		SDL.WINDOWPOS_CENTERED,
+		854,
+		480,
 		{.ALLOW_HIGHDPI, .HIDDEN, .RESIZABLE},
 	)
 	defer SDL.DestroyWindow(window)
@@ -58,8 +69,8 @@ metal_main :: proc() -> (err: ^NS.Error) {
 	};
 
 	vertex ColoredVertex vertex_main(constant float4 *position [[buffer(0)]],
-	                                 constant float4 *color    [[buffer(1)]],
-	                                 uint vid                  [[vertex_id]]) {
+									constant float4 *color    [[buffer(1)]],
+									uint vid                  [[vertex_id]]) {
 		ColoredVertex vert;
 		vert.position = position[vid];
 		vert.color    = color[vid];
@@ -70,7 +81,10 @@ metal_main :: proc() -> (err: ^NS.Error) {
 		return vert.color;
 	}
 	`
-	program_library := device->newLibraryWithSource(NS.AT(program_source), compile_options) or_return
+	program_library := device->newLibraryWithSource(
+		NS.AT(program_source),
+		compile_options,
+	) or_return
 
 	vertex_program := program_library->newFunctionWithName(NS.AT("vertex_main"))
 	fragment_program := program_library->newFunctionWithName(NS.AT("fragment_main"))
@@ -85,23 +99,14 @@ metal_main :: proc() -> (err: ^NS.Error) {
 
 	pipeline_state := device->newRenderPipelineState(pipeline_state_descriptor) or_return
 
-	positions := [?][4]f32{
-		{ 0.0,  0.5, 0, 1},
-		{-0.5, -0.5, 0, 1},
-		{ 0.5, -0.5, 0, 1},
-	}
-	colors := [?][4]f32{
-		{1, 0, 0, 1},
-		{0, 1, 0, 1},
-		{0, 0, 1, 1},
-	}
+	positions := [?][4]f32{{0.0, 0.5, 0, 1}, {-0.5, -0.5, 0, 1}, {0.5, -0.5, 0, 1}}
+	colors := [?][4]f32{{1, 0, 0, 1}, {0, 1, 0, 1}, {0, 0, 1, 1}}
 
 	position_buffer := device->newBufferWithSlice(positions[:], {})
-	color_buffer    := device->newBufferWithSlice(colors[:],    {})
-
+	color_buffer := device->newBufferWithSlice(colors[:], {})
 
 	SDL.ShowWindow(window)
-	for quit := false; !quit;  {
+	for quit := false; !quit; {
 		for e: SDL.Event; SDL.PollEvent(&e) != false; {
 			#partial switch e.type {
 			case .QUIT:
@@ -132,7 +137,7 @@ metal_main :: proc() -> (err: ^NS.Error) {
 
 		render_encoder->setRenderPipelineState(pipeline_state)
 		render_encoder->setVertexBuffer(position_buffer, 0, 0)
-		render_encoder->setVertexBuffer(color_buffer,    0, 1)
+		render_encoder->setVertexBuffer(color_buffer, 0, 1)
 		render_encoder->drawPrimitivesWithInstanceCount(.Triangle, 0, 3, 1)
 
 		render_encoder->endEncoding()
@@ -142,12 +147,4 @@ metal_main :: proc() -> (err: ^NS.Error) {
 	}
 
 	return nil
-}
-
-main :: proc() {
-	err := metal_main()
-	if err != nil {
-		fmt.eprintln(err->localizedDescription()->odinString())
-		os.exit(1)
-	}
 }

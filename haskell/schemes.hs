@@ -22,9 +22,9 @@ main = do
   --  --  print $ (refold' decrease multiply 6 :: Integer) -- factorial through expansion and contraction
   --  print $ refold decrease multiply 5 -- factorial through expansion and contracion
   --  --  print $ (refold' decrease multiply 6 :: Integer) -- factorial through expansion and contraction
-  --  print $ take 100 (unfold addlasttwo (0, 1) :: [Integer]) -- fibonacci
+  print $ take 100 (unfold addlasttwo (0, 1) :: [Integer]) -- fibonacci
   --  print $ takeWhile (< 100) (unfold endsWith9 9 :: [Integer])
-  print $ refold decrease multiply 1000
+--print $ refold decrease multiply 1000
 
 multiply :: (Num b) => Algebra (List b) b
 multiply Nil = 1

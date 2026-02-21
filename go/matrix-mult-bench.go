@@ -21,16 +21,35 @@ func main() {
   m3 := mult(&m1, &m2, &res)
   elapsed := time.Since(start) // calculate elapsed time
 
-  fmt.Printf("Function took %s\n", elapsed)
+  fmt.Printf("Multiplication using pointer array took %s\n", elapsed)
   fmt.Println("res : ", len(*m3))
 
   res = clear(res)
   start = time.Now()         // record start time
-  m4 := multAlt(m1, m2, res)
+  m4 := multUsingSlice(m1, m2, res)
   elapsed = time.Since(start) // calculate elapsed time
 
-  fmt.Printf("Alt Function took %s\n", elapsed)
-  fmt.Println("res Alt: ", len(m4))
+  fmt.Printf("Multiplication using array slice took %s\n", elapsed)
+  fmt.Println("res : ", len(m4))
+}
+
+func multUsingSlice(x [][]int, y [][]int, res [][]int) [][]int {
+  a := len(x)
+  if a < 1 || len(x[0]) < 1 {
+    return res
+  }
+  
+  b := len(x[0])
+  c := len(y[0])
+  
+  for i := range(a) {
+    for j := range(b) {
+      for k := range(c) {
+        res[i][k] += x[i][j] * y[j][k]
+      }
+    }
+  }
+  return res
 }
 
 func Mat(m int, n int) [][]int {
@@ -79,21 +98,3 @@ func mult(x *[][]int, y *[][]int, res *[][]int) *[][]int {
   return res
 }
 
-func multAlt(x [][]int, y [][]int, res [][]int) [][]int {
-  a := len(x)
-  if a < 1 || len(x[0]) < 1 {
-    return res
-  }
-
-  b := len(x[0])
-  c := len(y[0])
-
-  for i := range(a) {
-    for j := range(b) {
-      for k := range(c) {
-        res[i][k] += x[i][j] * y[j][k]
-      }
-    }
-  }
-  return res
-}

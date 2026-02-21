@@ -1,4 +1,4 @@
-(ns area_under_curve)
+(ns main)
 (defn hello-world []
     (println "Hello World"))
 ;

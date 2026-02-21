@@ -1,4 +1,3 @@
-
 enum Color { RED, GREEN, BLUE }
 
 void main() {

@@ -15,13 +15,18 @@ module Graph where
 module Main where
   func main :: IO ()
   func main = do
-    tc = io.readInt
-    for _ in range 0 tc do
-      let N, M = io.readLine.split.map(toInt)
-      for i in range(0, M) do
-        let x, y, c = io.readLine.split.map(parseInt)
+    tc = io.readInt()
+    for _ in range(tc) do
+      let N, M = io.readLine().split().map(toInt)
+      
+      for i in range(M) do
+        x, y, c = io.readLine.split.map(parseInt)
         graph(x).append(Tuple(y, c))
       end
       for i in range 0 N do
-        let cost = dijkstra a graph in
-          io.println "Cost = " cost
+        cost = dijkstra a graph
+        IO.Println("Cost = ", cost)
+      end
+    end
+  end
+end

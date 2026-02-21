@@ -10,9 +10,12 @@ public class ListNode {
 class Solution {
     var carry = 0
     func addTwoNumbers(_ l1: ListNode?, _ l2: ListNode?) -> ListNode? {
+        // guard l1 || l2 || carry > 0 {}
         guard l1 != nil || l2 != nil || carry != 0 else {
             return nil
         }
+        // let sum = l1.val.orElse(0) ...
+        // let sum = l1.val(0) ...
         
         let sum = (l1?.val ?? 0) + (l2?.val ?? 0) + carry
         carry = sum / 10

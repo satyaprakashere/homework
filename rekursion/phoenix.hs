@@ -11,7 +11,7 @@ randomList n         = do
 
 step = 0.001
 
-(Type solve Int Int [Int] [Int] (Double, Double))
+(typeOf solve Int Int []Int []Int (Double, Double))
 
 Type solve Int -> Int -> [Int] -> [Int] -> (Double, Double)
 

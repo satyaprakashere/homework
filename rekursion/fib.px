@@ -3,5 +3,3 @@ fib n = fibH(0, 1, n) where
 	fibH a b n = fibH(b, a+b, n-1) where
 		fibH1
 		fibH2
-
-func fibr

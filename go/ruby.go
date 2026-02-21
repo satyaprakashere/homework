@@ -16,8 +16,7 @@ func (i Int) Days() Int {
 
 func main() {
 	var a Int = 5
-	//var b MyInt = 10
+	// var b MyInt = 10
 	result := a.Days() // result is MyInt(15)
 	fmt.Println(result)
 }
-

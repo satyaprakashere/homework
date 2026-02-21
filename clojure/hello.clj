@@ -4,3 +4,4 @@
 ; (println "hello World!"))
 
 (println "Hello There!")
+(def pi 3.14)

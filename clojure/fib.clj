@@ -1,15 +1,10 @@
-;(ns fib)
+(defn fibH [^long a ^long b ^long n]
+  (cond
+  (= 0 n) a
+  :else (recur b (unchecked-add a b) (dec n))))
 
-(defn -main [& _]
-  (println "Hello, World!"))
+(defn fib [n]
+  (fibH 0 1 n))
 
-(println "Hello you")
-
-(defn fib [^long n]
-  (letfn [(fibH [^long a ^long b ^long n])]
-     (cond
-      (= 0 n) a
-      :else (recur b (unchecked-add a b) (dec n)))
-     (fibH 0 1 n)))
-
-(println (fib 98765432))
+(def n 98765432)
+(println "Fibonacci of " n ": " (fib n))
