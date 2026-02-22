@@ -20,4 +20,3 @@ class Solution {
 func randomArray(ofSize n: Int, range: Range<Int> = 0..<100) -> [Int] {    return (0..<n).map { _ in Int.random(in: range) }}
 
 print(Solution().twoSum(randomArray(ofSize: 100000), target: 76))
-

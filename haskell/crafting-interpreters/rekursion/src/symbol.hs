@@ -1,4 +1,4 @@
-module Symbol where
+module Symbol (symbol) where
 
 import Text.ParserCombinators.Parsec hiding (spaces)
 

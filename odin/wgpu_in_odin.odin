@@ -41,6 +41,10 @@ main :: proc() {
 	}
 	state.surface = os_get_surface(&state.os, state.instance)
 
+<<<<<<< HEAD
+=======
+// Requests should be message to Devatas
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 	wgpu.InstanceRequestAdapter(
 		state.instance,
 		&{compatibleSurface = state.surface},

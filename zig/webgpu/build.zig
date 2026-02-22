@@ -65,15 +65,21 @@ pub fn build(b: *std.Build) void {
         .root_module = exe_mod,
     });
 
-    exe.root_module.addObjectFile("deps/libwebgpu.a");
+    // exe.root_module.addObjectFile(b.path("deps/libwebgpu.a"));
 
-    // const wgpu_native_dep = b.dependency("wgpu_native_zig", .{});
+    const wgpu_native_dep = b.dependency("wgpu_native_zig", .{});
 
-    // // Add module to your exe (wgpu-c can also be added like this, just pass in "wgpu-c" instead)
-    // exe.root_module.addImport("wgpu", wgpu_native_dep.module("wgpu"));
-    // // Or, add to your lib similarly:
+    // Add module to your exe (wgpu-c can also be added like this, just pass in "wgpu-c" instead)
+    exe.root_module.addImport("wgpu", wgpu_native_dep.module("wgpu"));
+
+    // Add bmp module
+    const bmp = b.createModule(.{
+        .root_source_file = b.path("src/bmp.zig"),
+    });
+    exe.root_module.addImport("bmp", bmp);
+
+    // Or, add to your lib similarly:
     // lib.root_module.addImport("wgpu", wgpu_native_dep.module("wgpu"));
-
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

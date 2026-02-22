@@ -5,8 +5,7 @@ start() ->
     spawn_actors(1000000),
     io:format("Spawned 1 million actors~n").
 
-spawn_actors(0) ->
-    ok;
+spawn_actors(0) -> ok;
 spawn_actors(N) when N > 0 ->
     spawn(fun actor/0),
     spawn_actors(N - 1).

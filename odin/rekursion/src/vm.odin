@@ -58,6 +58,7 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 		if steps > 1000 {
 			fmt.println("VM reached max steps limit! Possible infinite loop.")
 			if vm.ip < len(bytecode.instructions) {
+<<<<<<< HEAD
 				fmt.printf("IP: %d, Op: %v\n", vm.ip, bytecode.instructions[vm.ip].op)
 			}
 			break
@@ -67,6 +68,17 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 		inst := bytecode.instructions[vm.ip]
 		vm.ip += 1
 
+=======
+				fmt.printf("debug: IP: %d, Op: %v\n", vm.ip, bytecode.instructions[vm.ip].op)
+			}
+			break
+		}
+		fmt.printf("info: Call Stack: %v\n", vm.stack[:])
+
+		inst := bytecode.instructions[vm.ip]
+		vm.ip += 1
+		fmt.printf("info: IP: %d, Op: %v\n\n", vm.ip, inst.op)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 		switch inst.op {
 		case .NOP:
 		// do nothing
@@ -204,6 +216,10 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 			// For now, simplify calls to builtins or fixed num args
 			proc_val := pop(&vm.stack)
 			num_args := int(inst.arg)
+<<<<<<< HEAD
+=======
+			fmt.printf("info: CALL. Expected %d args, stack has %d\n", num_args, len(vm.stack))
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 			if len(vm.stack) < num_args {
 				fmt.printf(
 					"Error: Stack underflow in CALL. Expected %d args, stack has %d\n",
@@ -214,15 +230,27 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 			}
 
 			args := make([]Value, num_args)
+<<<<<<< HEAD
 			for i in 0 ..< num_args {
 				args[num_args - 1 - i] = pop(&vm.stack)
 			}
+=======
+			defer destroy_values(args)
+			for i in 0 ..< num_args {
+				args[num_args - 1 - i] = pop(&vm.stack)
+			}
+			fmt.printf("info: CALL. Args: %v\n", args)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 
 			#partial switch p in proc_val {
 			case Builtin:
 				res := p(args)
 				append(&vm.stack, res)
 			case ^Procedure:
+<<<<<<< HEAD
+=======
+				fmt.printf("info: CALL. Procedure: %v\n", p)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 				// Push CallFrame
 				append(
 					&vm.frames,
@@ -277,6 +305,11 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 
 				vm.env = new_env
 				// Jump to body. `p.body` is holding the IP as i64 (HACK from compiler).
+<<<<<<< HEAD
+=======
+				fmt.printf("info: BytecodeInstructions: %v\n", bytecode.instructions)
+				fmt.printf("info: p.body: %v\n", p.body)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 				vm.ip = int(p.body.(i64))
 
 			case ^Continuation:
@@ -416,6 +449,11 @@ is_false :: proc(v: Value) -> bool {
 }
 
 env_lookup :: proc(env: ^Env, sym: Symbol) -> (Value, bool) {
+<<<<<<< HEAD
+=======
+	fmt.printf("info: env_lookup: %v\n", env.values)
+	fmt.printf("info: symbol: %v\n\n", sym)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 	curr := env
 	for curr != nil {
 		if val, ok := curr.values[sym]; ok {
@@ -441,3 +479,21 @@ env_set :: proc(env: ^Env, sym: Symbol, val: Value) {
 	}
 	// Error if not found
 }
+<<<<<<< HEAD
+=======
+
+destroy_bytecode :: proc(bytecode: ^Bytecode) {
+	destroy_values(bytecode.constants[:])
+
+	delete(bytecode.instructions)
+	delete(bytecode.constants)
+}
+
+destroy_vm :: proc(vm: ^VM) {
+	defer delete(vm.stack)
+	defer delete(vm.frames)
+
+	destroy_values(vm.stack[:])
+	destroy_call_frames(vm.frames[:])
+}
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)

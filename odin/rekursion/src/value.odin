@@ -10,11 +10,19 @@ Value :: union {
 	f64,
 	string,
 	Symbol,
+<<<<<<< HEAD
 	^Pair,
 	^Procedure,
 	Builtin,
 	^Continuation,
 	Array,
+=======
+	Array,
+	Builtin,
+	^Pair,
+	^Procedure,
+	^Continuation,
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 	^Table,
 }
 
@@ -140,3 +148,56 @@ array_to_string :: proc(v: Array) -> string {
 	strings.write_string(&sb, "]")
 	return strings.to_string(sb)
 }
+<<<<<<< HEAD
+=======
+
+destroy_value :: proc(v: Value) {
+	#partial switch val in v {
+	case ^Pair:
+		destroy_value(val.first)
+		destroy_value(val.rest)
+	case ^Procedure:
+		destroy_procedure(val)
+	case ^Continuation:
+		destroy_continuation(val)
+	case ^Table:
+		destroy_table(val)
+	}
+}
+
+destroy_values :: proc(vals: []Value) {
+	for val in vals {
+		destroy_value(val)
+	}
+}
+
+destroy_continuation :: proc(c: ^Continuation) {
+	delete(c.stack)
+	delete(c.frames)
+}
+
+destroy_table :: proc(t: ^Table) {
+	delete(t.data)
+}
+
+destroy_procedure :: proc(p: ^Procedure) {
+	destroy_value(p.body)
+	// destroy_env(p.env) // DON'T DO THIS: env is shared
+}
+
+destroy_call_frame :: proc(c: CallFrame) {
+	// destroy_env(c.env) // DON'T DO THIS: env is shared
+}
+
+destroy_call_frames :: proc(frames: []CallFrame) {
+	for frame in frames {
+		destroy_call_frame(frame)
+	}
+}
+
+destroy_env :: proc(e: ^Env) {
+	if e == nil {return}
+	// destroy_env(e.parent) // DON'T DO THIS: parent is shared
+	delete(e.values)
+}
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)

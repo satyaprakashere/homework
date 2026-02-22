@@ -19,12 +19,16 @@ match pattern = map fst . filter (valid . snd) . scanl step (0, root)
 
 root = build Null pat
 
+step :: Num a => (a, State) -> Char -> (a, State)
 step (length, state) token = (length + 1, op state token)
-   op state token = case state of
+
+op :: State -> Char -> State
+op state token = case state of
       Null                   -> root
       Node [] left _         -> op left token
       Node (x:xs) left right -> if x /= token then op left token else right
 
+build :: State -> [Char] -> State
 build left pattern = case pattern of
     []   -> Node [] left Null
     x:xs -> Node pattern left (build (op left x) xs)
@@ -44,6 +48,7 @@ matches pat str = refold f g (pat, str, listArray (0, length pat) [], 0, 0) wher
          False -> Cons (-1) (tail pat, tail str, helper, j, helper ! k)
 
 
+main :: IO ()
 main = do
 --     pattern <- getLine
 --     text    <- getLine

@@ -13,11 +13,11 @@ eulerLagrangeStep next x t =
     let xNew = x t + dt * (x (t + dt) - x t)  -- Euler update step
     in if abs (xNew - x t) < tolerance  -- Check for convergence
        then x t  -- Stop iterating if change is small
-       else next (\_ -> xNew) t  -- Continue iteration with updated x
+       else next (const xNew) t  -- Continue iteration with updated x
 
 -- Euler-Lagrange solver using fixpoint iteration
 solveEulerLagrange :: (Double -> Double) -> (Double -> Double)
-solveEulerLagrange x0 = fix eulerLagrangeStep x0
+solveEulerLagrange = fix eulerLagrangeStep
 
 -- Example function: Initial guess x(t) = t (simple linear motion)
 initialGuess :: Double -> Double

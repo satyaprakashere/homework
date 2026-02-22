@@ -1,3 +1,5 @@
+(ns reverseint)
+
 (defprotocol Recursive
   (project [node])  ; Defines how to decompose a structure
   (embed [node]))   ; Defines how to reassemble a structure
@@ -9,7 +11,7 @@
       nil
       [(mod n 10) (quot n 10)]))  ; Extracts digits (last digit first)
   (embed [digits]
-    (reduce (fn [acc x] (+ (* acc 10) x)) 0 digits)))  ; Constructs number from digits
+    (reduce (fn [acc x] (+ (* acc 10) x)) 0 digits)))  ; Extracts digits (last digit first)
 
 (defn hylo [project embed seed]
   (let [result (project seed)]

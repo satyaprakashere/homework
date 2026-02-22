@@ -9,5 +9,5 @@ String longestCommonPrefix(String[] strs) {
 }
 
 void main(String[] args) {
-        IO.println(longestCommonPrefix(new String[]{"flower","flow","flight"}));
+    IO.println(longestCommonPrefix(new String[]{"flower","flow","flight"}));
 }

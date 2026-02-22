@@ -1,0 +1,4 @@
+defprotocol Blank where
+    func isBlank : a -> bool
+end
+

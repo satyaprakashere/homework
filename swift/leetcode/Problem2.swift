@@ -22,3 +22,7 @@ class Solution {
         return .init(sum % 10, addTwoNumbers(l1?.next, l2?.next))
     }
 }
+
+var res = Solution().addTwoNumbers(ListNode.init(4), ListNode.init(5))?.val ?? -1
+
+print(res)

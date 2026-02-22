@@ -5,12 +5,12 @@
 ;  Created by Satya Prakash.
 ;  Copyright (c) 2015 Satya Prakash. All rights reserved.
 
-import phoenix.collection.Queue
-import phoenix.collection.Map
+import phoenix.collection
 
 module Graph where
-  func dijkstra :: (Ord a) => Graph a -> a -> Bool
-  func dijkstra graph start =
+  func dijkstra : (Ord a) => Graph a -> a -> Bool
+  func dijkstra graph start = undefined
+end
 
 module Main where
   func main :: IO ()
@@ -18,7 +18,7 @@ module Main where
     tc = io.readInt()
     for _ in range(tc) do
       let N, M = io.readLine().split().map(toInt)
-      
+
       for i in range(M) do
         x, y, c = io.readLine.split.map(parseInt)
         graph(x).append(Tuple(y, c))
@@ -28,5 +28,22 @@ module Main where
         IO.Println("Cost = ", cost)
       end
     end
+  om main : IO ()
+
+  om main = do
+    let tc = io.readInt
+    range(tc).forEach runTestCase
+  end
+end
+
+func runTestCase = do
+  let N, M = io.readLine.split.map(toInt)
+  for i in range M do
+    let x, y, c = io.readLine.split.map(parseInt) -- program should not crash if there are more than 3 integers in readline input
+    graph(x).appendEdge(y, c)
+  end
+
+  for i in range N do
+    let cost = dijkstra graph i in console.out "Cost = {}" cost
   end
 end

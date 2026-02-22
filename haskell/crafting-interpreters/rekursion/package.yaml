@@ -19,7 +19,7 @@ extra-source-files:
 # common to point users to the README.md file.
 description:         Please see the README on GitHub at <https://github.com/githubuser/rekursion#readme>
 
-dependencies:
+dependency:
 - base >= 4.7 && < 5
 
 ghc-options:
@@ -35,9 +35,20 @@ ghc-options:
 
 library:
   source-dirs: src
+  exposed-modules:
+    - Lib
+    - Spaces
+    - LispVal
+    - ParseExpr
+    - ReadExpr
+    - Symbol
+  dependencies:
+    - text
+    - parsec
+    - mtl
 
 executables:
-  rekursion-exe:
+  rekursion:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -57,3 +68,5 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - rekursion
+    - hspec
+    - hspec-discover

@@ -1,4 +1,4 @@
-(ns recursive-server
+(ns rserver
   (:import [java.net ServerSocket Socket]
            [java.io BufferedReader InputStreamReader OutputStreamWriter]))
 

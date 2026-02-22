@@ -1,0 +1,6 @@
+om main = do
+	let server   <- start |> HTTPServer
+	let response <- request |> server
+	
+	console.log(response)
+end

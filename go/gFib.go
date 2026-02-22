@@ -13,7 +13,8 @@ func gFib(n uint64, m uint64) uint64 {
 		return 0
 	}
 	
-	if n == 0 
-
-	
+	if n == 0 {
+		
+	}
+	return 0
 }

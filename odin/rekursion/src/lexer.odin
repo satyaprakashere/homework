@@ -24,6 +24,10 @@ Token_Type :: enum {
 	YIELD,
 	LEFT_BRACKET,
 	RIGHT_BRACKET,
+<<<<<<< HEAD
+=======
+	LAMBDA,
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 }
 
 Token :: struct {

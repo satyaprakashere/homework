@@ -4,6 +4,7 @@
 **/build
 **/Cargo.lock
 **/target
+**/dist-newstyle
 **/zig-out
 *.hi
 *.o

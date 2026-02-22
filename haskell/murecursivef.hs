@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 
-module PrimitiveRec where
+module Main where
 
 -- Primitive functions
 

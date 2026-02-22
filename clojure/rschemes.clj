@@ -1,7 +1,7 @@
-(ns recursionschemes)
+(ns rschemes)
 (require '[clojure.core :refer [seq]])
 
-(def ListF [a r] )
+;; (def ListF [a r] (ListF a r))
 
 (defprotocol Recursive
   (project [t]))

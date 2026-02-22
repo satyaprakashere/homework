@@ -6,6 +6,13 @@ Compiler :: struct {
 	bytecode: Bytecode,
 }
 
+<<<<<<< HEAD
+=======
+destroy_compiler :: proc(compiler: ^Compiler) {
+	destroy_bytecode(&compiler.bytecode)
+}
+
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 compiler_init :: proc() -> Compiler {
 	return Compiler {
 		bytecode = Bytecode {

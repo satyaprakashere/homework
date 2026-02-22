@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGPU Triangle</title>
+    <style>
+        body { margin: 0; background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { background: #000; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+    <canvas id="gpuCanvas" width="800" height="600"></canvas>
+    <script type="module">
+        async function initWebGPU() {
+            // 1. Check Support
+            if (!navigator.gpu) {
+                alert("WebGPU not supported on this browser.");
+                return;
+            }
+
+            // 2. Request Adapter and Device
+            const adapter = await navigator.gpu.requestAdapter();
+            if (!adapter) {
+                alert("No appropriate GPUAdapter found.");
+                return;
+            }
+            const device = await adapter.requestDevice();
+
+            // 3. Configure the Canvas
+            const canvas = document.getElementById("gpuCanvas");
+            const context = canvas.getContext("webgpu");
+            const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+            
+            context.configure({
+                device: device,
+                format: canvasFormat,
+                alphaMode: "premultiplied",
+            });
+
+            // 4. Define Shaders (WGSL)
+            const response = await fetch("./shaders.wgsl");
+            const shaderCode = await response.text();
+
+            const shaderModule = device.createShaderModule({
+                label: "Triangle Shader",
+                code: shaderCode
+            });
+
+            // 5. Create Render Pipeline
+            const pipeline = device.createRenderPipeline({
+                label: "Triangle Pipeline",
+                layout: "auto",
+                vertex: {
+                    module: shaderModule,
+                    entryPoint: "vs_main"
+                },
+                fragment: {
+                    module: shaderModule,
+                    entryPoint: "fs_main",
+                    targets: [{ format: canvasFormat }]
+                },
+                primitive: {
+                    topology: "triangle-list"
+                }
+            });
+
+            // 6. Create Command Encoder & Pass
+            const encoder = device.createCommandEncoder();
+            
+            const pass = encoder.beginRenderPass({
+                colorAttachments: [{
+                    view: context.getCurrentTexture().createView(),
+                    loadOp: "clear",
+                    clearValue: { r: 0.0, g: 0.0, b: 0.2, a: 1.0 }, // Dark blue background
+                    storeOp: "store",
+                }]
+            });
+
+            // 7. Draw
+            pass.setPipeline(pipeline);
+            pass.draw(3); // Draw 3 vertices
+            pass.end();
+
+            // 8. Submit to Queue
+            device.queue.submit([encoder.finish()]);
+        }
+
+        initWebGPU();
+    </script>
+</body>
+</html>

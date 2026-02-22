@@ -84,6 +84,7 @@ parse_list :: proc(p: ^Parser) -> Value {
 		return Nil{}
 	}
 
+<<<<<<< HEAD
 	car := parse_expression(p)
 
 	tok = parser_peek(p)
@@ -105,6 +106,43 @@ parse_list :: proc(p: ^Parser) -> Value {
 	pair.first = car
 	pair.rest = cdr
 	return pair
+=======
+	head := new(Pair)
+	curr := head
+
+	for {
+		curr.first = parse_expression(p)
+
+		tok = parser_peek(p)
+		if tok.type == .RIGHT_PAREN {
+			parser_advance(p)
+			curr.rest = Nil{}
+			break
+		}
+
+		if tok.type == .DOT {
+			parser_advance(p) // skip .
+			curr.rest = parse_expression(p)
+			tok = parser_advance(p) // skip )
+			if tok.type != .RIGHT_PAREN {
+				// Error: expected ) after dotted pair
+			}
+			break
+		}
+
+		if tok.type == .EOF {
+			// Error: unclosed list
+			curr.rest = Nil{}
+			break
+		}
+
+		next := new(Pair)
+		curr.rest = next
+		curr = next
+	}
+
+	return head
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 }
 
 parse_vector :: proc(p: ^Parser) -> Value {

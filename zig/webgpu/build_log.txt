@@ -1,0 +1,24 @@
+install
++- install webgpu
+   +- compile exe webgpu Debug native 1 errors
+src/main.zig:8:31: error: root source file struct 'Io' has no member named 'getStdOut'
+    const stdout_file = std.io.getStdOut().writer();
+                        ~~~~~~^~~~~~~~~~
+/Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/lib/std/Io.zig:1:1: note: struct declared here
+const builtin = @import("builtin");
+^~~~~
+referenced by:
+    callMain [inlined]: /Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/lib/std/start.zig:627:37
+    callMainWithArgs [inlined]: /Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/lib/std/start.zig:587:20
+    main: /Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/lib/std/start.zig:602:28
+    1 reference(s) hidden; use '-freference-trace=4' to see all references
+error: the following command failed with 1 compilation errors:
+"/Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/zig" build-exe -ODebug --dep webgpu_lib --dep wgpu --dep bmp -Mroot=/Users/prakash/Documents/homework/zig/webgpu/src/main.zig -ODebug -Mwebgpu_lib=/Users/prakash/Documents/homework/zig/webgpu/src/root.zig /Users/prakash/.cache/zig/p/N-V-__8AACj6lQmZEGeyjdn2CCD0as1hGMvrAUBsoTuBu_cR/lib/libwgpu_native.a -ODebug -Mwgpu=/Users/prakash/.cache/zig/p/wgpu_native_zig-6.5.0-B9jeDFtzAwB1vPOiXTd2BqrP1j4phYk-oBbxbpLKY3xD/src/root.zig -Mbmp=/Users/prakash/Documents/homework/zig/webgpu/src/bmp.zig -lc++ --cache-dir .zig-cache --global-cache-dir /Users/prakash/.cache/zig --name webgpu --zig-lib-dir "/Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/lib/" --listen=-
+
+Build Summary: 2/5 steps succeeded; 1 failed
+install transitive failure
++- install webgpu transitive failure
+   +- compile exe webgpu Debug native 1 errors
+
+error: the following build command failed with exit code 1:
+.zig-cache/o/c88b18d33533f2f8ac0b067c7ae6b3bd/build /Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/zig /Users/prakash/Library/Application Support/Antigravity/User/globalStorage/ziglang.vscode-zig/zig/aarch64-macos-0.15.2/lib /Users/prakash/Documents/homework/zig/webgpu .zig-cache /Users/prakash/.cache/zig --seed 0x4b4167c1 -Z052224287b7125db

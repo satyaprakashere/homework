@@ -17,7 +17,7 @@ subtringMatch os ow = findMatch os gss ow 0 0 where
     findMatch [] h w c res = -1 -- End of phrase, End of the OG loop
     findMatch s h w c res
         | c == length ow = res - c -- Success condition, End of the OG loop, End of the program
-        | otherwise = case (head s) == (head w) of
+        | otherwise = case head s == head w of
             True -> findMatch  (tail s) (tail h) (tail w) (c+1) (res+1) -- local match
             False -> findMatch (tail s) (drop (head h + 1) h) (drop (head h + 1) ow) 0 (res+1) -- local mismatch
     gss = [-1, 0, 0, 0, -1, 0, 2] -- helper table
@@ -88,10 +88,10 @@ hylo :: Functor f => CoAlgebra f a -> Algebra f b -> a -> b
 hylo f g = g . fmap (hylo f g) . f  -- no mention of Fix!
 
 para :: Functor f => RAlgebra f a -> Fix f -> a
-para f = f . fmap ((,) <*> (para f)) . out
+para f = f . fmap ((,) <*> para f) . out
 
 apo :: Functor f => RCoAlgebra f a -> a -> Fix f
-apo f = In . (fmap (either id (apo f))) . f
+apo f = In . fmap (either id (apo f)) . f
 
 zygo :: Functor f => Algebra f b ->  (f (b, a) -> a) -> Fix f -> a
 zygo f g = snd . cata (\x -> (f $ fmap fst x, g x))

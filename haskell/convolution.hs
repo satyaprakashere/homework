@@ -1,4 +1,5 @@
 {-# LANGUAGE RankNTypes #-}
+module Main where
 
 module Main where
 

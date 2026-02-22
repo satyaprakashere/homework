@@ -23,6 +23,12 @@ main :: proc() {
 		fmt.print("> ")
 		line, err := bufio.reader_read_string(&reader, '\n')
 		if err != nil {
+<<<<<<< HEAD
+=======
+			if err != .EOF {
+				fmt.printf("Error reading: %v\n", err)
+			}
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 			break
 		}
 
@@ -31,14 +37,25 @@ main :: proc() {
 
 		p := parser_init(line)
 		expr := parse_expression(&p)
+<<<<<<< HEAD
 
 		c := compiler_init()
+=======
+		defer destroy_value(expr)
+
+		c := compiler_init()
+		defer destroy_compiler(&c)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 		compile_expression(&c, expr)
 
 		// Add a return at the end if not there
 		append(&c.bytecode.instructions, Instruction{op = .RET})
 
 		vm := vm_init(global_env)
+<<<<<<< HEAD
+=======
+		defer destroy_vm(&vm)
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 		result := vm_run(&vm, &c.bytecode)
 
 		fmt.printf("=> %s\n", value_to_string(result))

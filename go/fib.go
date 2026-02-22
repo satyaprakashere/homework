@@ -6,7 +6,7 @@ import "fmt"
 
 func main() {
 	fmt.Println("hello world")
-	fmt.Println(fibI(987654321))
+	fmt.Println(fibI(98765432))
 }
 
 func fib(n uint64) uint64 {

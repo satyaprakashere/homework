@@ -8,18 +8,22 @@ module Main where
 import Data.Bifunctor
 import Data.Typeable
 
+main :: IO ()
 main = do
     print tree
     print (contract maxE tree :: Int)
-    print (contract double tree :: BTree Int Int)
-    print (expand hippify tree :: BTree Int Int)
+    print (contract minE tree :: Int)
+    print (contract double tree :: BTree Int)
+    print (expand hippify tree :: BTree Int)
   where
     tree = Node 42 (Node 2 (Leaf 243) (Leaf 23)) (Node 23 (Leaf 32) (Leaf 78)) -- :: (BTree Int Int)
 
+hippify :: BTree Int -> BTreeF Int (BTree Int)
 hippify (Leaf a) = LeafF a
-hippify t@(Node a x y) = shift (direction a x y) t
+hippify t@(Node a x y) = shift (minDirection a x y) t
 
-shift :: Shift -> BTree Int Int -> BTreeF Int Int (BTree Int Int)
+-- Single Move of Recursion
+shift :: Shift -> BTree Int -> BTreeF Int (BTree Int)
 shift _ (Leaf a) = LeafF a -- Base case
 shift None (Node a x y) = NodeF a x y
 shift Righty (Node a x (Leaf r)) = NodeF r x (Leaf a)
@@ -27,28 +31,37 @@ shift Righty (Node a x (Node r r1 r2)) = NodeF r x (Node a r1 r2)
 shift Lefty (Node a (Leaf l) y) = NodeF l (Leaf a) y
 shift Lefty (Node a (Node l l1 l2) y) = NodeF l (Node a l1 l2) y
 
-direction a x y
+minDirection :: Ord a => a -> BTree a -> BTree a -> Shift
+minDirection a x y
     | a <= value x && a <= value y = None
     | a > value x = Lefty
     | otherwise = Righty
 
+value :: BTree a -> a
 value (Leaf a) = a
 value (Node a _ _) = a
 
 data Shift = Lefty | Righty | None
 
+--double :: BTreeF a l r -> BTree a
+double :: Num a => BTreeF a (BTree a) -> BTree a
 double (LeafF a) = Leaf (2 * a)
 double (NodeF a l r) = Node (2 * a) l r
 
+--multiply :: BTreeF a l r -> a
+multiply :: Num b => BTreeF b b -> b
 multiply (LeafF a) = a
 multiply (NodeF a l r) = product [a, l, r]
 
+minE :: Ord b => BTreeF b b -> b
 minE (LeafF a) = a
 minE (NodeF a l r) = minimum [a, l, r]
 
+maxE :: Ord b => BTreeF b b -> b
 maxE (LeafF a) = a
 maxE (NodeF a l r) = maximum [a, l, r]
 
+sumE :: Num b => BTreeF b b -> b
 sumE (LeafF a) = a
 sumE (NodeF a l r) = sum [a, l, r]
 
@@ -98,26 +111,27 @@ type List a = Fix (ListF a)
 type instance Base (Fix f) = f
 type instance Base [a] = ListF a
 
-data BTree b l
-    = Node b (BTree b l) (BTree b l)
-    | Leaf l
+data BTree a
+    = Node a (BTree a) (BTree a)
+    | Leaf a
     deriving (Show, Typeable, Functor, Traversable, Foldable)
 
-instance Bifunctor BTree where
-    bimap _ g (Leaf x) = Leaf (g x)
-    bimap f g (Node b l r) = Node (f b) (bimap f g l) (bimap f g r)
+--instance Bifunctor BTree where
+--  bimap _ g (Leaf x) = Leaf (g x)
+--  bimap f g (Node b l r) = Node (f b) (bimap f g l) (bimap f g r)
 
-data BTreeF b l r
-    = NodeF b r r
-    | LeafF l
+data BTreeF b s
+    = NodeF b s s
+    | LeafF b
     deriving (Show, Functor, Typeable)
 
-type instance Base (BTree a b) = BTreeF a b
-instance Recursive (BTree a b) where
+type instance Base (BTree a) = BTreeF a
+
+instance Recursive (BTree a) where
     project (Leaf x) = LeafF x
     project (Node s l r) = NodeF s l r
 
-instance Corecursive (BTree a b) where
+instance Corecursive (BTree a) where
     embed (NodeF sp x xs) = Node sp x xs
     embed (LeafF x) = Leaf x
 

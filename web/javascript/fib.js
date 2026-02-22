@@ -10,4 +10,15 @@ function fibonacci(n) {
     return curr;
 }
 
+<<<<<<< HEAD
 console.log(fibonacci(98765432)); // Output: 55
+=======
+console.log(fibonacci(98765432)); // Output: 55
+
+const fs = require('node:fs');
+const wasmBuffer = fs.readFileSync('fib.wasm');
+WebAssembly.instantiate(wasmBuffer).then(({ instance }) => {
+  const { add } = instance.exports;
+  console.log(fib(987)); // 11
+});
+>>>>>>> 92e2e66 ([update] mac mini update from feb 2026)

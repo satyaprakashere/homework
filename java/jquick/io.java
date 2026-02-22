@@ -1,4 +1,3 @@
-
 void main() throws IOException {
   final var br = new BufferedReader(new InputStreamReader(System.in));
   final var st = new StringTokenizer(br.readLine());

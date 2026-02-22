@@ -1,11 +1,9 @@
-record Pair<T>(T x, T y) {
-}
+record Pair<T>(T x, T y) {}
 
-record Point(int x, int y) {
-}
+//@value
+record Point(int x, int y) {}
 
-record Node<T>(T value, Node<T> left, Node<T> right) {
-}
+record Node<T>(T value, Node<T> left, Node<T> right) {}
 
 sealed class Animal permits Dog, Cat {
     String sound() {
@@ -23,13 +21,15 @@ final class Cat extends Animal {
 }
 
 void main() {
-    IO.println("Hello, World!");
-    IO.println("Welcome to Java!");
+    IO.println("Welcome to Java 25!");
 
-    final var pair = new Pair<>(1, 2);
+    final var pair = new Point(1, 2);
+    final var pair2 = new Point(1, 2);
+    
     IO.println(pair.x());
     IO.println(pair.y());
-    IO.println(pair);
+    IO.println(pair == pair2);
+    IO.println(pair.equals(pair2));
 
     final var animal = new Dog();
     IO.println(animal.sound());

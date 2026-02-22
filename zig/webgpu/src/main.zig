@@ -4,17 +4,16 @@ const triangle = @import("triangle.zig");
 // var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
 // const stdout = &stdout_writer.interface;
 
-
 pub fn main() !void {
-    var buffer = [1024]u8{};
-    var stdout_writer = std.fs.File.stdout().writer(&buffer);
-    var stdout = &stdout_writer.interface;
+    var stdout_buffer: [4096]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
 
     std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-    try stdout.print("Run `zig build test` to run the tests.\n");
+    try stdout.print("Run `zig build test` to run the tests.\n", .{});
     try triangle.run();
 
-    stdout.flush();
+    try stdout.flush(); // Don't forget to flush!
 }
 
 test "simple test" {

@@ -1,9 +1,11 @@
 module Main (main) where
 
-import Lib
+import System.Environment (getArgs)
+import ReadExpr(readExpr)
 
 main :: IO ()
 main = do
-  args <- getArgs
-  let evaled = liftM show $ readExpr (head args) >>= eval in
-    putStrLn $ extractValue $ trapError evaled
+    args <- getArgs
+    case readExpr (head args) of
+        Left err -> print err
+        Right val -> print val

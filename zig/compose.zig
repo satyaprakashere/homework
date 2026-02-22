@@ -82,18 +82,18 @@ fn compose(comptime h: anytype, comptime gs: anytype) type {
 
 fn buildTuple(comptime types: []const type) type {
     comptime var fields: [types.len]std.builtin.Type.StructField = undefined;
+    const null_ptr: ?*const anyopaque = @ptrFromInt(0);
     inline for (types, 0..) |T, i| {
         fields[i] = .{
             .name = std.fmt.comptimePrint("{}", .{i}), // "@\"0\"", "@\"1\""
             .type = T,
-            .default_value_ptr = null,
+            .default_value_ptr = null_ptr,
             .is_comptime = true,
             .alignment = 0,
         };
     }
-    return @Type(.{
-        .@"struct" = .{ .layout = .auto, .fields = &fields, .decls = &[_]std.builtin.Type.Declaration{}, .is_tuple = true },
-    });
+
+    return @Type(.{ .@"struct" = .{ .layout = .auto, .fields = &fields, .decls = &[_]std.builtin.Type.Declaration{}, .is_tuple = true } });
 }
 
 // Example usage
