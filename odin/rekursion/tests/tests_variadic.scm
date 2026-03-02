@@ -1,6 +1,0 @@
-(print "Running Variadic Tests...")
-(define (list . x) x)
-(print (list 1 2 3))
-(define (head-rest x . y) y)
-(print (head-rest 1 2 3 4))
-(print (head-rest 1))

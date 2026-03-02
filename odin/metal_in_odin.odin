@@ -11,19 +11,10 @@ import "core:os"
 
 main :: proc() {
 	err := metal_main()
-<<<<<<< HEAD
 	if err != nil {
 		fmt.eprintln(err->localizedDescription()->odinString())
 		os.exit(1)
 	}
-=======
-	if err == nil {
-		return
-	}
-
-	fmt.eprintln(err->localizedDescription()->odinString())
-	os.exit(1)
->>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
 }
 
 metal_main :: proc() -> (err: ^NS.Error) {
@@ -32,7 +23,6 @@ metal_main :: proc() -> (err: ^NS.Error) {
 	SDL.Init({.VIDEO})
 	defer SDL.Quit()
 
-<<<<<<< HEAD
 	window := SDL.CreateWindow(
 		"Metal in Odin",
 		SDL.WINDOWPOS_CENTERED,
@@ -40,12 +30,7 @@ metal_main :: proc() -> (err: ^NS.Error) {
 		854,
 		480,
 		{.ALLOW_HIGHDPI, .HIDDEN, .RESIZABLE},
-	)
-=======
-	window := SDL.CreateWindow("Metal in Odin",
-		SDL.WINDOWPOS_CENTERED, SDL.WINDOWPOS_CENTERED,
-		854, 480, {.ALLOW_HIGHDPI, .HIDDEN, .RESIZABLE})
->>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
+	)r
 	defer SDL.DestroyWindow(window)
 
 	window_system_info: SDL.SysWMinfo

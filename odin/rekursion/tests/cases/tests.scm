@@ -1,0 +1,38 @@
+; (and true true) ;; => true
+(define x 10) ;; => x
+x ;; => 10
+(+ 1 2) ;; => 3
+(+ x 5) ;; => 15
+(cons 1 2) ;; => (1 . 2)
+(first (cons 1 2)) ;; => 1
+(rest (cons 1 2)) ;; => 2
+(array 1 2 3) ;; => (1 2 3)
+(define (add a b) (+ a b)) ;; => add
+(add 11 8) ;; => 19
+(add x 8) ;; => 18
+(define arr (array 1 2 3)) ;; => arr
+arr ;; => (1 2 3)
+(+ x 1) ;; => 11
+(define (list . x) x);; nil
+(array 1 2 4 3) ;; => (1 2 4 3)
+; (define (head-rest x . y) y);; nil
+; (head-rest 1 2 3 4) ;; => (2 3 4)
+; (head-rest 1) ;; => ()
+(define t (table)) ;; => t
+(set t 'x 10) ;; => 10
+(get t 'x) ;; => 10
+(define child (table)) ;; => child
+(set-parent child t) ;; => |table|
+(get child 'x) ;; => 10
+(set child 'x 20) ;; => 20
+(get child 'x) ;; => 20
+(get t 'x) ;; => 10
+(define (all . args) (and args));; => all
+; (all true false) ;; => false
+(define (test name expected actual) (if (eq? expected actual) (print (string-append "PASS: " name)) (print (string-append "FAIL: " name " expected " (number->string expected) " got " (number->string actual)))));; => test
+test ;; => |procedure|
+; (test "Simple reset" 1 (reset 1))
+; (test "Reset calc" 3 (reset (+ 1 2)))
+; (test "Shift discard" 5 (reset (+ 1 (shift k 5))))
+; (test "Shift use once" 3 (reset (+ 1 (shift k (k 2)))))
+; (test "Shift use twice manual check" 6 (reset (+ 1 (shift k (+ (k 2) (k 2))))))

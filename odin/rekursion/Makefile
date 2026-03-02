@@ -1,21 +1,20 @@
 .PHONY: build run test test-features
 
 build:
-	odin build src -out:out/rekursion
+	odin build core -out:out/rekursion
 
 run: build
 	./out/rekursion
 
+clean: rm -rf ./out
+
 test:
-	odin test src -out:out/rekursion_test
+	odin test tests -out:out/rekursion_test
 
 test-features: build
-<<<<<<< HEAD
-	cat tests/tests.scm 		 | ./out/rekursion
-=======
-	cat tests/simple.scm 		 | ./out/rekursion
->>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
-# 	cat tests/tests_features.scm | ./out/rekursion
-# 	cat tests/tests_arrays.scm 	 | ./out/rekursion
-# 	cat tests/tests_tables.scm 	 | ./out/rekursion
-# 	cat tests/tests_variadic.scm | ./out/rekursion
+	cat tests/cases/functions.scm 		 | ./out/rekursion
+	cat tests/cases/lambda.scm 		 | ./out/rekursion
+	cat tests/cases/continuations.scm 	 | ./out/rekursion
+	cat tests/cases/arrays.scm 	 		 | ./out/rekursion
+	cat tests/cases/tables.scm 	 		 | ./out/rekursion
+	cat tests/cases/variadic.scm 			 | ./out/rekursion

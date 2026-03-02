@@ -6,6 +6,7 @@ import "core:fmt"
 main :: proc() {
 	test_array()
 	test_set()
+	test_map()
 	test_quueue()
 }
 
@@ -31,11 +32,39 @@ test_set :: proc() {
 	if "Odin" in my_set {
 		fmt.println("Odin is in the set!")
 	}
-
+	
+	fmt.println(my_set)
 	// Iterate
-	for entry, _ in my_set {
-		fmt.println(entry)
-	}
+//	for entry, _ in my_set {
+//		fmt.println(entry)
+//	}
+}
+
+test_map :: proc() {
+// Initialize a set of strings
+	my_map:= make(map[string]^string)
+	defer delete(my_map)
+	
+	a := "C successor"
+	b := "Lightweight Java"
+	c:= "Evil"
+
+	// Add elements
+	my_map["Odin"] = &a
+	my_map["Go"] = &b
+	my_map["Rust"] = &c
+	
+	// Check for existence
+//	if "Odin" in my_map {
+//		fmt.println("Odin is in the set!")
+//	}
+//	
+	
+	fmt.println(my_map)
+	// Iterate
+//	for entry, _ in my_set {
+//		fmt.println(entry)
+//	}
 }
 
 test_quueue :: proc() {

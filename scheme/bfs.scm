@@ -1,5 +1,5 @@
-#! /usr/local/bin/csi -script
-(import srfi-1)
+;#! /usr/local/bin/csi -script
+;(import srfi-1)
 
 (define (assoc-get key alist)
   (let ((entry (assoc key alist)))

@@ -1,0 +1,10 @@
+(print "Running Table Tests...") ;; => Nil
+(define t (table)) ;; => t
+(set t 'x 10) ;; => 10
+(get t 'x) ;; => 10
+(define child (table)) ;; => child
+(set-parent child t) ;; => |Table|
+(get child 'x) ;; => 10
+(set child 'x 20) ;; => 20
+(get child 'x) ;; => 20
+(get t 'x) ;; => 10

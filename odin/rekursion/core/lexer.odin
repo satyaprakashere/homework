@@ -4,39 +4,6 @@ import "core:strings"
 import "core:unicode"
 import "core:unicode/utf8"
 
-Token_Type :: enum {
-	EOF,
-	LEFT_PAREN,
-	RIGHT_PAREN,
-	DOT,
-	QUOTE,
-	SYMBOL,
-	NUMBER,
-	STRING,
-	BOOLEAN,
-	REQUIRE,
-	IMPORT,
-	RECUR,
-	RETURN,
-	GOTO,
-	RETURNTO,
-	GENERATE,
-	YIELD,
-	LEFT_BRACKET,
-	RIGHT_BRACKET,
-<<<<<<< HEAD
-=======
-	LAMBDA,
->>>>>>> 92e2e66 ([update] mac mini update from feb 2026)
-}
-
-Token :: struct {
-	type: Token_Type,
-	text: string,
-	line: int,
-	col:  int,
-}
-
 Lexer :: struct {
 	source: string,
 	offset: int,
@@ -47,6 +14,10 @@ Lexer :: struct {
 lexer_init :: proc(source: string) -> Lexer {
 	return Lexer{source = source, line = 1, col = 1}
 }
+
+// is_newline :: proc(tok: Token) -> bool {
+// 	return tok.type == .NEWLINE
+// }
 
 is_whitespace :: proc(r: rune) -> bool {
 	return unicode.is_white_space(r)
@@ -86,25 +57,26 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 		l.offset += 1
 		l.col += 1
 		return Token{type = .QUOTE, text = "'", line = start_line, col = start_col}
+	case '`':
+		l.offset += 1
+		l.col += 1
+		return Token{type = .BACKTICK, text = "`", line = start_line, col = start_col}
+	case ',':
+		l.offset += 1
+		l.col += 1
+		r_next, _ := utf8.decode_rune_in_string(l.source[l.offset:])
+		if r_next == '@' {
+			l.offset += 1
+			l.col += 1
+			return Token{type = .COMMA_AT, text = ",@", line = start_line, col = start_col}
+		}
+		return Token{type = .COMMA, text = ",", line = start_line, col = start_col}
 	case '.':
 		l.offset += 1
 		l.col += 1
 		return Token{type = .DOT, text = ".", line = start_line, col = start_col}
-	case '#':
-		l.offset += 1
-		l.col += 1
-		r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
-		if r_next == 't' || r_next == 'f' {
-			l.offset += size_next
-			l.col += 1
-			return Token {
-				type = .BOOLEAN,
-				text = l.source[start_offset:l.offset],
-				line = start_line,
-				col = start_col,
-			}
-		}
-	// Fallthrough for other # things if needed, or error
+	// case '#':
+	// 	return lexer_read_hash(l, start_offset, start_line, start_col)
 	case '"':
 		return lexer_read_string(l)
 	case '[':
@@ -132,6 +104,24 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
 }
 
+// lexer_read_hash :: proc(l: ^Lexer, start_offset, start_line, start_col: int) -> Token {
+// 	l.offset += 1
+// 	l.col += 1
+// 	r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
+// 	if r_next == 't' || r_next == 'f' {
+// 		l.offset += size_next
+// 		l.col += 1
+// 		return Token {
+// 			type = .BOOLEAN,
+// 			text = l.source[start_offset:l.offset],
+// 			line = start_line,
+// 			col = start_col,
+// 		}
+// 	}
+// 	// Fallthrough error
+// 	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
+// }
+
 lexer_skip_whitespace :: proc(l: ^Lexer) {
 	for l.offset < len(l.source) {
 		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
@@ -143,17 +133,21 @@ lexer_skip_whitespace :: proc(l: ^Lexer) {
 				l.col += 1
 			}
 			l.offset += size
-		} else if r == ';' { 	// Comments
-			for l.offset < len(l.source) {
-				r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
-				l.offset += size_next
-				if r_next == '\n' {
-					l.line += 1
-					l.col = 1
-					break
-				}
-			}
+		} else if r == ';' {
+			lexer_skip_comment(l)
 		} else {
+			break
+		}
+	}
+}
+
+lexer_skip_comment :: proc(l: ^Lexer) {
+	for l.offset < len(l.source) {
+		r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
+		l.offset += size_next
+		if r_next == '\n' {
+			l.line += 1
+			l.col = 1
 			break
 		}
 	}
