@@ -1,6 +1,6 @@
 package rekursion
+
 import "core:fmt"
-import "core:mem"
 import "core:strings"
 
 Compiler :: struct {

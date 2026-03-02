@@ -1,3 +1,11 @@
+; (define (car list) (first list))
+; (define (cdr list) (rest list))
+
+; (define (+ args) (add args))
+; (define (- args) (sub args))
+; (define (* args) (mult args))
+; (define (/ args) (div args))
+
 (define cadr (lambda (x) (car (cdr x))))
 (define cdar (lambda (x) (cdr (car x))))
 (define caar (lambda (x) (car (car x))))

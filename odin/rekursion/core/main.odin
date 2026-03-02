@@ -73,7 +73,7 @@ repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 
 	line, err := bufio.reader_read_string(reader, '\n')
 	if err != nil {
-		if err != .EOF {fmt.printf("Error reading: %v\n", err)}
+		if err != .EOF {log.info("Error reading: %v\n", err)}
 		os.exit(0)
 	}
 	defer delete(line)
@@ -90,5 +90,5 @@ repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 
 	vm.ip = start_ip
 	result := vm_run(vm, &c.bytecode)
-	fmt.printf("=> %s\n", value_to_string(result))
+	log.info("=> %s\n", value_to_string(result))
 }

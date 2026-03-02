@@ -517,7 +517,7 @@ r_draw_text :: proc(
 	}
 
 	if x_inc != nil {
-		last := r.font_instances.data[r.font_instances.len - 1]
+		last := r.font_instances.data[r.font_instances.len-1]
 		x_inc^ += last.pos_max.x - pos.x
 	}
 }

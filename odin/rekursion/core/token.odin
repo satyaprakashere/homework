@@ -1,6 +1,37 @@
 package rekursion
 
-Token_Type :: enum {
+
+Token :: struct {
+	type: TokenType,
+	text: string,
+	line: int,
+	col:  int,
+}
+
+tokens := [TokenType.COUNT]string {
+	"EOF",
+	"(",
+	")",
+	".",
+	"\"",
+	"Symbol",
+	"NUMBER",
+	"Srting",
+	"Bool",
+	"[",
+	"]",
+	"{",
+	"}",
+	"lambda",
+	"`",
+	",",
+	",",
+	"\n",
+	";",
+	":",
+}
+
+TokenType :: enum {
 	EOF,
 	LEFT_PAREN,
 	RIGHT_PAREN,
@@ -21,11 +52,6 @@ Token_Type :: enum {
 	NEWLINE,
 	SEMICOLON,
 	COLON,
-}
 
-Token :: struct {
-	type: Token_Type,
-	text: string,
-	line: int,
-	col:  int,
+	COUNT,
 }

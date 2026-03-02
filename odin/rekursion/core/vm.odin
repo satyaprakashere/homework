@@ -256,7 +256,6 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return Nil{}, true
 	}
 	args := make([]Value, num_args)
-	defer destroy_values(args)
 	for i in 0 ..< num_args {
 		args[num_args - 1 - i] = pop(&vm.stack)
 	}

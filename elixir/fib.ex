@@ -22,7 +22,7 @@ defmodule Fibonacci do
   
   def run() do
     res = Fibonacci.fib(98765432)
-    IO.puts(res)
+    IO.puts res
   end
 end
 

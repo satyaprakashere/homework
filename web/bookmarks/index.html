@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bookmarks - A premium hacker news clone">
+    <title>Bookmarks</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="navbar">
+            <div class="nav-left">
+                <a href="#" class="logo">
+                    <span class="logo-box">B</span>
+                    <span class="logo-text">Bookmarks</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="#">new</a>
+                    <a href="#">past</a>
+                    <a href="#">comments</a>
+                    <a href="#">ask</a>
+                    <a href="#">show</a>
+                    <a href="#">jobs</a>
+                    <a href="#">submit</a>
+                </nav>
+            </div>
+            <div class="nav-right">
+                <a href="#">login</a>
+            </div>
+        </header>
+
+        <main class="content">
+            <ol class="news-list">
+                <!-- Item 1 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">Show Bookmarks: A sleek, modern Hacker News clone</a>
+                            <a href="#" class="item-domain">(github.com/prakash)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">420 points</span> by <a href="#" class="user">satyaprakash</a> <span class="time">1 hour ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">156 comments</a>
+                    </div>
+                </li>
+                
+                <!-- Item 2 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">NASA's new telescope captures breathtaking images of distant galaxies</a>
+                            <a href="#" class="item-domain">(nasa.gov)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">312 points</span> by <a href="#" class="user">astronerd</a> <span class="time">3 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">89 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 3 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">PostgreSQL 17 Released</a>
+                            <a href="#" class="item-domain">(postgresql.org)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">286 points</span> by <a href="#" class="user">dba_pro</a> <span class="time">4 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">234 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 4 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">Why we decided to rewrite our core engine in Rust</a>
+                            <a href="#" class="item-domain">(techblog.io)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">195 points</span> by <a href="#" class="user">rustacean</a> <span class="time">5 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">182 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 5 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">Ask Bookmarks: What are your favorite minimal web designs?</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">150 points</span> by <a href="#" class="user">design_enthusiast</a> <span class="time">6 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">310 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 6 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">A deep dive into CSS Grid layout techniques</a>
+                            <a href="#" class="item-domain">(css-tricks.com)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">112 points</span> by <a href="#" class="user">frontend_wizard</a> <span class="time">7 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">45 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 7 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">The history of the Unix operating system</a>
+                            <a href="#" class="item-domain">(bell-labs.com)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">98 points</span> by <a href="#" class="user">unixbeard</a> <span class="time">8 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">67 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 8 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">Reverse engineering a classic 90s arcade game</a>
+                            <a href="#" class="item-domain">(retro-hacker.net)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">85 points</span> by <a href="#" class="user">arcade_fan</a> <span class="time">9 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">24 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 9 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">An interactive guide to algorithms and data structures</a>
+                            <a href="#" class="item-domain">(algo-visualizer.org)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">74 points</span> by <a href="#" class="user">compscistudent</a> <span class="time">10 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">18 comments</a>
+                    </div>
+                </li>
+
+                <!-- Item 10 -->
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="#" class="item-title">OpenAI announces new voice API features</a>
+                            <a href="#" class="item-domain">(openai.com)</a>
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">62 points</span> by <a href="#" class="user">ai_watcher</a> <span class="time">11 hours ago</span> 
+                        <span class="meta-divider">•</span> <a href="#">hide</a> 
+                        <span class="meta-divider">•</span> <a href="#">92 comments</a>
+                    </div>
+                </li>
+            </ol>
+            
+            <a href="#" class="more-link">More articles</a>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#">Guidelines</a>
+                <span class="meta-divider">•</span>
+                <a href="#">FAQ</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Lists</a>
+                <span class="meta-divider">•</span>
+                <a href="#">API</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Security</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Legal</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Apply to YC</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Contact</a>
+            </div>
+            <div class="search-bar">
+                <label for="search">Search:</label>
+                <input type="text" id="search" placeholder="Search Bookmarks...">
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

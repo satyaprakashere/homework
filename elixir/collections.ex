@@ -1,12 +1,12 @@
 defmodule Collections do
 	def testList() do
 		lst = [1, 2]
-		IO.inspect(lst)
+		IO.inspect lst
 	end
 	
 	def testMap() do
 		map = %{1=>"Hello", 2=>"There"}
-		IO.inspect(map)
+		IO.inspect map
 	end
 
 	def testSet() do
@@ -14,7 +14,7 @@ defmodule Collections do
 		set = MapSet.put(set, 4)
 #		recur ()
 		set = MapSet.put(set, 2)
-		IO.inspect(set)
+		IO.inspect set
 	end
 end
 

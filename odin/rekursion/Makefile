@@ -3,10 +3,12 @@
 build:
 	odin build core -out:out/rekursion
 
-run: build
+run:
+	build
 	./out/rekursion
 
-clean: rm -rf ./out
+clean:
+	rm -rf ./out
 
 test:
 	odin test tests -out:out/rekursion_test

@@ -11,5 +11,5 @@ fn fib(n: u64) -> Num {
 }
 
 fn main() {
-    println!("{}", fib(987));
+    println!("{}", fib(98765));
 }

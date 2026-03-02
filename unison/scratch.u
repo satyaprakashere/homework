@@ -1,3 +1,7 @@
+<<<<<<< HEAD
 myTerm = List.map (x -> x * 10) [1,2,3,4,5,6]
 
 print "Hello"
+=======
+
+>>>>>>> ee3c6d7 ([update] mac mini update from march 2026)

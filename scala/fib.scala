@@ -1,3 +1,4 @@
-object Hello extends App {
-    println("Hello, world!")
-}
+@main
+def hello(): Unit =
+    println("Hello, World!")
+    

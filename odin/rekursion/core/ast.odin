@@ -171,30 +171,6 @@ array_to_string :: proc(v: Array) -> string {
 	return strings.to_string(sb)
 }
 
-destroy_value :: proc(v: Value) {
-	// Value lifecycle is now managed by arenas for AST/evaluation.
-	// Long-lived values (global_env) use the tracking allocator,
-	// but are technically living until application exit anyway.
-}
-
-destroy_values :: proc(vals: []Value) {
-}
-
-destroy_continuation :: proc(c: ^Continuation) {
-}
-
-destroy_table :: proc(t: ^Table) {
-}
-
-destroy_procedure :: proc(p: ^Procedure) {
-}
-
-destroy_call_frame :: proc(c: CallFrame) {
-}
-
-destroy_call_frames :: proc(frames: []CallFrame) {
-}
-
 destroy_env :: proc(e: ^Env) {
 	if e == nil {return}
 	delete(e.values)

@@ -71,8 +71,8 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 		l.offset += 1
 		l.col += 1
 		return Token{type = .DOT, text = ".", line = start_line, col = start_col}
-	// case '#':
-	// 	return lexer_read_hash(l, start_offset, start_line, start_col)
+	case '#':
+		return lexer_read_hash(l, start_offset, start_line, start_col)
 	case '"':
 		return lexer_read_string(l)
 	case '[':
@@ -100,23 +100,23 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
 }
 
-// lexer_read_hash :: proc(l: ^Lexer, start_offset, start_line, start_col: int) -> Token {
-// 	l.offset += 1
-// 	l.col += 1
-// 	r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
-// 	if r_next == 't' || r_next == 'f' {
-// 		l.offset += size_next
-// 		l.col += 1
-// 		return Token {
-// 			type = .BOOLEAN,
-// 			text = l.source[start_offset:l.offset],
-// 			line = start_line,
-// 			col = start_col,
-// 		}
-// 	}
-// 	// Fallthrough error
-// 	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
-// }
+lexer_read_hash :: proc(l: ^Lexer, start_offset, start_line, start_col: int) -> Token {
+	l.offset += 1
+	l.col += 1
+	r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
+	if r_next == 't' || r_next == 'f' {
+		l.offset += size_next
+		l.col += 1
+		return Token {
+			type = .BOOLEAN,
+			text = l.source[start_offset:l.offset],
+			line = start_line,
+			col = start_col,
+		}
+	}
+	// Fallthrough error
+	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
+}
 
 lexer_skip_whitespace :: proc(l: ^Lexer) {
 	for l.offset < len(l.source) {
