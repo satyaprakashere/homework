@@ -1,4 +1,3 @@
-defprotocol Blank where
-    func isBlank : a -> bool
-end
-
+(define Blank
+    (where
+        (func (isBlank a) bool)))

@@ -44,6 +44,7 @@ setup_primitives :: proc(env: ^Env) {
 
 builtin_add :: proc(args: []Value) -> Value {
 	res: i64 = 0
+	// TODO: Add optimizations in layer 2
 	for a in args {
 		res += a.(i64)
 	}

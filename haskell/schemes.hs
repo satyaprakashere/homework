@@ -13,7 +13,7 @@ import Debug.Trace
 main = do
   print "Hello world"
   --  print $ refold addlasttwo multiply (1, 2, 6) -- product of fibonacci
-  --  print (unfold decrease 6 :: [Integer]) -- list thourough expansion
+--print (anaf decreasef 6 :: [Integer]) -- list thourough expansion
   --  print $ toList (anaf decrease 6) -- list thourough expansion
   --  print $ fold multiply [1, 2, 3, 4, 5, 6] -- Factorial thourough product
   --  print $ fold multiply [] -- Factorial thourough product
@@ -46,6 +46,10 @@ addlasttwo (x, y) = Cons x (y, x + y) -- 0, 1, 1, 2, 3,
 decrease :: CoAlgebra (List Integer) Integer
 decrease 0 = Nil
 decrease n = Cons n (n - 1)
+
+--decreasef :: CoAlg (List Integer) Integer
+decreasef 0 = Nil
+decreasef n = Cons n (n - 1)
 
 endsWith9 n = Cons n (n + 10)
 

@@ -41,3 +41,6 @@ make test-features
 
 -   `src/`: Odin source code.
 -   `tests/`: Scheme test files.
+<div style="background-color: #fcf8e3; padding: 10px; border: 1px solid #faebcc;">
+	This is a highlighted block of text.
+</div>

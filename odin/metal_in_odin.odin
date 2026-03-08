@@ -30,7 +30,7 @@ metal_main :: proc() -> (err: ^NS.Error) {
 		854,
 		480,
 		{.ALLOW_HIGHDPI, .HIDDEN, .RESIZABLE},
-	)r
+	)
 	defer SDL.DestroyWindow(window)
 
 	window_system_info: SDL.SysWMinfo

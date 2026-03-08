@@ -15,10 +15,6 @@ lexer_init :: proc(source: string) -> Lexer {
 	return Lexer{source = source, line = 1, col = 1}
 }
 
-// is_newline :: proc(tok: Token) -> bool {
-// 	return tok.type == .NEWLINE
-// }
-
 is_whitespace :: proc(r: rune) -> bool {
 	return unicode.is_white_space(r)
 }

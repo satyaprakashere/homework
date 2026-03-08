@@ -36,8 +36,6 @@ void testExecutorService() throws IOException {
     try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
         IntStream.range(0, 100000).forEach((i) -> {
             Future<String> future = executor.submit(() -> {
-                // Simulate task
-//              Thread.sleep(500);
                 return "Result from virtual thread\n";
             });
             

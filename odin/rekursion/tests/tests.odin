@@ -1,5 +1,6 @@
 package tests
 
+import "core:log"
 import core "../core"
 
 import "core:fmt"
@@ -10,31 +11,28 @@ import "core:testing"
 
 @(test)
 tests :: proc(t: ^testing.T) {
-	handle, err := os.open(
-		"out/logs/tests_debug.log",
-		os.O_APPEND | os.O_WRONLY | os.O_CREATE,
-		0o644,
-	)
+	context.logger = log.create_console_logger()
+
+	handle, err := os.open("out/logs/tests_debug.log", os.O_APPEND | os.O_WRONLY | os.O_CREATE)
 	if err != nil {
-		fmt.println("Error: Could not open tests_debug.log")
+		log.error("Error: Could not open tests_debug.log")
 		os.exit(1)
 	}
 	defer os.close(handle)
-	fmt.println("Running tests from tests.scm...")
+	log.info("Running tests from tests.scm...")
 	os.write_string(handle, "Started tests runner\n")
 
 	// Read tests.scm
-	original_allocator := context.allocator
-	data, ok := os.read_entire_file("tests/cases/tests.scm", original_allocator)
-	if !ok {
-		fmt.println("Error: Could not read tests.scm")
+	data, errf := os.read_entire_file("tests/cases/tests.scm", context.allocator)
+	if errf != nil {
+		log.info("Error: Could not read tests.scm")
 		os.exit(1)
 	}
-	defer delete(data, original_allocator)
+	defer delete(data, context.allocator)
 
 	content := string(data)
-	lines := strings.split(content, "\n", original_allocator)
-	defer delete(lines, original_allocator)
+	lines := strings.split(content, "\n")
+	defer delete(lines)
 
 	// Prepare an arena allocator for this iteration of the test
 	arena: virtual.Arena
@@ -55,7 +53,7 @@ tests :: proc(t: ^testing.T) {
 	c := core.compiler_init(global_env)
 	vm := core.vm_init(global_env)
 
-	core.load_stdlib(&arena, global_env, &c, &vm)
+	core.load_stdlib(&c, &vm)
 
 	failed := 0
 	passed := 0
@@ -80,20 +78,11 @@ tests :: proc(t: ^testing.T) {
 		// Run code
 		p := core.parser_init(code)
 		expr := core.parse_expression(&p)
-		// fmt.printf("Parsed: %v\n", expr)
 		start_ip := len(c.bytecode.instructions)
 
 		core.compile_expression(&c, expr)
-
 		// Add return
 		append(&c.bytecode.instructions, core.Instruction{op = .RET})
-
-		// DEBUG: Print emitted instructions
-		// fmt.printf("Instructions for %s:\n", code)
-		// for idx := start_ip; idx < len(c.bytecode.instructions); idx += 1 {
-		// 	inst := c.bytecode.instructions[idx]
-		// 	fmt.printf("  %d: %v %v\n", idx, inst.op, inst.arg)
-		// }
 
 		vm.ip = start_ip
 		result := core.vm_run(&vm, &c.bytecode)

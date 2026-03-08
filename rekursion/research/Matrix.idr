@@ -5,3 +5,4 @@ interface MatrixOp Num a => (mat : n -> m -> a -> Type) where
   (+) : (mat n m a) -> (mat n m a) -> (mat n m a)
   (-) : (mat n m a) -> (mat n m a) -> (mat n m a)
   (*) : (mat n m a) -> (mat m o a) -> (mat n o a)
+

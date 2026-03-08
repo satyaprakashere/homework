@@ -373,12 +373,16 @@ compile_begin :: proc(compiler: ^Compiler, p: ^Pair) {
 
 compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 	args := p.rest.(^Pair)
+
 	jump_idx := len(compiler.bytecode.instructions)
 	append(&compiler.bytecode.instructions, Instruction{op = .JUMP, arg = 0})
+
 	start_ip := len(compiler.bytecode.instructions)
 	compile_expression(compiler, args.rest.(^Pair).first)
 	append(&compiler.bytecode.instructions, Instruction{op = .RET})
+
 	compiler.bytecode.instructions[jump_idx].arg = i32(len(compiler.bytecode.instructions))
+	
 	proc_proto := compile_lambda_params(args.first, start_ip)
 	idx := add_constant(compiler, proc_proto)
 	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
@@ -420,9 +424,11 @@ compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
 compile_reset :: proc(compiler: ^Compiler, p: ^Pair) {
 	args := p.rest.(^Pair)
 	reset_idx := len(compiler.bytecode.instructions)
+
 	append(&compiler.bytecode.instructions, Instruction{op = .RESET})
 	compile_expression(compiler, args.first)
 	append(&compiler.bytecode.instructions, Instruction{op = .FINISH_RESET})
+
 	compiler.bytecode.instructions[reset_idx].arg = i32(len(compiler.bytecode.instructions))
 }
 

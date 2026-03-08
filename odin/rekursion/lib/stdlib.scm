@@ -33,7 +33,7 @@
       '()
       (let ((clause (car clauses)))
         (if (eq (car clause) 'else)
-            `(begin ,@(cdr clause))
             `(if ,(car clause)
                  (begin ,@(cdr clause))
                  (cond ,@(cdr clauses)))))))
+

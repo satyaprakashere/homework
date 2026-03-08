@@ -4,7 +4,7 @@ import Language.Haskell.TH
 
 main :: IO ()
 main = do
-    print (listToTuple 3 [1,2,3])
+	print (listToTuple 3 [1,2,3])
 
 
 listToTuple :: Int -> [a] -> Q Exp

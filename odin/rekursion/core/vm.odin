@@ -4,7 +4,7 @@ import "core:fmt"
 import "core:mem"
 import "core:reflect"
 
-STACK_LIMIT :: 10
+STACK_LIMIT :: 108
 
 Op_Code :: enum u8 {
 	NOP,
@@ -71,13 +71,6 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 		}
 		inst := bytecode.instructions[vm.ip]
 		vm.ip += 1
-		// fmt.printf(
-		// 	"TRACE: ip=%d op=%v arg=%v len(stack)=%d\n",
-		// 	vm.ip - 1,
-		// 	inst.op,
-		// 	inst.arg,
-		// 	len(vm.stack),
-		// )
 		if val, quit := vm_exec_inst(vm, bytecode, inst); quit {
 			return val
 		}
@@ -88,6 +81,11 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 
 vm_exec_inst :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value, bool) {
 	switch inst.op {
+	// vm_exec_inst to vm_exec_stack
+	// with same arguments
+	// and one extra result-flag
+	//
+	// I should be able to reuse this callframe/stackframe, how?
 	case .NOP, .PUSH_CONST, .PUSH_NIL, .PUSH_TRUE, .PUSH_FALSE, .POP, .MAKE_ARRAY:
 		return vm_exec_stack(vm, bytecode, inst), false
 	case .LOAD_VAR, .STORE_VAR, .DEF_VAR:
@@ -108,14 +106,16 @@ vm_exec_inst :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return vm_exec_call(vm, bytecode, inst)
 	case .RESET, .FINISH_RESET, .SHIFT, .SHIFT_YIELD:
 		return vm_exec_shift_reset(vm, inst), false
+	case:
+		return Nil{}, false
 	}
-	return Nil{}, false
 }
 
 vm_exec_stack :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 	#partial switch inst.op {
 	case .NOP:
 	case .PUSH_CONST:
+		// TODO: add multiple type of constants
 		append(&vm.stack, bytecode.constants[inst.arg])
 	case .PUSH_NIL:
 		append(&vm.stack, Nil{})
@@ -126,16 +126,18 @@ vm_exec_stack :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value 
 		v: Value = false
 		append(&vm.stack, v)
 	case .POP:
+		// TODO: why not return this value?
 		pop(&vm.stack)
 	case .MAKE_ARRAY:
 		size := int(inst.arg)
 		vec := make([dynamic]Value, size)
+		// TODO: optimize in layer 2
 		for i in 0 ..< size {
 			vec[size - 1 - i] = pop(&vm.stack)
 		}
 		append(&vm.stack, Array{data = vec})
-	case:
 	}
+
 	return Nil{}
 }
 
@@ -143,7 +145,9 @@ vm_exec_env :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 	symbol := bytecode.constants[inst.arg].(Symbol)
 	#partial switch inst.op {
 	case .LOAD_VAR:
-		if val, ok := env_lookup(vm.env, symbol); ok {append(&vm.stack, val)} else {
+		if val, ok := env_lookup(vm.env, symbol); ok {
+			append(&vm.stack, val)
+		} else {
 			fmt.printf("Unbound variable: %s\n", symbol)
 			append(&vm.stack, Nil{})
 		}
@@ -153,11 +157,11 @@ vm_exec_env :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 		val := pop(&vm.stack)
 		if vm.env.parent == nil {
 			// Global environment: copy out of the current arena
+			// TODO: ??
 			val = clone_value(val)
 		}
 		env_define(vm.env, symbol, val)
 		append(&vm.stack, symbol)
-	case:
 	}
 	return Nil{}
 }

@@ -36,13 +36,6 @@ test_debug :: proc(t: ^testing.T) {
 		steps += 1
 		if steps > 200 {fmt.println("HANG"); break}
 		inst := c.bytecode.instructions[vm.ip]
-		// fmt.printf(
-		// 	"IP: %d | Op: %v | Stack: %d | Frames: %d\n",
-		// 	vm.ip,
-		// 	inst.op,
-		// 	len(vm.stack),
-		// 	len(vm.frames),
-		// )
 		vm.ip += 1
 		if _, quit := core.vm_exec_inst(&vm, &c.bytecode, inst); quit {
 			break
