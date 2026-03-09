@@ -108,7 +108,7 @@ lexer_read_hash :: proc(l: ^Lexer, start_offset, start_line, start_col: int) -> 
 		l.offset += size_next
 		l.col += 1
 		return Token {
-			type = .BOOLEAN,
+			type = .SYMBOL,
 			text = l.source[start_offset:l.offset],
 			line = start_line,
 			col = start_col,

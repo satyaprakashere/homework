@@ -1,12 +1,15 @@
-;; Core library features for scheme language
-
-; (define (car list) (first list))
-; (define (cdr list) (rest list))
-
-; (define (+ args) (add args))
-; (define (- args) (sub args))
-; (define (* args) (mult args))
-; (define (/ args) (div args))
+(define + add)
+(define - sub)
+(define * mul)
+(define / div)
+(define = numeq)
+(define < lt)
+(define > gt)
+(define car first)
+(define cdr rest)
+(define number->string number-to-string)
+(define #t true)
+(define #f false)
 
 ;; Logic
 (define (not x) (if x false true))

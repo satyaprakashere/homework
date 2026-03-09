@@ -18,7 +18,8 @@ test:
 	odin test tests -out:out/rekursion_test
 
 test-features: build
-	cat tests/cases/functions.scm 		 | ./out/rekursion
+	cat tests/cases/aliasing.scm 		 | ./out/rekursion
+	cat tests/cases/function.scm 		 | ./out/rekursion
 	cat tests/cases/lambda.scm 		 	 | ./out/rekursion
 	cat tests/cases/continuations.scm 	 | ./out/rekursion
 	cat tests/cases/arrays.scm 	 		 | ./out/rekursion

@@ -71,7 +71,6 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 		}
 		inst := bytecode.instructions[vm.ip]
 
-		// fmt.printf("TRACE [%d] %v arg=%d stack=%d\n", vm.ip, inst.op, inst.arg, len(vm.stack))
 
 		vm.ip += 1
 		if val, quit := vm_exec_inst(vm, bytecode, inst); quit {

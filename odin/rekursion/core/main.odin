@@ -7,7 +7,7 @@ import "core:mem/virtual"
 import "core:os"
 import "core:strings"
 
-import "../sqlite"
+// import "../sqlite"
 
 main :: proc() {
 	context.logger = log.create_console_logger()
@@ -65,7 +65,6 @@ load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
 		expr := parse_expression(&parser)
 		start_ip := len(compiler.bytecode.instructions)
 
-		fmt.println("Compiling:", value_to_string(expr))
 		compile_expression(compiler, expr)
 		append(&compiler.bytecode.instructions, Instruction{op = .RET})
 

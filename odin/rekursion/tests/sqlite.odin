@@ -58,7 +58,6 @@ test_sqlite :: proc(t: ^testing.T) {
 			name: string,
 			ok:   bool,
 		}) {
-		fmt.printf("ROW: %v\n", row)
 		count += 1
 	}
 	testing.expect(t, count > 0, "Expected at least one row from SQLite query")

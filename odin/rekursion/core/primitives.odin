@@ -3,16 +3,9 @@ package rekursion
 import "core:fmt"
 
 setup_primitives :: proc(env: ^Env) {
-	env_define(env, Symbol("+"), Builtin(builtin_add))
-	env_define(env, Symbol("-"), Builtin(builtin_sub))
-	env_define(env, Symbol("*"), Builtin(builtin_mul))
-	env_define(env, Symbol("/"), Builtin(builtin_div))
-	env_define(env, Symbol("car"), Builtin(builtin_first))
-	env_define(env, Symbol("cdr"), Builtin(builtin_rest))
-
 	env_define(env, Symbol("add"), Builtin(builtin_add))
 	env_define(env, Symbol("sub"), Builtin(builtin_sub))
-	env_define(env, Symbol("mult"), Builtin(builtin_mul))
+	env_define(env, Symbol("mul"), Builtin(builtin_mul))
 	env_define(env, Symbol("div"), Builtin(builtin_div))
 	env_define(env, Symbol("cons"), Builtin(builtin_cons))
 	env_define(env, Symbol("first"), Builtin(builtin_first))
@@ -29,8 +22,6 @@ setup_primitives :: proc(env: ^Env) {
 	// Constants
 	env_define(env, Symbol("true"), true)
 	env_define(env, Symbol("false"), false)
-	env_define(env, Symbol("#t"), true)
-	env_define(env, Symbol("#f"), false)
 
 	// Predicates
 	env_define(env, Symbol("is-null"), Builtin(builtin_is_null))
@@ -44,7 +35,6 @@ setup_primitives :: proc(env: ^Env) {
 
 	// Converters
 	env_define(env, Symbol("number-to-string"), Builtin(builtin_number_to_string))
-	env_define(env, Symbol("number->string"), Builtin(builtin_number_to_string))
 	env_define(env, Symbol("symbol-to-string"), Builtin(builtin_symbol_to_string))
 	env_define(env, Symbol("string-append"), Builtin(builtin_string_append))
 

@@ -31,9 +31,6 @@ compile_expression :: proc(compiler: ^Compiler, expr: Value) {
 		idx := add_constant(compiler, e)
 		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 	case Symbol:
-		if strings.contains(string(e), "lambda") {
-			fmt.printf("WARNING: Emitting LOAD_VAR for %q\n", string(e))
-		}
 		idx := add_constant(compiler, e)
 		append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
 	case ^Pair:
@@ -58,7 +55,6 @@ add_constant :: proc(compiler: ^Compiler, val: Value) -> int {
 
 	cloned_val := clone_value(val)
 	append(&compiler.bytecode.constants, cloned_val)
-	// fmt.printf("DEBUG add_constant: Added new constant %v at index %d\n", val, len(compiler.bytecode.constants) - 1)
 	return len(compiler.bytecode.constants) - 1
 }
 
@@ -107,7 +103,7 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 			compile_reset(compiler, p); return
 		case "shift":
 			compile_shift(compiler, p); return
-		case "+", "-", "*", "/", "=", "<", ">":
+		case "add", "sub", "mul", "div", "numeq", "lt", "gt":
 			compile_primitive(compiler, p, h); return
 		}
 	}
@@ -117,25 +113,7 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 		if macro_val, found := env_lookup(compiler.env, sym); found {
 			if m, is_macro := macro_val.(^Macro); is_macro {
 
-				// DEBUG: Trace macro input
-				if string(sym) == "let" || string(sym) == "and" || string(sym) == "or" {
-					// fmt.printf(
-					// 	"\nDEBUG: Intercepting macro '%v' with args: %v\n",
-					// 	string(sym),
-					// 	value_to_string(p.rest),
-					// )
-				}
-
 				expanded_expr := compiler_evaluate_macro(compiler, m, p.rest)
-
-				if string(sym) == "let" || string(sym) == "and" || string(sym) == "or" {
-					// fmt.printf(
-					// 	"DEBUG: Macro '%v' expanded to: %v\n\n",
-					// 	string(sym),
-					// 	value_to_string(expanded_expr),
-					// )
-				}
-
 				compile_expression(compiler, expanded_expr)
 				return
 			}
@@ -495,19 +473,19 @@ compile_primitive :: proc(compiler: ^Compiler, p: ^Pair, h: Symbol) {
 	}
 	op: Op_Code
 	switch string(h) {
-	case "+":
+	case "add":
 		op = .ADD
-	case "-":
+	case "sub":
 		op = .SUB
-	case "*":
+	case "mul":
 		op = .MUL
-	case "/":
+	case "div":
 		op = .DIV
-	case "=":
+	case "numeq":
 		op = .EQ
-	case "<":
+	case "lt":
 		op = .LT
-	case ">":
+	case "gt":
 		op = .GT
 	}
 	for i in 0 ..< num_args - 1 {
