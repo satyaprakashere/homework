@@ -1,6 +1,8 @@
 .PHONY: build run test test-features
 
 build:
+	mkdir -p out
+	mkdir -p out/logs
 	odin build core -out:out/rekursion
 
 run:
@@ -11,6 +13,8 @@ clean:
 	rm -rf ./out
 
 test:
+	mkdir -p out
+	mkdir -p out/logs
 	odin test tests -out:out/rekursion_test
 
 test-features: build
@@ -20,3 +24,4 @@ test-features: build
 	cat tests/cases/arrays.scm 	 		 | ./out/rekursion
 	cat tests/cases/tables.scm 	 		 | ./out/rekursion
 	cat tests/cases/variadic.scm 		 | ./out/rekursion
+	cat tests/cases/actor_test.scm 		 | ./out/rekursion

@@ -62,11 +62,8 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 	steps := 0
 	for vm.ip < len(bytecode.instructions) {
 		steps += 1
-		if steps > 100 {
-			fmt.println("VM reached max steps limit! Possible infinite loop. steps: %v", steps)
-			if vm.ip < len(bytecode.instructions) {
-				fmt.printf("debug: IP: %d, Op: %v\n", vm.ip, bytecode.instructions[vm.ip].op)
-			}
+		if steps > 10000000 {
+			fmt.printf("VM reached max steps limit! steps: %v\n", steps)
 			break
 		}
 		inst := bytecode.instructions[vm.ip]

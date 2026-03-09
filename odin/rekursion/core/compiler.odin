@@ -382,7 +382,7 @@ compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 	append(&compiler.bytecode.instructions, Instruction{op = .RET})
 
 	compiler.bytecode.instructions[jump_idx].arg = i32(len(compiler.bytecode.instructions))
-	
+
 	proc_proto := compile_lambda_params(args.first, start_ip)
 	idx := add_constant(compiler, proc_proto)
 	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})

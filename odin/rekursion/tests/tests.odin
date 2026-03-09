@@ -1,7 +1,7 @@
 package tests
 
-import "core:log"
 import core "../core"
+import "core:log"
 
 import "core:fmt"
 import "core:mem/virtual"
@@ -53,7 +53,7 @@ tests :: proc(t: ^testing.T) {
 	c := core.compiler_init(global_env)
 	vm := core.vm_init(global_env)
 
-	core.load_stdlib(&c, &vm)
+	core.load_file("lib/stdlib.scm", &c, &vm)
 
 	failed := 0
 	passed := 0

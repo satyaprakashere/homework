@@ -13,10 +13,11 @@ main :: proc() {
 	context.logger = log.create_console_logger()
 	log.info("Scheme Bytecode Interpreter in Odin\nPress Ctrl+C to exit")
 
-	global_env := new(Env)
-	global_env.values = make(map[Symbol]Value)
-	defer delete(global_env.values)
-	setup_primitives(global_env)
+	global_env := new(Env); {
+		global_env.values = make(map[Symbol]Value)
+		defer delete(global_env.values)
+		setup_primitives(global_env)
+	}
 
 	r_stream := os.to_stream(os.stdin)
 	reader: bufio.Reader
@@ -36,17 +37,21 @@ main :: proc() {
 	context.allocator = virtual.arena_allocator(&arena)
 
 	// TODO: do we need to pass env to compiler and vm?
-	c  := compiler_init(global_env)
+	c := compiler_init(global_env)
 	vm := vm_init(global_env)
 
-	load_stdlib(&c, &vm)
+	fmt.printf("Builtin '+' in env: %v\n", env_lookup(global_env, Symbol("+")))
+	fmt.printf("Builtin 'car' in env: %v\n", env_lookup(global_env, Symbol("car")))
+
+	load_file("lib/stdlib.scm", &c, &vm)
+	load_file("lib/actor.scm", &c, &vm)
 
 	for {repl_step(&reader, &c, &vm)}
 }
 
-load_stdlib :: proc(compiler: ^Compiler, vm: ^VM) {
-	data, err := os.read_entire_file("lib/stdlib.scm", context.allocator); if err != nil {
-		log.error("Warning: Could not load lib/stdlib.scm")
+load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
+	data, err := os.read_entire_file(path, context.allocator); if err != nil {
+		log.error("Warning: Could not load file: %v", path)
 		return
 	}
 	defer delete(data)
