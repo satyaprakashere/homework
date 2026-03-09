@@ -14,16 +14,14 @@ tests :: proc(t: ^testing.T) {
 	context.logger = log.create_console_logger()
 
 	handle, err := os.open("out/logs/tests_debug.log", os.O_APPEND | os.O_WRONLY | os.O_CREATE)
-	if err != nil {
-		log.error("Error: Could not open tests_debug.log")
-		os.exit(1)
-	}
+	assert(err == nil)
 	defer os.close(handle)
+
 	log.info("Running tests from tests.scm...")
 	os.write_string(handle, "Started tests runner\n")
 
 	// Read tests.scm
-	data, errf := os.read_entire_file("tests/cases/tests.scm", context.allocator)
+	data, errf := os.read_entire_file("tests/cases/minimal-lisp.scm", context.allocator)
 	if errf != nil {
 		log.info("Error: Could not read tests.scm")
 		os.exit(1)
@@ -55,8 +53,6 @@ tests :: proc(t: ^testing.T) {
 
 	core.load_file("lib/stdlib.scm", &c, &vm)
 
-	failed := 0
-	passed := 0
 
 	for line, i in lines {
 		trimmed := strings.trim_space(line)
@@ -90,20 +86,7 @@ tests :: proc(t: ^testing.T) {
 
 		actual := core.value_to_string(result)
 		testing.expect_value(t, actual, expected)
-		if actual == expected {
-			passed += 1
-			fmt.printf("PASS: %s => %s => %s\n", code, expected, actual)
-		} else {
-			failed += 1
-			fmt.printf("FAIL: Line %d: %s\n", i + 1, code)
-			fmt.printf("  Expected: %s\n", expected)
-			fmt.printf("  Actual:   %s\n", actual)
-		}
 	}
 
-	fmt.printf("\n%d passed, %d failed\n", passed, failed)
 
-	if failed > 0 {
-		os.exit(1)
-	}
 }

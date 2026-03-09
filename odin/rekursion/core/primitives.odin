@@ -26,6 +26,12 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("set-parent"), Builtin(builtin_table_set_parent))
 	env_define(env, Symbol("and"), Builtin(builtin_and))
 
+	// Constants
+	env_define(env, Symbol("true"), true)
+	env_define(env, Symbol("false"), false)
+	env_define(env, Symbol("#t"), true)
+	env_define(env, Symbol("#f"), false)
+
 	// Predicates
 	env_define(env, Symbol("is-null"), Builtin(builtin_is_null))
 	env_define(env, Symbol("is-pair"), Builtin(builtin_is_pair))
@@ -368,10 +374,13 @@ rekursion_value_equal :: proc(a, b: Value) -> bool {
 }
 
 builtin_and :: proc(args: []Value) -> Value {
+	if len(args) == 0 {return true}
+	res: Value = true
 	for arg in args {
-		if !arg.(bool) {
+		res = arg
+		if is_false(arg) {
 			return false
 		}
 	}
-	return true
+	return res
 }

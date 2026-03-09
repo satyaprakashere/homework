@@ -1,47 +1,49 @@
-; (define (car list) (first list))
-; (define (cdr list) (rest list))
+(define (car list) (first list))
+(define (cdr list) (rest list))
 
-; (define (+ args) (add args))
-; (define (- args) (sub args))
-; (define (* args) (mult args))
-; (define (/ args) (div args))
+(define (+ args) (add args))
+(define (- args) (sub args))
+(define (* args) (mult args))
+(define (/ args) (div args))
 
-(define cadr (lambda (x) (car (cdr x))))
-(define cdar (lambda (x) (cdr (car x))))
-(define caar (lambda (x) (car (car x))))
-(define cddr (lambda (x) (cdr (cdr x))))
-(define caddr (lambda (x) (car (cdr (cdr x)))))
+
+(define cadr (lambda (x) (first (rest x))))
+(define cdar (lambda (x) (rest (first x))))
+(define caar (lambda (x) (first (first x))))
+(define cddr (lambda (x) (rest (rest x))))
+(define caddr (lambda (x) (first (rest (rest x)))))
 
 (define map
   (lambda (proc lst)
     (if (is-null lst)
         '()
-        (cons (proc (car lst)) (map proc (cdr lst))))))
+        (cons (proc (first lst)) (map proc (rest lst))))))
 
 (defmacro let (bindings . body)
-  `((lambda ,(map car bindings) ,@body) ,@(map cadr bindings)))
+  (cons (cons 'lambda (cons (map first bindings) body))
+        (map cadr bindings)))
 
 (defmacro and args
   (if (is-null args)
-      true
-      (if (is-null (cdr args))
-          (car args)
-          `(if ,(car args) (and ,@(cdr args)) #f))))
+      'true
+      (if (is-null (rest args))
+          (first args)
+          (cons 'if (cons (first args) (cons (cons 'and (rest args)) (cons 'false '())))))))
 
 (defmacro or args
   (if (is-null args)
-      #f
-      (if (is-null (cdr args))
-          (car args)
-          (let ((val (car args)))
-            `(if ,val ,val (or ,@(cdr args)))))))
+      'false
+      (if (is-null (rest args))
+          (first args)
+          (cons 'let (cons (cons (cons '__or_val (cons (first args) '())) '())
+                (cons (cons 'if (cons '__or_val (cons '__or_val (cons (cons 'or (rest args)) '())))) '()))))))
 
 (defmacro cond clauses
   (if (is-null clauses)
-      '()
-      (let ((clause (car clauses)))
-        (if (eq (car clause) 'else)
-            `(if ,(car clause)
-                 (begin ,@(cdr clause))
-                 (cond ,@(cdr clauses)))))))
-
+      false
+      (let ((clause (first clauses)))
+        (if (eq? (first clause) 'else)
+            (cons 'begin (rest clause))
+            (cons 'if (cons (first clause)
+                  (cons (cons 'begin (rest clause))
+                  (cons (cons 'cond (rest clauses)) '()))))))))

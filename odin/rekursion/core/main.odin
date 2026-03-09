@@ -65,6 +65,7 @@ load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
 		expr := parse_expression(&parser)
 		start_ip := len(compiler.bytecode.instructions)
 
+		fmt.println("Compiling:", value_to_string(expr))
 		compile_expression(compiler, expr)
 		append(&compiler.bytecode.instructions, Instruction{op = .RET})
 

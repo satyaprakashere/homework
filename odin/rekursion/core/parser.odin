@@ -51,7 +51,10 @@ parse_expression :: proc(p: ^Parser) -> Value {
 	case .STRING:
 		return tok.text[1:len(tok.text) - 1]
 	case .BOOLEAN:
-		return tok.text == "true" || tok.text == "false"
+		if len(tok.text) >= 2 && tok.text[1] == 't' {
+			return true
+		}
+		return false
 	case .LEFT_BRACKET:
 		return parse_vector(p)
 	}

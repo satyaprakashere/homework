@@ -22,6 +22,8 @@ compile_expression :: proc(compiler: ^Compiler, expr: Value) {
 	#partial switch e in expr {
 	case Nil:
 		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+	case nil:
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
 	case bool:
 		op := e ? Op_Code.PUSH_TRUE : Op_Code.PUSH_FALSE
 		append(&compiler.bytecode.instructions, Instruction{op = op})
@@ -117,21 +119,21 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 
 				// DEBUG: Trace macro input
 				if string(sym) == "let" || string(sym) == "and" || string(sym) == "or" {
-					fmt.printf(
-						"\nDEBUG: Intercepting macro '%v' with args: %v\n",
-						string(sym),
-						value_to_string(p.rest),
-					)
+					// fmt.printf(
+					// 	"\nDEBUG: Intercepting macro '%v' with args: %v\n",
+					// 	string(sym),
+					// 	value_to_string(p.rest),
+					// )
 				}
 
 				expanded_expr := compiler_evaluate_macro(compiler, m, p.rest)
 
 				if string(sym) == "let" || string(sym) == "and" || string(sym) == "or" {
-					fmt.printf(
-						"DEBUG: Macro '%v' expanded to: %v\n\n",
-						string(sym),
-						value_to_string(expanded_expr),
-					)
+					// fmt.printf(
+					// 	"DEBUG: Macro '%v' expanded to: %v\n\n",
+					// 	string(sym),
+					// 	value_to_string(expanded_expr),
+					// )
 				}
 
 				compile_expression(compiler, expanded_expr)
@@ -159,6 +161,8 @@ compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
 		compile_expression(compiler, lambda_expr)
 		idx := add_constant(compiler, name)
 		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
+	case:
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
 	}
 }
 
@@ -284,19 +288,38 @@ compile_defmacro :: proc(compiler: ^Compiler, p: ^Pair) {
 }
 
 compile_if :: proc(compiler: ^Compiler, p: ^Pair) {
-	args := p.rest.(^Pair)
-	then_args := args.rest.(^Pair)
-	else_args := then_args.rest.(^Pair)
+	args, ok := p.rest.(^Pair)
+	if !ok {
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		return
+	}
+	then_args, then_ok := args.rest.(^Pair)
+	if !then_ok {
+		compile_expression(compiler, args.first)
+		append(&compiler.bytecode.instructions, Instruction{op = .POP})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		return
+	}
+	else_args, else_ok := then_args.rest.(^Pair)
+
 	compile_expression(compiler, args.first)
 	jump_if_false_idx := len(compiler.bytecode.instructions)
 	append(&compiler.bytecode.instructions, Instruction{op = .JUMP_IF_FALSE, arg = 0})
+
 	compile_expression(compiler, then_args.first)
 	jump_idx := len(compiler.bytecode.instructions)
 	append(&compiler.bytecode.instructions, Instruction{op = .JUMP, arg = 0})
+
 	compiler.bytecode.instructions[jump_if_false_idx].arg = i32(
 		len(compiler.bytecode.instructions),
 	)
-	compile_expression(compiler, else_args.first)
+
+	if else_ok {
+		compile_expression(compiler, else_args.first)
+	} else {
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+	}
+
 	compiler.bytecode.instructions[jump_idx].arg = i32(len(compiler.bytecode.instructions))
 }
 
@@ -378,7 +401,20 @@ compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 	append(&compiler.bytecode.instructions, Instruction{op = .JUMP, arg = 0})
 
 	start_ip := len(compiler.bytecode.instructions)
-	compile_expression(compiler, args.rest.(^Pair).first)
+	body_list := args.rest
+	if body_pair, ok := body_list.(^Pair); ok {
+		if _, is_nil := body_pair.rest.(Nil); !is_nil {
+			begin_sym := Symbol("begin")
+			begin_pair := new(Pair)
+			begin_pair.first = begin_sym
+			begin_pair.rest = body_list
+			compile_expression(compiler, begin_pair)
+		} else {
+			compile_expression(compiler, body_pair.first)
+		}
+	} else {
+		compile_expression(compiler, args.rest.(^Pair).first)
+	}
 	append(&compiler.bytecode.instructions, Instruction{op = .RET})
 
 	compiler.bytecode.instructions[jump_idx].arg = i32(len(compiler.bytecode.instructions))

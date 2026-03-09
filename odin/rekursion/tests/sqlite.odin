@@ -4,12 +4,16 @@ import sqlite "../sqlite"
 
 import "core:fmt"
 import "core:os"
+import "core:testing"
 
-main :: proc() {
+@(test)
+test_sqlite :: proc(t: ^testing.T) {
 	DB_FILE :: "tests/db/test.sqlite"
+	// Ensure directory exists
+	os.make_directory("tests/db")
 	db, status := sqlite.open(DB_FILE); if status != nil {
 		fmt.eprintf(
-			"Unable to open database '%s'(%v): %s",
+			"Unable to open database '%s'(%v): %s\n",
 			DB_FILE,
 			status,
 			sqlite.status_explain(status),
@@ -26,6 +30,11 @@ main :: proc() {
             , name VARCHAR(64) NOT NULL
             , flag INTEGER NOT NULL
         );
+    `,
+	)
+	sqlite.sql_exec(
+		db,
+		`
         INSERT INTO users (name, flag) VALUES
             ('john', 1)
             , ('mary', 0)
@@ -44,10 +53,13 @@ main :: proc() {
     `,
 		false,
 	)
+	count := 0
 	for row in sqlite.sql_row(db, query, struct {
 			name: string,
 			ok:   bool,
 		}) {
 		fmt.printf("ROW: %v\n", row)
+		count += 1
 	}
+	testing.expect(t, count > 0, "Expected at least one row from SQLite query")
 }
