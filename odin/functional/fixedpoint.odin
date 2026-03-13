@@ -68,7 +68,7 @@ main :: proc() {
 
 // cata: (ExprF(A) -> A) -> Expr -> A
 // It collapses the recursive 'Expr' into a single value 'A'.
-cata :: proc(node: ^Expr, algebra: proc(NodeF($A)) -> A) -> A {
+cata :: proc(node: ^NodeF, algebra: proc(NodeF($A)) -> A) -> A {
     // 1. Recurse down: map 'cata' over children to turn them into 'A'
     mapped_layer: ExprF(A)
     

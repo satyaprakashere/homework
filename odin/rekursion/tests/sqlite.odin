@@ -8,7 +8,6 @@ import "core:testing"
 
 @(test)
 test_sqlite :: proc(t: ^testing.T) {
-	DB_FILE :: "tests/db/test.sqlite"
 	// Ensure directory exists
 	os.make_directory("tests/db")
 	db, status := sqlite.open(DB_FILE); if status != nil {
@@ -61,4 +60,5 @@ test_sqlite :: proc(t: ^testing.T) {
 		count += 1
 	}
 	testing.expect(t, count > 0, "Expected at least one row from SQLite query")
+	sqlite.sql_exec(db, "DROP TABLE users;")
 }

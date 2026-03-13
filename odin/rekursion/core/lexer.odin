@@ -25,7 +25,7 @@ is_digit :: proc(r: rune) -> bool {
 
 is_symbol_char :: proc(r: rune) -> bool {
 	if unicode.is_letter(r) || unicode.is_digit(r) {return true}
-	return strings.contains_rune("+-*/<=>?!_$", r)
+	return strings.contains_rune("+-*/<=>?!_#$", r)
 }
 
 lexer_next_token :: proc(l: ^Lexer) -> Token {
@@ -41,48 +41,86 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 	start_col := l.col
 
 	switch r {
-	case '(':
+	case rune(tokens[TokenType.LEFT_PAREN][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .LEFT_PAREN, text = "(", line = start_line, col = start_col}
-	case ')':
+		return Token {
+			type = .LEFT_PAREN,
+			text = tokens[TokenType.LEFT_PAREN],
+			line = start_line,
+			col = start_col,
+		}
+	case rune(tokens[TokenType.RIGHT_PAREN][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .RIGHT_PAREN, text = ")", line = start_line, col = start_col}
-	case '\'':
+		return Token {
+			type = .RIGHT_PAREN,
+			text = tokens[TokenType.RIGHT_PAREN],
+			line = start_line,
+			col = start_col,
+		}
+	case rune(tokens[TokenType.QUOTE][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .QUOTE, text = "'", line = start_line, col = start_col}
-	case '`':
+		return Token {
+			type = .QUOTE,
+			text = tokens[TokenType.QUOTE],
+			line = start_line,
+			col = start_col,
+		}
+	case rune(tokens[TokenType.BACKTICK][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .BACKTICK, text = "`", line = start_line, col = start_col}
-	case ',':
+		return Token {
+			type = .BACKTICK,
+			text = tokens[TokenType.BACKTICK],
+			line = start_line,
+			col = start_col,
+		}
+	case rune(tokens[TokenType.COMMA][0]):
 		l.offset += 1
 		l.col += 1
 		r_next, _ := utf8.decode_rune_in_string(l.source[l.offset:])
-		if r_next == '@' {
+		if r_next == rune(tokens[TokenType.COMMA_AT][1]) {
 			l.offset += 1
 			l.col += 1
-			return Token{type = .COMMA_AT, text = ",@", line = start_line, col = start_col}
+			return Token {
+				type = .COMMA_AT,
+				text = tokens[TokenType.COMMA_AT],
+				line = start_line,
+				col = start_col,
+			}
 		}
-		return Token{type = .COMMA, text = ",", line = start_line, col = start_col}
-	case '.':
+		return Token {
+			type = .COMMA,
+			text = tokens[TokenType.COMMA],
+			line = start_line,
+			col = start_col,
+		}
+	case rune(tokens[TokenType.DOT][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .DOT, text = ".", line = start_line, col = start_col}
-	case '#':
-		return lexer_read_hash(l, start_offset, start_line, start_col)
-	case '"':
+		return Token{type = .DOT, text = tokens[TokenType.DOT], line = start_line, col = start_col}
+	case rune(tokens[TokenType.STRING][0]):
 		return lexer_read_string(l)
-	case '[':
+	case rune(tokens[TokenType.LEFT_BRACKET][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .LEFT_BRACKET, text = "[", line = start_line, col = start_col}
-	case ']':
+		return Token {
+			type = .LEFT_BRACKET,
+			text = tokens[TokenType.LEFT_BRACKET],
+			line = start_line,
+			col = start_col,
+		}
+	case rune(tokens[TokenType.RIGHT_BRACKET][0]):
 		l.offset += 1
 		l.col += 1
-		return Token{type = .RIGHT_BRACKET, text = "]", line = start_line, col = start_col}
+		return Token {
+			type = .RIGHT_BRACKET,
+			text = tokens[TokenType.RIGHT_BRACKET],
+			line = start_line,
+			col = start_col,
+		}
 	}
 
 	if is_digit(r) ||

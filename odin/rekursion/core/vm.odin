@@ -4,8 +4,6 @@ import "core:fmt"
 import "core:mem"
 import "core:reflect"
 
-STACK_LIMIT :: 108
-
 Op_Code :: enum u8 {
 	NOP,
 	PUSH_CONST,
@@ -20,13 +18,6 @@ Op_Code :: enum u8 {
 	RET,
 	JUMP,
 	JUMP_IF_FALSE,
-	ADD,
-	SUB,
-	MUL,
-	DIV,
-	EQ,
-	LT,
-	GT,
 	RESET,
 	SHIFT,
 	FINISH_RESET,
@@ -62,7 +53,7 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 	steps := 0
 	for vm.ip < len(bytecode.instructions) {
 		steps += 1
-		if steps > 500 {
+		if steps > 1_000_000 {
 			fmt.println("VM reached max steps limit! Possible infinite loop. steps: %v", steps)
 			if vm.ip < len(bytecode.instructions) {
 				fmt.printf("debug: IP: %d, Op: %v\n", vm.ip, bytecode.instructions[vm.ip].op)
@@ -100,8 +91,6 @@ vm_exec_inst :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return vm_exec_control(vm, inst), false
 	case .RET:
 		return vm_exec_ret(vm)
-	case .ADD, .SUB, .MUL, .DIV, .EQ, .LT, .GT:
-		return vm_exec_math(vm, inst), false
 	case .CLOSE_PROC:
 		return vm_exec_close_proc(vm), false
 	case .CALL:
@@ -150,7 +139,7 @@ vm_exec_env :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 		if val, ok := env_lookup(vm.env, symbol); ok {
 			append(&vm.stack, val)
 		} else {
-			fmt.printf("Unbound variable: %s\n", symbol)
+			fmt.eprintf("Unbound variable: %s\n", symbol)
 			append(&vm.stack, Nil{})
 		}
 	case .STORE_VAR:
@@ -202,30 +191,6 @@ vm_exec_ret :: proc(vm: ^VM) -> (Value, bool) {
 	return Nil{}, false
 }
 
-vm_exec_math :: proc(vm: ^VM, inst: Instruction) -> Value {
-	b_val, a_val := pop(&vm.stack), pop(&vm.stack)
-	if _, ok_b := b_val.(Nil); ok_b {fmt.println("ERROR: Math pop got Nil for b")}
-	if _, ok_a := a_val.(Nil); ok_a {fmt.println("ERROR: Math pop got Nil for a")}
-	b, a := b_val.(i64), a_val.(i64)
-	#partial switch inst.op {
-	case .ADD:
-		append(&vm.stack, a + b)
-	case .SUB:
-		append(&vm.stack, a - b)
-	case .MUL:
-		append(&vm.stack, a * b)
-	case .DIV:
-		append(&vm.stack, a / b)
-	case .EQ:
-		append(&vm.stack, a == b)
-	case .LT:
-		append(&vm.stack, a < b)
-	case .GT:
-		append(&vm.stack, a > b)
-	case:
-	}
-	return Nil{}
-}
 
 vm_exec_close_proc :: proc(vm: ^VM) -> Value {
 	proc_val := pop(&vm.stack)
@@ -258,6 +223,7 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return Nil{}, true
 	}
 	args := make([]Value, num_args)
+	defer delete(args, context.allocator)
 	for i in 0 ..< num_args {
 		args[num_args - 1 - i] = pop(&vm.stack)
 	}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bookmarks - A premium hacker news clone">
+    <title>Bookmarks</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header class="navbar">
+            <div class="nav-left">
+                <a href="#" class="logo">
+                    <span class="logo-box">S</span>
+                    <span class="logo-text">News</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="#">new</a>
+                    <a href="#">past</a>
+                    <a href="#">comments</a>
+                    <a href="#">ask</a>
+                    <a href="#">show</a>
+                    <a href="#">jobs</a>
+                    <a href="#">submit</a>
+                </nav>
+            </div>
+            <div class="nav-right">
+                <a href="#">login</a>
+            </div>
+        </header>
+
+        <main class="content">
+            <ol class="news-list">
+                {{ range .Posts }}
+                <li class="news-item">
+                    <div class="item-main">
+                        <div class="upvote-wrapper">
+                            <button class="upvote-btn" aria-label="upvote"></button>
+                        </div>
+                        <div class="item-title-row">
+                            <a href="{{ if .URL }}{{ .URL }}{{ else }}#{{ end }}" class="item-title">{{ .Title }}</a>
+                            {{ if .URL }}
+                            <a href="#" class="item-domain">({{ getDomain .URL }})</a>
+                            {{ end }}
+                        </div>
+                    </div>
+                    <div class="item-meta">
+                        <span class="score">{{ .Score }} points</span> by <a href="#" class="user">{{ .Username }}</a> <span
+                            class="time">{{ .CreatedAt }}</span>
+                        <span class="meta-divider">•</span> <a href="#">hide</a>
+                        <span class="meta-divider">•</span> <a href="#">comments</a>
+                    </div>
+                </li>
+                {{ end }}
+            </ol>
+
+            <a href="#" class="more-link">More articles</a>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#">Guidelines</a>
+                <span class="meta-divider">•</span>
+                <a href="#">FAQ</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Lists</a>
+                <span class="meta-divider">•</span>
+                <a href="#">API</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Security</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Legal</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Apply to YC</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Contact</a>
+            </div>
+            <div class="search-bar">
+                <label for="search">Search:</label>
+                <input type="text" id="search" placeholder="Search Bookmarks...">
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

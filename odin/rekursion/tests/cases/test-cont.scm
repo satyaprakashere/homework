@@ -1,1 +1,1 @@
-(test "Simple reset" 1 (reset 1))
+(test "Simple reset" 1 (reset 1));; => 1

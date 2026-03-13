@@ -1,3 +1,3 @@
-(+ 1 2)
-(define (add a b) (+ a b))
-(add 10 20)
+(add 1 2) ;; => 3
+(define (+ a b) (add a b)) ;; => +
+(+ 10 20) ;; => 30

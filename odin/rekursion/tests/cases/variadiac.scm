@@ -1,4 +1,3 @@
-(print "Running Variadic Tests...")
 (define (list . x) x);; nil
 (list 1 2 3) ;; => (1 2 3)
 (define (head-rest x . y) y);; nil

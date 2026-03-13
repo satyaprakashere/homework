@@ -37,7 +37,7 @@ new_node :: proc(allocator: mem.Allocator, val: ExprF(^Expr)) -> ^Expr {
 
 // cata: (ExprF(A) -> A) -> Expr -> A
 // It collapses the recursive 'Expr' into a single value 'A'.
-cata :: proc(node: ^Expr, algebra: proc(ExprF($A)) -> A) -> A {
+cata :: proc(node: ^Expr, algebra: proc(_: ExprF($A)) -> A) -> A {
 	// 1. Recurse down: map 'cata' over children to turn them into 'A'
 	mapped_layer: ExprF(A)
 
@@ -45,7 +45,7 @@ cata :: proc(node: ^Expr, algebra: proc(ExprF($A)) -> A) -> A {
 	case int:
 		mapped_layer.variant = v
 	case BinaryOP(^Expr):
-		mapped_layer.variant = BinaryOP(A){
+		mapped_layer.variant = BinaryOP(A) {
 			left  = cata(v.left, algebra),
 			right = cata(v.right, algebra),
 			op    = v.op,
@@ -60,11 +60,14 @@ cata :: proc(node: ^Expr, algebra: proc(ExprF($A)) -> A) -> A {
 
 eval_algebra :: proc(e: ExprF(int)) -> int {
 	switch v in e.variant {
-	case int: return v
+	case int:
+		return v
 	case BinaryOP(int):
 		switch v.op {
-		case '+': return v.left + v.right
-		case '*': return v.left * v.right
+		case '+':
+			return v.left + v.right
+		case '*':
+			return v.left * v.right
 		}
 	}
 	return 0
@@ -86,24 +89,24 @@ main :: proc() {
 	// Building the tree: (10 + 20) * 2
 	// Note how much cleaner 'new_node' is than nested polymorphic literals.
 
-	ten := new_node(alloc, ExprF(^Expr){ variant = 10 })
-	twenty := new_node(alloc, ExprF(^Expr){ variant = 20 })
+	ten := new_node(alloc, ExprF(^Expr){variant = 10})
+	twenty := new_node(alloc, ExprF(^Expr){variant = 20})
 
-	inner_add := new_node(alloc, ExprF(^Expr){
-		variant = BinaryOP(^Expr){
-			left  = ten,
-			right = twenty,
-			op    = '+',
-		},
-	})
+	inner_add := new_node(
+		alloc,
+		ExprF(^Expr){variant = BinaryOP(^Expr){left = ten, right = twenty, op = '+'}},
+	)
 
-	root := new_node(alloc, ExprF(^Expr){
-		variant = BinaryOP(^Expr){
-			left  = inner_add,
-			right = new_node(alloc, ExprF(^Expr){ variant = 2 }),
-			op    = '*',
+	root := new_node(
+		alloc,
+		ExprF(^Expr) {
+			variant = BinaryOP(^Expr) {
+				left = inner_add,
+				right = new_node(alloc, ExprF(^Expr){variant = 2}),
+				op = '*',
+			},
 		},
-	})
+	)
 
 	// Run the Catamorphism
 	result := cata(root, eval_algebra)

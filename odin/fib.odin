@@ -15,8 +15,8 @@ fib_tail_recursive :: proc(a, b, n: int) -> int {
 main :: proc() {
     n := 10
     result := fib_recursive(n)
-    fmt.printf("Fibonacici of %v is %v\n", n, result)
-    
+    fmt.printf("Fibonacci of %v is %v\n", n, result)
+
     n = 98765
     result = fib_tail_recursive(0, 1, n)
     fmt.printf("Fibonacci of %v is %v\n", n, result)

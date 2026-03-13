@@ -1,4 +1,3 @@
-(print "Running Table Tests...") ;; => Nil
 (define t (table)) ;; => t
 (set t 'x 10) ;; => 10
 (get t 'x) ;; => 10

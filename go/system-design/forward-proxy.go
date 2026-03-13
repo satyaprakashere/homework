@@ -1,6 +1,7 @@
 //go:build ignore
-package system
+
+package main
 
 func main() {
-    
+
 }

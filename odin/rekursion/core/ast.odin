@@ -127,8 +127,7 @@ complex_value_to_string :: proc(v: Value) -> string {
 
 pair_to_string :: proc(p: ^Pair) -> string {
 	sb: strings.Builder
-	strings.builder_init(&sb)
-	defer strings.builder_destroy(&sb)
+	strings.builder_init(&sb, context.temp_allocator)
 	strings.write_string(&sb, "(")
 	curr := p
 	for {
@@ -158,8 +157,7 @@ format_pair_rest :: proc(sb: ^strings.Builder, curr: ^Pair) -> (^Pair, bool) {
 
 array_to_string :: proc(v: Array) -> string {
 	sb: strings.Builder
-	strings.builder_init(&sb)
-	defer strings.builder_destroy(&sb)
+	strings.builder_init(&sb, context.temp_allocator)
 	strings.write_string(&sb, "[")
 	for val, i in v.data {
 		strings.write_string(&sb, value_to_string(val))

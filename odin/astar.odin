@@ -7,12 +7,12 @@ import "core:slice"
 // A simple coordinate point
 Pos :: [2]int
 
-Node :: struct {
+ASNode :: struct {
 	pos:    Pos,
 	g_cost: f32, // Distance from start
 	h_cost: f32, // Estimated distance to goal
 	f_cost: f32, // Total cost (g + h)
-	parent: ^Node,
+	parent: ^ASNode,
 }
 
 // Manhattan distance for grid-based movement
@@ -21,10 +21,10 @@ heuristic :: proc(a, b: Pos) -> f32 {
 }
 
 find_path :: proc(start, goal: Pos, grid_width, grid_height: int) -> []Pos {
-	open_set := make([dynamic]^Node)
+	open_set := make([dynamic]^ASNode)
 	closed_set := make(map[Pos]bool)
 	// Keep track of all allocated nodes to clean up later
-	all_nodes := make(map[Pos]^Node)
+	all_nodes := make(map[Pos]^ASNode)
 
 	defer {
 		for _, n in all_nodes {free(n)}
@@ -33,7 +33,7 @@ find_path :: proc(start, goal: Pos, grid_width, grid_height: int) -> []Pos {
 		delete(closed_set)
 	}
 
-	start_node := new(Node)
+	start_node := new(ASNode)
 	start_node.pos = start
 	start_node.h_cost = heuristic(start, goal)
 	start_node.f_cost = start_node.h_cost
@@ -86,7 +86,7 @@ find_path :: proc(start, goal: Pos, grid_width, grid_height: int) -> []Pos {
 			neighbor, exists := all_nodes[next_pos]
 
 			if !exists {
-				neighbor = new(Node)
+				neighbor = new(ASNode)
 				neighbor.pos = next_pos
 				all_nodes[next_pos] = neighbor
 			}
@@ -106,7 +106,7 @@ find_path :: proc(start, goal: Pos, grid_width, grid_height: int) -> []Pos {
 	return nil // No path found
 }
 
-reconstruct_path :: proc(end_node: ^Node) -> []Pos {
+reconstruct_path :: proc(end_node: ^ASNode) -> []Pos {
 	path := make([dynamic]Pos)
 	curr := end_node
 	for curr != nil {

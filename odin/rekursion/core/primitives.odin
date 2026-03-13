@@ -17,7 +17,6 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("get"), Builtin(builtin_table_get))
 	env_define(env, Symbol("set"), Builtin(builtin_table_set))
 	env_define(env, Symbol("set-parent"), Builtin(builtin_table_set_parent))
-	env_define(env, Symbol("and"), Builtin(builtin_and))
 
 	// Constants
 	env_define(env, Symbol("true"), true)
@@ -42,22 +41,38 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("eq"), Builtin(builtin_eq))
 	env_define(env, Symbol("eq?"), Builtin(builtin_eq))
 	env_define(env, Symbol("equal"), Builtin(builtin_equal))
+	env_define(env, Symbol("numeq"), Builtin(builtin_numeq))
+	env_define(env, Symbol("lt"), Builtin(builtin_lt))
+	env_define(env, Symbol("gt"), Builtin(builtin_gt))
 }
 
 builtin_add :: proc(args: []Value) -> Value {
 	res: i64 = 0
-	// TODO: Add optimizations in layer 2
 	for a in args {
-		res += a.(i64)
+		if val, ok := a.(i64); ok {
+			res += val
+		} else if fval, fok := a.(f64); fok {
+			res += i64(fval)
+		}
 	}
 	return res
 }
 
 builtin_sub :: proc(args: []Value) -> Value {
 	if len(args) == 0 {return i64(0)}
-	res := args[0].(i64)
+	res: i64 = 0
+	if val, ok := args[0].(i64); ok {
+		res = val
+	} else if fval, fok := args[0].(f64); fok {
+		res = i64(fval)
+	}
+
 	for i in 1 ..< len(args) {
-		res -= args[i].(i64)
+		if val, ok := args[i].(i64); ok {
+			res -= val
+		} else if fval, fok := args[i].(f64); fok {
+			res -= i64(fval)
+		}
 	}
 	return res
 }
@@ -65,16 +80,34 @@ builtin_sub :: proc(args: []Value) -> Value {
 builtin_mul :: proc(args: []Value) -> Value {
 	res: i64 = 1
 	for a in args {
-		res *= a.(i64)
+		if val, ok := a.(i64); ok {
+			res *= val
+		} else if fval, fok := a.(f64); fok {
+			res *= i64(fval)
+		}
 	}
 	return res
 }
 
 builtin_div :: proc(args: []Value) -> Value {
 	if len(args) == 0 {return i64(1)}
-	res := args[0].(i64)
+	res: i64 = 1
+	if val, ok := args[0].(i64); ok {
+		res = val
+	} else if fval, fok := args[0].(f64); fok {
+		res = i64(fval)
+	}
 	for i in 1 ..< len(args) {
-		res /= args[i].(i64)
+		denominator: i64 = 1
+		if val, ok := args[i].(i64); ok {
+			denominator = val
+		} else if fval, fok := args[i].(f64); fok {
+			denominator = i64(fval)
+		}
+
+		if denominator != 0 {
+			res /= denominator
+		}
 	}
 	return res
 }
@@ -171,6 +204,10 @@ get_string_key :: proc(v: Value) -> (string, bool) {
 		return k, true
 	case Symbol:
 		return string(k), true
+	case i64:
+		return fmt.aprintf("%d", k), true
+	case f64:
+		return fmt.aprintf("%f", k), true
 	}
 	return "", false
 }
@@ -363,14 +400,76 @@ rekursion_value_equal :: proc(a, b: Value) -> bool {
 	return false
 }
 
-builtin_and :: proc(args: []Value) -> Value {
-	if len(args) == 0 {return true}
-	res: Value = true
-	for arg in args {
-		res = arg
-		if is_false(arg) {
+builtin_numeq :: proc(args: []Value) -> Value {
+	if len(args) < 2 {return true}
+	first, ok := args[0].(i64)
+	if !ok {
+		if f, fok := args[0].(f64); fok {
+			first = i64(f)
+		} else {
 			return false
 		}
 	}
-	return res
+
+	for i in 1 ..< len(args) {
+		val, vok := args[i].(i64)
+		if !vok {
+			if f, fok := args[i].(f64); fok {
+				val = i64(f)
+			} else {
+				return false
+			}
+		}
+		if first != val {return false}
+	}
+	return true
+}
+
+builtin_lt :: proc(args: []Value) -> Value {
+	if len(args) < 2 {return true}
+	for i in 0 ..< len(args) - 1 {
+		a, a_ok := args[i].(i64)
+		if !a_ok {
+			if f, fok := args[i].(f64); fok {
+				a = i64(f)
+			} else {
+				return false
+			}
+		}
+		b, b_ok := args[i + 1].(i64)
+		if !b_ok {
+			if f, fok := args[i + 1].(f64); fok {
+				b = i64(f)
+			} else {
+				return false
+			}
+		}
+
+		if a >= b {return false}
+	}
+	return true
+}
+
+builtin_gt :: proc(args: []Value) -> Value {
+	if len(args) < 2 {return true}
+	for i in 0 ..< len(args) - 1 {
+		a, a_ok := args[i].(i64)
+		if !a_ok {
+			if f, fok := args[i].(f64); fok {
+				a = i64(f)
+			} else {
+				return false
+			}
+		}
+		b, b_ok := args[i + 1].(i64)
+		if !b_ok {
+			if f, fok := args[i + 1].(f64); fok {
+				b = i64(f)
+			} else {
+				return false
+			}
+		}
+		if a <= b {return false}
+	}
+	return true
 }

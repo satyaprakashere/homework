@@ -103,8 +103,6 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 			compile_reset(compiler, p); return
 		case "shift":
 			compile_shift(compiler, p); return
-		case "add", "sub", "mul", "div", "numeq", "lt", "gt":
-			compile_primitive(compiler, p, h); return
 		}
 	}
 
@@ -127,6 +125,10 @@ compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
 	args := p.rest.(^Pair)
 	#partial switch def_head in args.first {
 	case Symbol:
+		if _, is_nil := args.rest.(Nil); is_nil {
+			fmt.println("Error: define missing value for", def_head)
+			return
+		}
 		compile_expression(compiler, args.rest.(^Pair).first)
 		idx := add_constant(compiler, def_head)
 		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
@@ -458,40 +460,6 @@ compile_shift :: proc(compiler: ^Compiler, p: ^Pair) {
 	compiler.bytecode.instructions[shift_idx].arg = i32(offset)
 }
 
-compile_primitive :: proc(compiler: ^Compiler, p: ^Pair, h: Symbol) {
-	curr := p.rest
-	num_args := 0
-	for {
-		#partial switch list in curr {
-		case ^Pair:
-			compile_expression(compiler, list.first)
-			num_args += 1
-			curr = list.rest
-		}
-		if _, ok := curr.(Nil); ok {break}
-		if _, ok := curr.(^Pair); !ok {break}
-	}
-	op: Op_Code
-	switch string(h) {
-	case "add":
-		op = .ADD
-	case "sub":
-		op = .SUB
-	case "mul":
-		op = .MUL
-	case "div":
-		op = .DIV
-	case "numeq":
-		op = .EQ
-	case "lt":
-		op = .LT
-	case "gt":
-		op = .GT
-	}
-	for i in 0 ..< num_args - 1 {
-		append(&compiler.bytecode.instructions, Instruction{op = op})
-	}
-}
 
 compile_call :: proc(compiler: ^Compiler, p: ^Pair) {
 	curr := p.rest

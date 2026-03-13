@@ -8,27 +8,28 @@ Token :: struct {
 	col:  int,
 }
 
-tokens := [TokenType.COUNT]string {
-	"EOF",
-	"(",
-	")",
-	".",
-	"\"",
-	"Symbol",
-	"NUMBER",
-	"Srting",
-	"Bool",
-	"[",
-	"]",
-	"{",
-	"}",
-	"lambda",
-	"`",
-	",",
-	",",
-	"\n",
-	";",
-	":",
+tokens :: [TokenType]string {
+	.EOF           = "EOF",
+	.LEFT_PAREN    = "(",
+	.RIGHT_PAREN   = ")",
+	.DOT           = ".",
+	.QUOTE         = "'",
+	.SYMBOL        = "Symbol",
+	.NUMBER        = "NUMBER",
+	.STRING        = "\"",
+	.BOOLEAN       = "Bool",
+	.LEFT_BRACKET  = "[",
+	.RIGHT_BRACKET = "]",
+	.LEFT_BRACE    = "{",
+	.RIGHT_BRACE   = "}",
+	.LAMBDA        = "lambda",
+	.BACKTICK      = "`",
+	.COMMA         = ",",
+	.COMMA_AT      = ",@",
+	.NEWLINE       = "\n",
+	.SEMICOLON     = ";",
+	.COLON         = ":",
+	.COUNT         = "COUNT",
 }
 
 TokenType :: enum {
@@ -52,6 +53,5 @@ TokenType :: enum {
 	NEWLINE,
 	SEMICOLON,
 	COLON,
-
 	COUNT,
 }

@@ -7,17 +7,15 @@ import "core:mem/virtual"
 import "core:os"
 import "core:strings"
 
-// import "../sqlite"
-
 main :: proc() {
 	context.logger = log.create_console_logger()
 	log.info("Scheme Bytecode Interpreter in Odin\nPress Ctrl+C to exit")
 
-	global_env := new(Env); {
-		global_env.values = make(map[Symbol]Value)
-		defer delete(global_env.values)
-		setup_primitives(global_env)
-	}
+	global_env := new(Env)
+	global_env.values = make(map[Symbol]Value)
+	setup_primitives(global_env)
+	defer free(global_env)
+	defer delete(global_env.values)
 
 	r_stream := os.to_stream(os.stdin)
 	reader: bufio.Reader
@@ -40,21 +38,17 @@ main :: proc() {
 	c := compiler_init(global_env)
 	vm := vm_init(global_env)
 
-	fmt.printf("Builtin '+' in env: %v\n", env_lookup(global_env, Symbol("+")))
-	fmt.printf("Builtin 'car' in env: %v\n", env_lookup(global_env, Symbol("car")))
-
 	load_file("lib/stdlib.scm", &c, &vm)
+	load_file("lib/scheme.scm", &c, &vm)
 	load_file("lib/actor.scm", &c, &vm)
 
 	for {repl_step(&reader, &c, &vm)}
 }
 
 load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
-	data, err := os.read_entire_file(path, context.allocator); if err != nil {
-		log.error("Warning: Could not load file: %v", path)
-		return
-	}
-	defer delete(data)
+	data, err := os.read_entire_file(path, context.allocator)
+	assert(err == nil)
+	defer delete(data, context.allocator)
 
 	content := string(data)
 	parser := parser_init(content)
@@ -81,7 +75,7 @@ repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 		if err != .EOF {log.info("Error reading: %v\n", err)}
 		os.exit(0)
 	}
-	defer delete(line)
+	// defer delete(line)
 
 	line = strings.trim_space(line)
 	if line == "" {return}

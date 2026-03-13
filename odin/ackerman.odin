@@ -4,7 +4,7 @@ import "core:fmt"
 
 // ackermann computes the Ackermann-Péter function
 ackermann :: proc(m, n: u64) -> u64 {
-	fmt.println("m: ", m, ", n: ", n)
+//	fmt.println("m: ", m, ", n: ", n)
 	
 	if m == 0 {
 		return n + 1
@@ -16,7 +16,7 @@ ackermann :: proc(m, n: u64) -> u64 {
 }
 
 ackermann_fast :: proc(m, n: u64) -> u64 {
-	fmt.println("m: ", m, ", n: ", n)
+//	fmt.println("m: ", m, ", n: ", n)
 	if m == 0 {
 		return n + 1
 	} else if m > 0 && n == 0 {

@@ -29,7 +29,12 @@ parser_advance :: proc(p: ^Parser) -> Token {
 	return lexer_next_token(&p.lexer)
 }
 
-parse_expression :: proc(p: ^Parser) -> Value {
+parse_expression :: proc(
+	p: ^Parser,
+) -> // TODO: is this needed?
+
+
+	Value {// defer free(head)
 	tok := parser_advance(p)
 	#partial switch tok.type {
 	case .EOF, .RIGHT_PAREN, .RIGHT_BRACKET, .DOT:
@@ -98,11 +103,21 @@ parse_list_elements :: proc(p: ^Parser, head: ^Pair) {
 
 parse_list_next :: proc(p: ^Parser, curr: ^Pair) -> (^Pair, bool) {
 	tok := parser_peek(p)
-	if tok.type == .RIGHT_PAREN {parser_advance(p); curr.rest = Nil{}; return nil, true}
-	if tok.type == .DOT {
-		parser_advance(p); curr.rest = parse_expression(p); parser_advance(p); return nil, true
+	if tok.type == .RIGHT_PAREN {
+		parser_advance(p)
+		curr.rest = Nil{}
+		return nil, true
 	}
-	if tok.type == .EOF {curr.rest = Nil{}; return nil, true}
+	if tok.type == .DOT {
+		parser_advance(p)
+		curr.rest = parse_expression(p)
+		parser_advance(p)
+		return nil, true
+	}
+	if tok.type == .EOF {
+		curr.rest = Nil{}
+		return nil, true
+	}
 	next := new(Pair)
 	curr.rest = next
 	return next, false
