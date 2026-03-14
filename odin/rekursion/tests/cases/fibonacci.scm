@@ -1,6 +1,9 @@
-(define (fib n)
+(define (fibH r)
+  (lambda (n)
     (if (lt n 2)
         n
-        (add (fib (sub n 1)) (fib (sub n 2))))) ;; => fib
+        (add (r (sub n 1)) (r (sub n 2)))))) ;; => fibH
 
-(fib 10) ;; => 55
+(define fib (lambda (n) ((Y fibH) n))) ;; => fib
+
+(fib 3) ;; => 2

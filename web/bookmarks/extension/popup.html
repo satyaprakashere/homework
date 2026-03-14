@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { width: 250px; padding: 15px; font-family: sans-serif; background: #111b21; color: #e9edef; }
+    h2 { font-size: 16px; margin-top: 0; }
+    input { width: 100%; padding: 8px; margin: 10px 0; background: #202c33; border: 1px solid #3b4a54; color: white; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background: #00a884; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #06cf9c; }
+    .footer { margin-top: 15px; font-size: 11px; color: #8696a0; text-align: center; }
+    kbd { background: #3b4a54; padding: 2px 4px; border-radius: 3px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h2>Bookmarks Control</h2>
+  <label>Server URL:</label>
+  <input type="text" id="serverUrl" placeholder="https://localhost">
+  <button id="save">Save Settings</button>
+  <div class="footer">
+    Use <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> to bookmark any page.
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -17,8 +17,8 @@
   (let ((q (get scheduler 'run-queue)))
     (if (is-null q)
         '()
-        (let ((head (car q))
-              (tail (cdr q)))
+        (let ((head (first q))
+              (tail (rest q)))
           (set scheduler 'run-queue tail)
           head))))))
 
@@ -31,7 +31,7 @@
 (define spawn (lambda (f)
   (let ((pid (get scheduler 'next-pid))
         (info (table)))
-    (set scheduler 'next-pid (+ pid 1))
+    (set scheduler 'next-pid (add pid 1))
     
     (set info 'mailbox '())
     (set info 'waiting false)
@@ -48,7 +48,7 @@
 (define (send pid msg)
   (let ((info (get (get scheduler 'actors) pid)))
     (if (is-null info)
-        #f
+        false
         (begin
           (let ((mbox (get info 'mailbox)))
             (if (is-null mbox)
@@ -64,7 +64,7 @@
                               (k 'wake)
                               (set scheduler 'current-pid '())
                               (schedule-next))))
-                #f))
+                false))
           'ok))))
 
 (define receive (lambda ()

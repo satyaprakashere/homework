@@ -4,6 +4,8 @@ import "core:fmt"
 import "core:mem"
 import "core:reflect"
 
+STACK_LIMIT :: 1024
+
 Op_Code :: enum u8 {
 	NOP,
 	PUSH_CONST,
@@ -50,14 +52,16 @@ vm_init :: proc(env: ^Env) -> VM {
 }
 
 vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
+	// fmt.println("DEBUG: vm_run starting with", len(bytecode.instructions), "instructions")
 	steps := 0
 	for vm.ip < len(bytecode.instructions) {
 		steps += 1
-		if steps > 1_000_000 {
-			fmt.println("VM reached max steps limit! Possible infinite loop. steps: %v", steps)
-			if vm.ip < len(bytecode.instructions) {
-				fmt.printf("debug: IP: %d, Op: %v\n", vm.ip, bytecode.instructions[vm.ip].op)
-			}
+		if steps > STACK_LIMIT {
+			fmt.printf(
+				"VM reached max steps limit! Possible infinite loop. steps: %d, limit: %d\n",
+				steps,
+				STACK_LIMIT,
+			)
 			break
 		}
 		inst := bytecode.instructions[vm.ip]

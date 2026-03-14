@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmarks Submitter",
+  "version": "1.1",
+  "description": "Intercepts bookmark commands and submits the link to the Bookmarks app.",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "notifications",
+    "cookies",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:9000/*",
+    "https://localhost/*",
+    "http://127.0.0.1:9000/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "submit-bookmark": {
+      "suggested_key": {
+        "default": "Alt+Shift+D",
+        "mac": "Alt+Shift+D"
+      },
+      "description": "Submit current page to Bookmarks"
+    }
+  },
+  "icons": {
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}

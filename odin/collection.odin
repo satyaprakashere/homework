@@ -11,10 +11,9 @@ main :: proc() {
 }
 
 test_array :: proc() {
-	arr := make([dynamic]int)
-	defer delete(arr)
+	arr := [?]int {1, 2, 4}
 
-	append(&arr, 100)
+	arr[2] = 3
 	fmt.println(arr)
 }
 

@@ -3,9 +3,9 @@ package main
 import "core:fmt"
 import "core:math/rand"
 import "core:mem"
+import unix "core:sys/posix"
 import "core:testing"
 import "core:time"
-import unix "core:sys/posix"
 
 T_DEGREE :: 4
 MAX_KEYS :: 2 * T_DEGREE - 1

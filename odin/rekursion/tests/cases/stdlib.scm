@@ -28,3 +28,13 @@
 
 (test "cond 1" 2 (cond (false 1) (true 2) (else 3))); => nil
 (test "cond else" 3 (cond (false 1) (false 2) (else 3))); => nil
+
+(and) ;; => true
+(and true true) ;; => true
+(and true false) ;; => false
+(and true true 10) ;; => 10
+
+(or) ;; => false
+(or false true) ;; => true
+(or true false) ;; => true
+(or false false 20) ;; => 20

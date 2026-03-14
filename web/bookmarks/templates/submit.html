@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit - Bookmarks</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#111b21">
+    <link rel="apple-touch-icon" href="/static/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header class="navbar">
+            <div class="nav-left">
+                <a href="/" class="logo">
+                    <span class="logo-box">S</span>
+                    <span class="logo-text">News</span>
+                </a>
+                <nav class="nav-links">
+                    <a href="/">new</a>
+                    <a href="#">past</a>
+                    <a href="#">comments</a>
+                    <a href="#">ask</a>
+                    <a href="#">show</a>
+                    <a href="#">jobs</a>
+                    <a href="/submit">submit</a>
+                </nav>
+            </div>
+            <div class="nav-right">
+                {{ if .User }}
+                <span class="user-greeting">{{ .User.Username }}</span>
+                <span class="meta-divider">|</span>
+                <form action="/logout" method="POST" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+                    <button type="submit" class="logout-link"
+                        style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-family:inherit; padding:0; font-size: inherit;">logout</button>
+                </form>
+                {{ else }}
+                <a href="/login">login</a>
+                {{ end }}
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="submit-container" style="padding: 20px; max-width: 600px;">
+                <h1 style="font-size: 1.5rem; margin-bottom: 20px; color: var(--text-primary);">Submit Post</h1>
+                <form action="/submit" method="POST" class="submit-form">
+                    <input type="hidden" name="csrf_token" value="{{ .CSRFToken }}">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="title" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: 500;">Title</label>
+                        <input type="text" id="title" name="title" required maxlength="100" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="url" style="display: block; margin-bottom: 5px; color: var(--text-secondary); font-weight: 500;">URL</label>
+                        <input type="url" id="url" name="url" required maxlength="500" placeholder="https://..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                    </div>
+                    <button type="submit" class="submit-btn" style="background: var(--accent-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: opacity 0.2s;">Submit</button>
+                </form>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#">Guidelines</a>
+                <span class="meta-divider">•</span>
+                <a href="#">FAQ</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Lists</a>
+                <span class="meta-divider">•</span>
+                <a href="#">API</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Security</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Legal</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Apply to YC</a>
+                <span class="meta-divider">•</span>
+                <a href="#">Contact</a>
+            </div>
+        </footer>
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
+    </script>
+</body>
+
+</html>

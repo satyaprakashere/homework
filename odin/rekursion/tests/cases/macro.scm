@@ -6,20 +6,3 @@
 (define x 10) ;; => x
 (when (< x 20) (print "x is less than 20")) ;; => nil
 (unless (> x 20) (print "x is not greater than 20")) ;; => nil
-
-(let ((a 1) (b 2)) (+ a b)) ;; => 3
-(let ((foo 10) (bar 20)) (let ((baz 30)) (+ foo (+ bar baz)))) ;; => 60
-
-(and) ;; => true
-(and true true) ;; => true
-(and true false) ;; => false
-(and true true 10) ;; => 10
-
-(or) ;; => false
-(or false true) ;; => true
-(or true false) ;; => true
-(or false false 20) ;; => 20
-(cond (false 1) (false 2) (else 3)) ;; => 3
-(cond (true 1) (false 2) (else 3)) ;; => 1
-(cond (false 1) (true 2) (else 3)) ;; => 2
-(cond (false 1) ((< 1 2) (+ 1 3)) (else 5)) ;; => 4

@@ -23,7 +23,7 @@ main :: proc() {
 	// Small demo
 	values := [SAMPLE_SIZE]int{}
 	for i in 0 ..< SAMPLE_SIZE {
-		values[i] = rand.int_max(1_000_000*10)
+		values[i] = rand.int_max(1_000_000 * 10)
 		insert(&tree, values[i])
 	}
 

@@ -1,4 +1,4 @@
-package main
+package algorithm
 
 import "core:fmt"
 import "core:math/rand"
@@ -8,14 +8,39 @@ import "core:testing"
 import "core:time"
 
 T_DEGREE :: 4
+// 64 Byte cache line? cache line length will depend on level
+// for memory it will be page size of 4-16kb
+// for HDD it will be 4-16mb? block size
 MAX_KEYS :: 2 * T_DEGREE - 1
+// Total cache lines
+// for ref:  AMD EPYC™ 9965 (192 cores, 384 threads, 384MB L3 cache)
+// depends on the size of memory of that level
+// for l1 cache it will be 4000 lines of 64 bytes each (256kb l1 cache) per core
+// for l2 cache it will be 64000 lines of 64 bytes each (4mb l2 cache) per core
+// for l3 cache it will be 6144000 lines of 64 bytes each (384mb l3 cache)
+// for ram it will be 4194304 lines of 64 bytes each (256gb ram)
+// for ssd it will be 2097152 lines of 4kb each (8tb ssd)
+// for hdd it will be 16777216 lines of 4kb each (64tb hdd)
+// for network it will be 67108864 lines of 4kb each (256tb network)
+// for archive it will be 268435456 lines of 4kb each (1024tb archive)
 MAX_CHILDREN :: 2 * T_DEGREE
 
 SAMPLE_SIZE :: 1_000_000
 TEST_SAMPLE_SIZE :: 1_000_000
 
+M2_PRO :: struct {
+	l1_cache: [128_000]u8,
+	l2_cache: [4_096_000]u8,
+	l3_cache: [24_000_000]u8,
+	ram:      [16_000_000_000]u8,
+	ssd:      [512_000_000_000]u8,
+	hdd:      [4_000_000_000_000]u8,
+	network:  [8_000_000_000_000]u8,
+	archive:  [8_000_000_000_000]u8,
+}
+
 main :: proc() {
-	fmt.println("--- B-Tree Pointer-free Demo ---")
+	fmt.println("--- B-Tree Min Heap Demo ---")
 
 	tree: BTree(int)
 	init(&tree)
@@ -23,7 +48,7 @@ main :: proc() {
 	// Small demo
 	values := [SAMPLE_SIZE]int{}
 	for i in 0 ..< SAMPLE_SIZE {
-		values[i] = rand.int_max(1_000_000*10)
+		values[i] = rand.int_max(1_000_000 * 10)
 		insert(&tree, values[i])
 	}
 

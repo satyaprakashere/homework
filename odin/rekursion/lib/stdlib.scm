@@ -9,7 +9,7 @@
 (define (length lst)
   (if (is-null lst)
       0
-      (+ 1 (length (cdr lst)))))
+      (+ 1 (length (rest lst)))))
 
 (define (append lst1 lst2)
   (if (is-null lst1)
