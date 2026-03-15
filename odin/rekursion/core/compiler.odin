@@ -20,13 +20,9 @@ compiler_init :: proc(env: ^Env) -> Compiler {
 
 compile_expression :: proc(compiler: ^Compiler, expr: Value) {
 	#partial switch e in expr {
-	case Nil:
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
-	case nil:
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
-	case bool:
-		op := e ? Op_Code.PUSH_TRUE : Op_Code.PUSH_FALSE
-		append(&compiler.bytecode.instructions, Instruction{op = op})
+	case Nil, nil, bool:
+		idx := add_constant(compiler, e)
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 	case i64, f64, string:
 		idx := add_constant(compiler, e)
 		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
@@ -39,9 +35,12 @@ compile_expression :: proc(compiler: ^Compiler, expr: Value) {
 		for val in e.data {
 			compile_expression(compiler, val)
 		}
+		// Emit call to 'array' primitive
+		idx := add_constant(compiler, Symbol("array"))
+		append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
 		append(
 			&compiler.bytecode.instructions,
-			Instruction{op = .MAKE_ARRAY, arg = i32(len(e.data))},
+			Instruction{op = .CALL, arg = i32(len(e.data))},
 		)
 	}
 }
@@ -99,10 +98,6 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 			compile_lambda(compiler, p); return
 		case "begin":
 			compile_begin(compiler, p); return
-		case "reset":
-			compile_reset(compiler, p); return
-		case "shift":
-			compile_shift(compiler, p); return
 		}
 	}
 
@@ -142,7 +137,8 @@ compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
 		idx := add_constant(compiler, name)
 		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
 	case:
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		idx := add_constant(compiler, Nil{})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 	}
 }
 
@@ -264,20 +260,23 @@ compile_defmacro :: proc(compiler: ^Compiler, p: ^Pair) {
 	}
 
 	env_define(compiler.env, name, final_macro)
-	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+	idx := add_constant(compiler, Nil{})
+	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 }
 
 compile_if :: proc(compiler: ^Compiler, p: ^Pair) {
 	args, ok := p.rest.(^Pair)
 	if !ok {
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		idx := add_constant(compiler, Nil{})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 		return
 	}
 	then_args, then_ok := args.rest.(^Pair)
 	if !then_ok {
 		compile_expression(compiler, args.first)
 		append(&compiler.bytecode.instructions, Instruction{op = .POP})
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		idx := add_constant(compiler, Nil{})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 		return
 	}
 	else_args, else_ok := then_args.rest.(^Pair)
@@ -297,7 +296,8 @@ compile_if :: proc(compiler: ^Compiler, p: ^Pair) {
 	if else_ok {
 		compile_expression(compiler, else_args.first)
 	} else {
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		idx := add_constant(compiler, Nil{})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 	}
 
 	compiler.bytecode.instructions[jump_idx].arg = i32(len(compiler.bytecode.instructions))
@@ -342,9 +342,13 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 		compile_quasiquote_expr(compiler, e.rest)
 
 		if is_splicing {
-			append(&compiler.bytecode.instructions, Instruction{op = .CALL_APPEND})
+			idx := add_constant(compiler, Symbol("append"))
+			append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
+			append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = 2})
 		} else {
-			append(&compiler.bytecode.instructions, Instruction{op = .CALL_CONS})
+			idx := add_constant(compiler, Symbol("cons"))
+			append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
+			append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = 2})
 		}
 	case:
 		// atoms are just quoted
@@ -356,7 +360,8 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 compile_begin :: proc(compiler: ^Compiler, p: ^Pair) {
 	curr := p.rest
 	if _, is_nil := curr.(Nil); is_nil {
-		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_NIL})
+		idx := add_constant(compiler, Nil{})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 		return
 	}
 	for curr != nil {
@@ -437,28 +442,7 @@ compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
 	return proc_val
 }
 
-compile_reset :: proc(compiler: ^Compiler, p: ^Pair) {
-	args := p.rest.(^Pair)
-	reset_idx := len(compiler.bytecode.instructions)
-
-	append(&compiler.bytecode.instructions, Instruction{op = .RESET})
-	compile_expression(compiler, args.first)
-	append(&compiler.bytecode.instructions, Instruction{op = .FINISH_RESET})
-
-	compiler.bytecode.instructions[reset_idx].arg = i32(len(compiler.bytecode.instructions))
-}
-
-compile_shift :: proc(compiler: ^Compiler, p: ^Pair) {
-	args := p.rest.(^Pair)
-	idx_sym := add_constant(compiler, args.first.(Symbol))
-	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx_sym)})
-	shift_idx := len(compiler.bytecode.instructions)
-	append(&compiler.bytecode.instructions, Instruction{op = .SHIFT, arg = 0})
-	compile_expression(compiler, args.rest.(^Pair).first)
-	append(&compiler.bytecode.instructions, Instruction{op = .SHIFT_YIELD})
-	offset := len(compiler.bytecode.instructions) - (shift_idx + 1)
-	compiler.bytecode.instructions[shift_idx].arg = i32(offset)
-}
+// Procedures like compile_reset and compile_shift are removed.
 
 
 compile_call :: proc(compiler: ^Compiler, p: ^Pair) {

@@ -1,6 +1,6 @@
 (define (fibH r)
   (lambda (n)
-    (if (lt n 2)
+    (if (less_than n 2)
         n
         (add (r (sub n 1)) (r (sub n 2)))))) ;; => fibH
 

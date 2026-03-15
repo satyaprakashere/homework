@@ -3,7 +3,7 @@
 build:
 	mkdir -p out
 	mkdir -p out/logs
-	odin build core -out:out/rekursion
+	odin build core -out:out/rekursion -debug
 
 run: build
 	./out/rekursion
@@ -17,7 +17,8 @@ test:
 	odin test tests -out:out/rekursion_test -define:ODIN_TEST_THREADS=1
 
 test-features: build
-	cat tests/cases/actor.scm | out/rekursion
+	cat tests/cases/macro.scm | out/rekursion
+# 	cat tests/cases/actor.scm | out/rekursion
 # 	cat tests/cases/continuations.scm | out/rekursion
 # 	cat tests/cases/quotes.scm | out/rekursion
 # 	cat tests/cases/aliasing.scm | out/rekursion

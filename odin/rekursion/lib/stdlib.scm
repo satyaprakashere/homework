@@ -46,6 +46,7 @@
       init
       (proc (first lst) (foldr proc init (rest lst)))))
 
+;; Macros
 (defmacro let (bindings . body)
   (cons (cons 'lambda (cons (map first bindings) body))
         (map (lambda (b) (first (rest b))) bindings)))
@@ -75,7 +76,15 @@
                   (cons (cons 'begin (rest clause))
                   (cons (cons 'cond (rest clauses)) '()))))))))
 
+;; Recursion
 (define Y
   (lambda (f)
     ((lambda (x) (f (lambda (v) ((x x) v))))
      (lambda (x) (f (lambda (v) ((x x) v)))))))
+
+;; Delimited Continuations
+(defmacro reset (body)
+  (list 'creset (list 'lambda '() body)))
+
+(defmacro shift (k . body)
+  (list 'cshift (list 'lambda (list k) (cons 'begin body))))

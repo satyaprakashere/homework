@@ -3,12 +3,6 @@
       (print (string-append "STDLIB-PASS: " name))
       (print (string-append "STDLIB-FAIL: " name " | expected " (number->string expected) " got " (number->string actual))))); => test
 
-; (test "not #t" false (not true)); => nil
-; (test "not #f" true (not false)); => nil
-
-; (test "caar" 1 (caar '((1 2) 3))); => nil
-; (test "cadr" 2 (cadr '(1 2 3))); => nil
-
 (test "list" '(1 2 3) (list 1 2 3)); => nil
 (test "length empty" 0 (length '())); => nil
 (test "length non-empty" 3 (length '(a b c))); => nil
