@@ -49,7 +49,7 @@
   (let ((info (get (get scheduler (quote actors)) pid)))
     (if (is-null info)
         false
-        (begin
+        (do
           (let ((mbox (get info (quote mailbox))))
             (if (is-null mbox)
                 (set info (quote mailbox) (list msg))
@@ -57,7 +57,7 @@
           
           (let ((k (get info (quote waiting))))
             (if k
-                (begin
+                (do
                   (set info (quote waiting) false)
                   (enqueue (lambda () 
                               (set scheduler (quote current-pid) pid)
@@ -72,13 +72,13 @@
     (let ((info (get (get scheduler (quote actors)) pid)))
       (let ((mbox (get info (quote mailbox))))
         (if (is-null mbox)
-            (begin
+            (do
               (shift k
-                     (begin
+                     (do
                        (set info (quote waiting) k)
                        (quote suspended)))
               (receive))
-            (begin
+            (do
               (let ((msg (first mbox))
                     (rest-mbox (rest mbox)))
                 (set info (quote mailbox) rest-mbox)

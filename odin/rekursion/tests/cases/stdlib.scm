@@ -1,7 +1,7 @@
 (define (test name expected actual)
   (if (equal expected actual)
       (print (string-append "STDLIB-PASS: " name))
-      (print (string-append "STDLIB-FAIL: " name " | expected " (number->string expected) " got " (number->string actual))))); => test
+      (print (string-append "STDLIB-FAIL: " name " expected " (number->string expected) " got " (number->string actual))))); => test
 
 (test "list" '(1 2 3) (list 1 2 3)); => nil
 (test "length empty" 0 (length '())); => nil

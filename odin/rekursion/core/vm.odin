@@ -254,4 +254,5 @@ env_set :: proc(env: ^Env, sym: Symbol, val: Value) {
 		curr = curr.parent
 	}
 	// Error if not found
+	fmt.eprintf("Unbound variable: %s\n", sym)
 }

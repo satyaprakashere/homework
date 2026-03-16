@@ -73,9 +73,9 @@
       false
       (let ((clause (first clauses)))
         (if (eq? (first clause) (quote else))
-            (cons (quote begin) (rest clause))
+            (cons (quote do) (rest clause))
             (cons (quote if) (cons (first clause)
-                  (cons (cons (quote begin) (rest clause))
+                  (cons (cons (quote do) (rest clause))
                   (cons (cons (quote cond) (rest clauses)) (quote ())))))))))
 
 ;; Recursion
@@ -94,7 +94,7 @@
   (cons (quote creset) (cons (cons (quote lambda) (cons (quote ()) (cons body (quote ())))) (quote ()))))
 
 (defmacro shift (k . body)
-  (cons (quote cshift) (cons (cons (quote lambda) (cons (cons k (quote ())) (cons (cons (quote begin) body) (quote ())))) (quote ()))))
+  (cons (quote cshift) (cons (cons (quote lambda) (cons (cons k (quote ())) (cons (cons (quote do) body) (quote ())))) (quote ()))))
 
 ;; Helper for assoc
 (define (assoc key alist)
@@ -130,17 +130,17 @@
       (let ((alist (first (rest tbl))))
         (let ((pair (assoc key alist)))
           (if pair
-              (begin
+              (do
                 (set-rest! pair val)
                 val)
-              (begin
+              (do
                 (set-first! (rest tbl) (cons (cons key val) alist))
                 val))))
       (quote ())))
 
 (define (set-parent tbl parent)
   (if (is-map tbl)
-      (begin
+      (do
         (set-first! (rest (rest tbl)) parent)
         parent)
       (quote ())))

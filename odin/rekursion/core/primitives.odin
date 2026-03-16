@@ -154,12 +154,9 @@ builtin_apply :: proc(vm: ^VM, args: []Value) {
 	call_args := make([dynamic]Value, context.temp_allocator)
 	curr := list_val
 	for {
-		if p, ok := curr.(^Pair); ok {
-			append(&call_args, p.first)
-			curr = p.rest
-		} else {
-			break
-		}
+		p := curr.(^Pair) or_break
+		append(&call_args, p.first)
+		curr = p.rest
 	}
 
 	vm_exec_call_proc(vm, nil, proc_val, call_args[:], vm.ip)

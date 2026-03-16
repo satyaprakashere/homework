@@ -45,29 +45,6 @@ main :: proc() {
 	for {repl_step(&reader, &c, &vm)}
 }
 
-load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
-	log.info("Loading file: %s", path)
-	data, err := os.read_entire_file(path, context.allocator)
-	assert(err == nil)
-	defer delete(data, context.allocator)
-
-	content := string(data)
-	parser := parser_init(content)
-	for {
-		tok := parser_peek(&parser)
-		if tok.type == .EOF {break}
-
-		expr := parse_expression(&parser)
-		start_ip := len(compiler.bytecode.instructions)
-
-		compile_expression(compiler, expr)
-		append(&compiler.bytecode.instructions, Instruction{op = .RET})
-
-		vm.ip = start_ip
-		vm_run(vm, &compiler.bytecode)
-	}
-}
-
 repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 	fmt.print("> ")
 
@@ -91,4 +68,27 @@ repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 	vm.ip = start_ip
 	result := vm_run(vm, &c.bytecode)
 	log.info("=> %s\n", value_to_string(result))
+}
+
+load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
+	// log.info("Loading file: %s", path)
+	data, err := os.read_entire_file(path, context.allocator)
+	assert(err == nil)
+	defer delete(data, context.allocator)
+
+	content := string(data)
+	parser := parser_init(content)
+	for {
+		tok := parser_peek(&parser)
+		if tok.type == .EOF {break}
+
+		expr := parse_expression(&parser)
+		start_ip := len(compiler.bytecode.instructions)
+
+		compile_expression(compiler, expr)
+		append(&compiler.bytecode.instructions, Instruction{op = .RET})
+
+		vm.ip = start_ip
+		vm_run(vm, &compiler.bytecode)
+	}
 }

@@ -1,10 +1,7 @@
 package rekursion
 
-import "core:fmt"
 import "core:mem"
 import "core:strings"
-
-// Types and basic helpers are now in types_shared.odin
 
 clone_value :: proc(v: Value, allocator: mem.Allocator = context.allocator) -> Value {
 	#partial switch val in v {

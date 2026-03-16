@@ -29,15 +29,21 @@ parser_advance :: proc(p: ^Parser) -> Token {
 	return lexer_next_token(&p.lexer)
 }
 
-parse_expression :: proc(p: ^Parser) -> Value {
+parse_expression :: proc(p: ^Parser) ->  Value {// consume )
 	tok := parser_advance(p)
 	#partial switch tok.type {
-	case .LEFT_PAREN:   return parse_list(p)
-	case .LEFT_BRACKET: return parse_vector(p)
-	case .SYMBOL:       return Symbol(tok.text)
-	case .NUMBER:       return parse_number_value(tok.text)
-	case .STRING:       return tok.text[1:len(tok.text) - 1]
-	case:               return Nil{}
+	case .LEFT_PAREN:
+		return parse_list(p)
+	case .LEFT_BRACKET:
+		return parse_array(p)
+	case .SYMBOL:
+		return Symbol(tok.text)
+	case .NUMBER:
+		return parse_number_value(tok.text)
+	case .STRING:
+		return tok.text[1:len(tok.text) - 1]
+	case:
+		return Nil{}
 	}
 }
 
@@ -68,7 +74,7 @@ parse_list :: proc(p: ^Parser) -> Value {
 		} else if tok.type == .DOT {
 			parser_advance(p)
 			curr.rest = parse_expression(p)
-			parser_advance(p) // consume )
+			parser_advance(p)
 			break
 		} else if tok.type == .EOF {
 			curr.rest = Nil{}
@@ -81,12 +87,12 @@ parse_list :: proc(p: ^Parser) -> Value {
 	return head
 }
 
-parse_vector :: proc(p: ^Parser) -> Value {
+parse_array :: proc(p: ^Parser) -> Value {
 	vals := make([dynamic]Value)
 	for {
 		tok := parser_peek(p)
 		if tok.type == .RIGHT_BRACKET || tok.type == .EOF {
-			if tok.type == .RIGHT_BRACKET { parser_advance(p) }
+			if tok.type == .RIGHT_BRACKET {parser_advance(p)}
 			break
 		}
 		append(&vals, parse_expression(p))

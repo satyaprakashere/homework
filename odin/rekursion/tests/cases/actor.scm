@@ -5,7 +5,7 @@
       (let ((msg (receive)))
         (print "Ping got message: " msg)
         (if (eq msg (quote start))
-            (begin
+            (do
               (print "Ping responding with pong")
               (send pong-actor (quote ping))
               (quote done))

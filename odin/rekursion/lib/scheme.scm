@@ -7,6 +7,7 @@
 (define > greater_than)
 (define car first)
 (define cdr rest)
+(defmacro begin body (cons (quote do) body))
 (define number->string number-to-string)
 (define #t true)
 (define #f false)
@@ -83,7 +84,7 @@
       false
       (let ((clause (car clauses)))
         (if (eq? (car clause) (quote else))
-            (cons (quote begin) (cdr clause))
+            (cons (quote do) (cdr clause))
             (cons (quote if) (cons (car clause)
-                  (cons (cons (quote begin) (cdr clause))
+                  (cons (cons (quote do) (cdr clause))
                   (cons (cons (quote cond) (cdr clauses)) (quote ())))))))))

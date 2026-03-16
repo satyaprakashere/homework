@@ -87,27 +87,25 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 		case "defmacro":
 			compile_defmacro(compiler, p); return
 		case "quote":
+			compile_quote(compiler, p); return
+		case "quasiquote":
 			compile_quasiquote(compiler, p); return
 		case "lambda":
 			compile_lambda(compiler, p); return
-		case "begin":
-			compile_begin(compiler, p, is_tail); return
+		case "do":
+			compile_do(compiler, p, is_tail); return
 		}
-	}
-
-	// Macro Intercept
-	if sym, ok := head.(Symbol); ok {
-		if macro_val, found := env_lookup(compiler.env, sym); found {
+		if macro_val, found := env_lookup(compiler.env, h); found {
 			if m, is_macro := macro_val.(^Macro); is_macro {
-
 				expanded_expr := compiler_evaluate_macro(compiler, m, p.rest)
 				compile_expression(compiler, expanded_expr, is_tail)
 				return
 			}
 		}
+		compile_call(compiler, p, is_tail)
+	case:
+		compile_call(compiler, p, is_tail)
 	}
-
-	compile_call(compiler, p, is_tail)
 }
 
 compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
@@ -167,11 +165,6 @@ compiler_evaluate_macro :: proc(compiler: ^Compiler, m: ^Macro, args_val: Value)
 			return Nil{}
 		}
 	}
-	if m.is_variadic && curr_arg != nil {
-		if _, ok := curr_arg.(Nil); !ok {
-			env_define(call_env, m.params[len(m.params) - 1], curr_arg)
-		}
-	}
 
 	// Compile the macro body into the current compiler to share constant IPs
 	start_ip := len(compiler.bytecode.instructions)
@@ -229,17 +222,19 @@ compile_defmacro :: proc(compiler: ^Compiler, p: ^Pair) {
 			}
 		}
 
-		macro_val.params = params[:]
+		macro_val.params = make([]Symbol, len(params))
+		for sym, i in params {
+			macro_val.params[i] = sym
+		}
 		macro_val.is_variadic = is_variadic
 
-		// Body is the rest of the arguments
-		// We want an implicit `begin` block if there are multiple body statements
+		// We want an implicit `do` block if there are multiple body statements
 		body_list := pair.rest
 		if body_pair, is_pair := body_list.(^Pair); is_pair {
 			if _, is_nil := body_pair.rest.(Nil); is_nil {
 				macro_val.body = body_pair.first
 			} else {
-				begin_sym := Symbol("begin")
+				begin_sym := Symbol("do")
 				begin_pair := new(Pair)
 				begin_pair.first = begin_sym
 				begin_pair.rest = body_list
@@ -354,27 +349,21 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 	}
 }
 
-compile_begin :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
+compile_do :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	curr := p.rest
 	if _, is_nil := curr.(Nil); is_nil {
 		idx := add_constant(compiler, Nil{})
 		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 		return
 	}
-	for curr != nil {
-		if pair, ok := curr.(^Pair); ok {
-			is_last := false
-			if _, is_nil := pair.rest.(Nil); is_nil {
-				is_last = true
-			}
-			compile_expression(compiler, pair.first, is_tail && is_last)
-			if !is_last {
-				append(&compiler.bytecode.instructions, Instruction{op = .POP})
-			}
-			curr = pair.rest
-		} else {
-			break
+	for {
+		pair := curr.(^Pair) or_break
+		_, is_last := pair.rest.(Nil)
+		compile_expression(compiler, pair.first, is_tail && is_last)
+		if !is_last {
+			append(&compiler.bytecode.instructions, Instruction{op = .POP})
 		}
+		curr = pair.rest
 	}
 }
 
@@ -388,7 +377,7 @@ compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 	body_list := args.rest
 	if body_pair, ok := body_list.(^Pair); ok {
 		if _, is_nil := body_pair.rest.(Nil); !is_nil {
-			begin_sym := Symbol("begin")
+			begin_sym := Symbol("do")
 			begin_pair := new(Pair)
 			begin_pair.first = begin_sym
 			begin_pair.rest = body_list
@@ -415,18 +404,15 @@ compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
 	is_variadic := false
 	curr := params_val
 	for {
-		#partial switch list in curr {
-		case ^Pair:
-			append(&params, list.first.(Symbol))
-			curr = list.rest
-		case Symbol:
-			append(&params, list)
+		if sym, is_sym := curr.(Symbol); is_sym {
+			append(&params, sym)
 			is_variadic = true
 			break
 		}
-		if is_variadic {break}
-		if _, ok := curr.(Nil); ok {break}
-		if _, ok := curr.(^Pair); !ok {break}
+
+		list := curr.(^Pair) or_break
+		append(&params, list.first.(Symbol))
+		curr = list.rest
 	}
 	proc_val := new(Procedure)
 
@@ -448,14 +434,10 @@ compile_call :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	curr := p.rest
 	num_args := 0
 	for {
-		#partial switch list in curr {
-		case ^Pair:
-			compile_expression(compiler, list.first)
-			num_args += 1
-			curr = list.rest
-		}
-		if _, ok := curr.(Nil); ok {break}
-		if _, ok := curr.(^Pair); !ok {break}
+		list := curr.(^Pair) or_break
+		compile_expression(compiler, list.first)
+		num_args += 1
+		curr = list.rest
 	}
 	compile_expression(compiler, p.first, false)
 	op: Op_Code = is_tail ? .TAIL_CALL : .CALL
