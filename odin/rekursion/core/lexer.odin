@@ -15,14 +15,6 @@ lexer_init :: proc(source: string) -> Lexer {
 	return Lexer{source = source, line = 1, col = 1}
 }
 
-is_whitespace :: proc(r: rune) -> bool {
-	return unicode.is_white_space(r)
-}
-
-is_digit :: proc(r: rune) -> bool {
-	return unicode.is_digit(r)
-}
-
 is_symbol_char :: proc(r: rune) -> bool {
 	if unicode.is_letter(r) || unicode.is_digit(r) {return true}
 	return strings.contains_rune("+-*/<=>?!_#$", r)
@@ -41,168 +33,75 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 	start_col := l.col
 
 	switch r {
-	case rune(tokens[TokenType.LEFT_PAREN][0]):
-		l.offset += 1
-		l.col += 1
-		return Token {
-			type = .LEFT_PAREN,
-			text = tokens[TokenType.LEFT_PAREN],
-			line = start_line,
-			col = start_col,
-		}
-	case rune(tokens[TokenType.RIGHT_PAREN][0]):
-		l.offset += 1
-		l.col += 1
-		return Token {
-			type = .RIGHT_PAREN,
-			text = tokens[TokenType.RIGHT_PAREN],
-			line = start_line,
-			col = start_col,
-		}
-	case rune(tokens[TokenType.DOT][0]):
-		l.offset += 1
-		l.col += 1
-		return Token{type = .DOT, text = tokens[TokenType.DOT], line = start_line, col = start_col}
-	case rune(tokens[TokenType.STRING][0]):
-		return lexer_read_string(l)
-	case rune(tokens[TokenType.LEFT_BRACKET][0]):
-		l.offset += 1
-		l.col += 1
-		return Token {
-			type = .LEFT_BRACKET,
-			text = tokens[TokenType.LEFT_BRACKET],
-			line = start_line,
-			col = start_col,
-		}
-	case rune(tokens[TokenType.RIGHT_BRACKET][0]):
-		l.offset += 1
-		l.col += 1
-		return Token {
-			type = .RIGHT_BRACKET,
-			text = tokens[TokenType.RIGHT_BRACKET],
-			line = start_line,
-			col = start_col,
-		}
+	case '(': return lexer_emit(l, .LEFT_PAREN, "(", size)
+	case ')': return lexer_emit(l, .RIGHT_PAREN, ")", size)
+	case '[': return lexer_emit(l, .LEFT_BRACKET, "[", size)
+	case ']': return lexer_emit(l, .RIGHT_BRACKET, "]", size)
+	case '.': return lexer_emit(l, .DOT, ".", size)
+	case '"': return lexer_read_string(l)
 	}
 
-	if is_digit(r) ||
-	   (r == '-' && l.offset + 1 < len(l.source) && is_digit(rune(l.source[l.offset + 1]))) {
-		return lexer_read_number(l)
+	if unicode.is_digit(r) || (r == '-' && l.offset + 1 < len(l.source) && unicode.is_digit(rune(l.source[l.offset + 1]))) {
+		return lexer_read_while(l, .NUMBER, proc(r: rune) -> bool {
+			return unicode.is_digit(r) || r == '.'
+		})
 	}
 
 	if is_symbol_char(r) {
-		return lexer_read_symbol(l)
+		return lexer_read_while(l, .SYMBOL, is_symbol_char)
 	}
 
-	// Unknown char
 	l.offset += size
 	l.col += 1
 	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
 }
 
-lexer_read_hash :: proc(l: ^Lexer, start_offset, start_line, start_col: int) -> Token {
-	l.offset += 1
+lexer_emit :: proc(l: ^Lexer, type: TokenType, text: string, size: int) -> Token {
+	tok := Token{type = type, text = text, line = l.line, col = l.col}
+	l.offset += size
 	l.col += 1
-	r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
-	if r_next == 't' || r_next == 'f' {
-		l.offset += size_next
-		l.col += 1
-		return Token {
-			type = .SYMBOL,
-			text = l.source[start_offset:l.offset],
-			line = start_line,
-			col = start_col,
+	return tok
+}
+
+lexer_read_while :: proc(l: ^Lexer, type: TokenType, predicate: proc(rune) -> bool) -> Token {
+	start := l.offset
+	start_line, start_col := l.line, l.col
+	for l.offset < len(l.source) {
+		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
+		if predicate(r) {
+			l.offset += size
+			l.col += 1
+		} else {
+			break
 		}
 	}
-	// Fallthrough error
-	return Token{type = .EOF, text = "ERROR", line = start_line, col = start_col}
+	return Token{type = type, text = l.source[start:l.offset], line = start_line, col = start_col}
+}
+
+lexer_read_string :: proc(l: ^Lexer) -> Token {
+	start, start_line, start_col := l.offset, l.line, l.col
+	l.offset += 1; l.col += 1 // skip "
+	for l.offset < len(l.source) {
+		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
+		l.offset += size
+		l.col += 1
+		if r == '"' { break }
+	}
+	return Token{type = .STRING, text = l.source[start:l.offset], line = start_line, col = start_col}
 }
 
 lexer_skip_whitespace :: proc(l: ^Lexer) {
 	for l.offset < len(l.source) {
 		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
-		if is_whitespace(r) {
-			if r == '\n' {
-				l.line += 1
-				l.col = 1
-			} else {
-				l.col += 1
-			}
+		if unicode.is_white_space(r) {
+			if r == '\n' { l.line += 1; l.col = 1 } else { l.col += 1 }
 			l.offset += size
 		} else if r == ';' {
-			lexer_skip_comment(l)
-		} else {
-			break
-		}
-	}
-}
-
-lexer_skip_comment :: proc(l: ^Lexer) {
-	for l.offset < len(l.source) {
-		r_next, size_next := utf8.decode_rune_in_string(l.source[l.offset:])
-		l.offset += size_next
-		if r_next == '\n' {
-			l.line += 1
-			l.col = 1
-			break
-		}
-	}
-}
-
-lexer_read_number :: proc(l: ^Lexer) -> Token {
-	start := l.offset
-	for l.offset < len(l.source) {
-		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
-		if is_digit(r) || r == '.' {
-			l.offset += size
-			l.col += 1
-		} else {
-			break
-		}
-	}
-	return Token {
-		type = .NUMBER,
-		text = l.source[start:l.offset],
-		line = l.line,
-		col = l.col - (l.offset - start),
-	}
-}
-
-lexer_read_symbol :: proc(l: ^Lexer) -> Token {
-	start := l.offset
-	for l.offset < len(l.source) {
-		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
-		if is_symbol_char(r) {
-			l.offset += size
-			l.col += 1
-		} else {
-			break
-		}
-	}
-	return Token {
-		type = .SYMBOL,
-		text = l.source[start:l.offset],
-		line = l.line,
-		col = l.col - (l.offset - start),
-	}
-}
-
-lexer_read_string :: proc(l: ^Lexer) -> Token {
-	start_offset := l.offset
-	l.offset += 1 // skip "
-	l.col += 1
-	for l.offset < len(l.source) {
-		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
-		l.offset += size
-		l.col += 1
-		if r == '"' {
-			break
-		}
-	}
-	return Token {
-		type = .STRING,
-		text = l.source[start_offset:l.offset],
-		line = l.line,
-		col = l.col - (l.offset - start_offset),
+			for l.offset < len(l.source) {
+				r2, s2 := utf8.decode_rune_in_string(l.source[l.offset:])
+				l.offset += s2
+				if r2 == '\n' { l.line += 1; l.col = 1; break }
+			}
+		} else { break }
 	}
 }

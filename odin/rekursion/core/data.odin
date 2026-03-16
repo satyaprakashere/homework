@@ -104,6 +104,12 @@ VM :: struct {
 	ip:     int,
 }
 
+// destroy_env :: proc(e: ^Env) {
+// 	if e == nil {return}
+// 	delete(e.values)
+// 	free(e)
+// }
+
 is_false :: proc(v: Value) -> bool {
 	#partial switch val in v {
 	case bool:
@@ -111,12 +117,13 @@ is_false :: proc(v: Value) -> bool {
 	case Nil:
 		return true
 	}
+
 	return false
 }
 
 pop :: proc(stack: ^[dynamic]$T) -> T {
 	if len(stack) == 0 {
-		fmt.println("Error: Stack underflow")
+		fmt.eprintln("Error: Stack underflow")
 		return T{}
 	}
 	val := stack[len(stack) - 1]
@@ -157,7 +164,7 @@ simple_value_to_string :: proc(v: Value) -> (string, bool) {
 	case Symbol:
 		return string(val), true
 	}
-	return "", false
+	return "||unknown simple value|", false
 }
 
 complex_value_to_string :: proc(v: Value) -> string {
@@ -177,7 +184,7 @@ complex_value_to_string :: proc(v: Value) -> string {
 	case ^Macro:
 		return "|macro|"
 	}
-	return "|unknown|"
+	return "||unknown complex value||"
 }
 
 pair_to_string :: proc(p: ^Pair) -> string {

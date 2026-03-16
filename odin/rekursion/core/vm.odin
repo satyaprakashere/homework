@@ -1,11 +1,17 @@
 package rekursion
 
 import "core:fmt"
+import "core:mem"
 
-STACK_LIMIT :: 1024
+MAX_STEPS :: 100_000
 
-vm_init :: proc(env: ^Env) -> VM {
-	return VM{stack = make([dynamic]Value), frames = make([dynamic]CallFrame), env = env, ip = 0}
+vm_init :: proc(env: ^Env, allocator: mem.Allocator = context.allocator) -> VM {
+	return VM {
+		stack = make([dynamic]Value, 0, 1024, allocator = allocator),
+		frames = make([dynamic]CallFrame, 0, 1024, allocator = allocator),
+		env = env,
+		ip = 0,
+	}
 }
 
 vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
@@ -13,11 +19,11 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 	steps := 0
 	for vm.ip >= 0 && vm.ip < len(bytecode.instructions) {
 		steps += 1
-		if steps > STACK_LIMIT {
+		if steps > MAX_STEPS {
 			fmt.eprintf(
 				"VM reached max steps limit! Possible infinite loop. steps: %d, limit: %d\n",
 				steps,
-				STACK_LIMIT,
+				MAX_STEPS,
 			)
 			break
 		}

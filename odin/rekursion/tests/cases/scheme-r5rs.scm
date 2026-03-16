@@ -5,12 +5,12 @@
 (and #t #f) ;; => false
 (or #f #f) ;; => false
 
-(eq? 'a 'a) ;; => true
-(eq? '() '()) ;; => true
+(eq? (quote a) (quote a)) ;; => true
+(eq? (quote ()) (quote ())) ;; => true
 
-(cons 'a '()) ;; => (a)
-(car (cons 'a 'b)) ;; => a
-(cdr (cons 'a 'b)) ;; => b
+(cons (quote a) (quote ())) ;; => (a)
+(car (cons (quote a) (quote b))) ;; => a
+(cdr (cons (quote a) (quote b))) ;; => b
 (list 1 2 3) ;; => (1 2 3)
 (length (list 1 2 3)) ;; => 3
 (append (list 1 2) (list 3 4)) ;; => (1 2 3 4)
@@ -18,8 +18,8 @@
 
 ((lambda (x) (+ x x)) 4) ;; => 8
 
-(if #t 'yes 'no) ;; => yes
-(if #f 'yes 'no) ;; => no
+(if #t (quote yes) (quote no)) ;; => yes
+(if #f (quote yes) (quote no)) ;; => no
 (cond (#f 1) (#t 2) (else 3)) ;; => 2
 (cond (#f 1) (#f 2) (else 3)) ;; => 3
 
@@ -29,5 +29,5 @@
 (foldl (lambda (acc x) (+ acc x)) 0 (list 1 2 3 4)) ;; => 10
 (foldr (lambda (x acc) (+ acc x)) 0 (list 1 2 3 4)) ;; => 10
 
-(caar '((1 2) 3)) ;; => 1
-(cadr '(1 2 3)) ;; => 2
+(caar (quote ((1 2) 3))) ;; => 1
+(cadr (quote (1 2 3))) ;; => 2
