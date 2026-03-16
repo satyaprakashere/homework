@@ -17,7 +17,7 @@ compiler_init :: proc(env: ^Env) -> Compiler {
 	}
 }
 
-compile_expression :: proc(compiler: ^Compiler, expr: Value) {
+compile_expression :: proc(compiler: ^Compiler, expr: Value, is_tail := false) {
 	#partial switch e in expr {
 	case Nil, nil, bool:
 		idx := add_constant(compiler, e)
@@ -29,7 +29,7 @@ compile_expression :: proc(compiler: ^Compiler, expr: Value) {
 		idx := add_constant(compiler, e)
 		append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
 	case ^Pair:
-		compile_list(compiler, e)
+		compile_list(compiler, e, is_tail)
 	case Array:
 		for val in e.data {
 			compile_expression(compiler, val)
@@ -75,7 +75,7 @@ value_equals :: proc(a, b: Value) -> bool {
 	return res
 }
 
-compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
+compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	head := p.first
 	#partial switch h in head {
 	case Symbol:
@@ -83,7 +83,7 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 		case "define":
 			compile_define(compiler, p); return
 		case "if":
-			compile_if(compiler, p); return
+			compile_if(compiler, p, is_tail); return
 		case "defmacro":
 			compile_defmacro(compiler, p); return
 		case "quote":
@@ -91,7 +91,7 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 		case "lambda":
 			compile_lambda(compiler, p); return
 		case "begin":
-			compile_begin(compiler, p); return
+			compile_begin(compiler, p, is_tail); return
 		}
 	}
 
@@ -101,13 +101,13 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 			if m, is_macro := macro_val.(^Macro); is_macro {
 
 				expanded_expr := compiler_evaluate_macro(compiler, m, p.rest)
-				compile_expression(compiler, expanded_expr)
+				compile_expression(compiler, expanded_expr, is_tail)
 				return
 			}
 		}
 	}
 
-	compile_call(compiler, p)
+	compile_call(compiler, p, is_tail)
 }
 
 compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
@@ -258,7 +258,7 @@ compile_defmacro :: proc(compiler: ^Compiler, p: ^Pair) {
 	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 }
 
-compile_if :: proc(compiler: ^Compiler, p: ^Pair) {
+compile_if :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	args, ok := p.rest.(^Pair)
 	if !ok {
 		idx := add_constant(compiler, Nil{})
@@ -279,7 +279,7 @@ compile_if :: proc(compiler: ^Compiler, p: ^Pair) {
 	jump_if_false_idx := len(compiler.bytecode.instructions)
 	append(&compiler.bytecode.instructions, Instruction{op = .JUMP_IF_FALSE, arg = 0})
 
-	compile_expression(compiler, then_args.first)
+	compile_expression(compiler, then_args.first, is_tail)
 	jump_idx := len(compiler.bytecode.instructions)
 	append(&compiler.bytecode.instructions, Instruction{op = .JUMP, arg = 0})
 
@@ -288,7 +288,7 @@ compile_if :: proc(compiler: ^Compiler, p: ^Pair) {
 	)
 
 	if else_ok {
-		compile_expression(compiler, else_args.first)
+		compile_expression(compiler, else_args.first, is_tail)
 	} else {
 		idx := add_constant(compiler, Nil{})
 		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
@@ -354,7 +354,7 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 	}
 }
 
-compile_begin :: proc(compiler: ^Compiler, p: ^Pair) {
+compile_begin :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	curr := p.rest
 	if _, is_nil := curr.(Nil); is_nil {
 		idx := add_constant(compiler, Nil{})
@@ -363,11 +363,13 @@ compile_begin :: proc(compiler: ^Compiler, p: ^Pair) {
 	}
 	for curr != nil {
 		if pair, ok := curr.(^Pair); ok {
-			compile_expression(compiler, pair.first)
-			if pair.rest != nil {
-				if _, right_nil := pair.rest.(Nil); !right_nil {
-					append(&compiler.bytecode.instructions, Instruction{op = .POP})
-				}
+			is_last := false
+			if _, is_nil := pair.rest.(Nil); is_nil {
+				is_last = true
+			}
+			compile_expression(compiler, pair.first, is_tail && is_last)
+			if !is_last {
+				append(&compiler.bytecode.instructions, Instruction{op = .POP})
 			}
 			curr = pair.rest
 		} else {
@@ -390,12 +392,12 @@ compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 			begin_pair := new(Pair)
 			begin_pair.first = begin_sym
 			begin_pair.rest = body_list
-			compile_expression(compiler, begin_pair)
+			compile_expression(compiler, begin_pair, true)
 		} else {
-			compile_expression(compiler, body_pair.first)
+			compile_expression(compiler, body_pair.first, true)
 		}
 	} else {
-		compile_expression(compiler, args.rest.(^Pair).first)
+		compile_expression(compiler, args.rest.(^Pair).first, true)
 	}
 	append(&compiler.bytecode.instructions, Instruction{op = .RET})
 
@@ -442,7 +444,7 @@ compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
 // Procedures like compile_reset and compile_shift are removed.
 
 
-compile_call :: proc(compiler: ^Compiler, p: ^Pair) {
+compile_call :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	curr := p.rest
 	num_args := 0
 	for {
@@ -455,6 +457,7 @@ compile_call :: proc(compiler: ^Compiler, p: ^Pair) {
 		if _, ok := curr.(Nil); ok {break}
 		if _, ok := curr.(^Pair); !ok {break}
 	}
-	compile_expression(compiler, p.first)
-	append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = i32(num_args)})
+	compile_expression(compiler, p.first, false)
+	op: Op_Code = is_tail ? .TAIL_CALL : .CALL
+	append(&compiler.bytecode.instructions, Instruction{op = op, arg = i32(num_args)})
 }

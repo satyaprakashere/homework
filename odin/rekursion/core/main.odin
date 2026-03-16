@@ -9,7 +9,7 @@ import "core:strings"
 
 main :: proc() {
 	context.logger = log.create_console_logger()
-	log.info("Scheme Bytecode Interpreter in Odin\nPress Ctrl+C to exit")
+	log.info("Scheme Bytecode Interpreter written in Odin\nPress Ctrl+C to exit")
 
 	global_env := new(Env)
 	global_env.values = make(map[Symbol]Value)

@@ -49,7 +49,7 @@ vm_exec_inst :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return vm_exec_ret(vm)
 	case .CLOSE_PROC:
 		return vm_exec_close_proc(vm), false
-	case .CALL:
+	case .CALL, .TAIL_CALL:
 		return vm_exec_call(vm, bytecode, inst)
 	case:
 		return Nil{}, false
@@ -156,6 +156,16 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 	for i in 0 ..< num_args {
 		args[num_args - 1 - i] = pop(&vm.stack)
 	}
+
+	if inst.op == .TAIL_CALL && len(vm.frames) > 0 {
+		if p, ok := proc_val.(^Procedure); ok {
+			last_frame := pop(&vm.frames)
+			vm.env = last_frame.env
+			vm_exec_call_proc(vm, bytecode, proc_val, args, last_frame.return_ip)
+			return Nil{}, false
+		}
+	}
+
 	vm_exec_call_proc(vm, bytecode, proc_val, args, vm.ip)
 	return Nil{}, false
 }

@@ -4,7 +4,7 @@
         n
         (add (r (sub n 1)) (r (sub n 2)))))) ;; => fibH
 
-(define fib (lambda (n) ((Z fibH) n))) ;; => fib
+(define fib (lambda (n) ((Y fibH) n))) ;; => fib
 
 (fib 0) ;; => 0
 (fib 1) ;; => 1
@@ -17,3 +17,4 @@
 (fib 8) ;; => 21
 (fib 9) ;; => 34
 (fib 10) ;; => 55
+(fib 15) ;; => 610

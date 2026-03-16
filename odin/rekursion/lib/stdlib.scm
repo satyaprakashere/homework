@@ -48,8 +48,14 @@
 
 ;; Macros
 (defmacro let (bindings . body)
-  (cons (cons (quote lambda) (cons (map first bindings) body))
-        (map (lambda (b) (first (rest b))) bindings)))
+  (if (is-symbol bindings)
+      (quasiquote
+       ((lambda ()
+          (define (comma bindings) (comma-at (map first (first body))))
+          (comma-at (rest body))
+          ((comma bindings) (comma-at (map (lambda (b) (first (rest b))) (first body)))))))
+      (cons (cons (quote lambda) (cons (map first bindings) body))
+            (map (lambda (b) (first (rest b))) bindings))))
 
 (defmacro and args
   (if (is-null args)

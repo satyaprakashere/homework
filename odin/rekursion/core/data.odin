@@ -15,6 +15,7 @@ Op_Code :: enum u8 {
 	JUMP,
 	JUMP_IF_FALSE,
 	CLOSE_PROC,
+	TAIL_CALL,
 }
 
 Instruction :: struct {
