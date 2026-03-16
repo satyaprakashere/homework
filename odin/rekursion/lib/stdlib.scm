@@ -21,17 +21,17 @@
     (if (is-null lst)
         acc
         (rev-helper (rest lst) (cons (first lst) acc))))
-  (rev-helper lst '()))
+  (rev-helper lst (quote ())) )
 
 (define map
   (lambda (proc lst)
     (if (is-null lst)
-        '()
+        (quote ())
         (cons (proc (first lst)) (map proc (rest lst))))))
 
 (define (filter pred lst)
   (if (is-null lst)
-      '()
+      (quote ())
       (if (pred (first lst))
           (cons (first lst) (filter pred (rest lst)))
           (filter pred (rest lst)))))
@@ -48,7 +48,7 @@
 
 ;; Macros
 (defmacro let (bindings . body)
-  (cons (cons 'lambda (cons (map first bindings) body))
+  (cons (cons (quote lambda) (cons (map first bindings) body))
         (map (lambda (b) (first (rest b))) bindings)))
 
 (defmacro and args
@@ -56,25 +56,25 @@
       true
       (if (is-null (rest args))
           (first args)
-          (cons 'if (cons (first args) (cons (cons 'and (rest args)) (cons false '())))))))
+          (cons (quote if) (cons (first args) (cons (cons (quote and) (rest args)) (cons false (quote ()))))))))
 
 (defmacro or args
   (if (is-null args)
       false
       (if (is-null (rest args))
           (first args)
-          (cons 'let (cons (cons (cons '__or_val (cons (first args) '())) '())
-                (cons (cons 'if (cons '__or_val (cons '__or_val (cons (cons 'or (rest args)) '())))) '()))))))
+          (cons (quote let) (cons (cons (cons (quote __or_val) (cons (first args) (quote ()))) (quote ()))
+                (cons (cons (quote if) (cons (quote __or_val) (cons (quote __or_val) (cons (cons (quote or) (rest args)) (quote ()))))) (quote ())))))))
 
 (defmacro cond clauses
   (if (is-null clauses)
       false
       (let ((clause (first clauses)))
-        (if (eq? (first clause) 'else)
-            (cons 'begin (rest clause))
-            (cons 'if (cons (first clause)
-                  (cons (cons 'begin (rest clause))
-                  (cons (cons 'cond (rest clauses)) '()))))))))
+        (if (eq? (first clause) (quote else))
+            (cons (quote begin) (rest clause))
+            (cons (quote if) (cons (first clause)
+                  (cons (cons (quote begin) (rest clause))
+                  (cons (cons (quote cond) (rest clauses)) (quote ())))))))))
 
 ;; Recursion
 (define Y
@@ -84,7 +84,7 @@
 
 ;; Delimited Continuations
 (defmacro reset (body)
-  (list 'creset (list 'lambda '() body)))
+  (list (quote creset) (list (quote lambda) (quote ()) body)))
 
 (defmacro shift (k . body)
-  (list 'cshift (list 'lambda (list k) (cons 'begin body))))
+  (list (quote cshift) (list (quote lambda) (list k) (cons (quote begin) body))))

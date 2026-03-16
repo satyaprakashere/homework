@@ -59,44 +59,6 @@ lexer_next_token :: proc(l: ^Lexer) -> Token {
 			line = start_line,
 			col = start_col,
 		}
-	case rune(tokens[TokenType.QUOTE][0]):
-		l.offset += 1
-		l.col += 1
-		return Token {
-			type = .QUOTE,
-			text = tokens[TokenType.QUOTE],
-			line = start_line,
-			col = start_col,
-		}
-	case rune(tokens[TokenType.BACKTICK][0]):
-		l.offset += 1
-		l.col += 1
-		return Token {
-			type = .BACKTICK,
-			text = tokens[TokenType.BACKTICK],
-			line = start_line,
-			col = start_col,
-		}
-	case rune(tokens[TokenType.COMMA][0]):
-		l.offset += 1
-		l.col += 1
-		r_next, _ := utf8.decode_rune_in_string(l.source[l.offset:])
-		if r_next == rune(tokens[TokenType.COMMA_AT][1]) {
-			l.offset += 1
-			l.col += 1
-			return Token {
-				type = .COMMA_AT,
-				text = tokens[TokenType.COMMA_AT],
-				line = start_line,
-				col = start_col,
-			}
-		}
-		return Token {
-			type = .COMMA,
-			text = tokens[TokenType.COMMA],
-			line = start_line,
-			col = start_col,
-		}
 	case rune(tokens[TokenType.DOT][0]):
 		l.offset += 1
 		l.col += 1

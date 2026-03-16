@@ -91,8 +91,6 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair) {
 		case "defmacro":
 			compile_defmacro(compiler, p); return
 		case "quote":
-			compile_quote(compiler, p); return
-		case "quasiquote":
 			compile_quasiquote(compiler, p); return
 		case "lambda":
 			compile_lambda(compiler, p); return
@@ -318,7 +316,8 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 	#partial switch e in expr {
 	case ^Pair:
 		if sym, ok := e.first.(Symbol); ok {
-			if string(sym) == "unquote" {
+			sym_str := string(sym)
+			if sym_str == "unquote" || sym_str == "comma" {
 				// evaluate unquote
 				compile_expression(compiler, e.rest.(^Pair).first)
 				return
@@ -327,11 +326,13 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 
 		is_splicing := false
 		if first_pair, ok := e.first.(^Pair); ok {
-			if sym, is_sym := first_pair.first.(Symbol);
-			   is_sym && string(sym) == "unquote-splicing" {
-				// evaluate the unquote-splicing argument
-				compile_expression(compiler, first_pair.rest.(^Pair).first)
-				is_splicing = true
+			if sym, is_sym := first_pair.first.(Symbol); is_sym {
+				sym_str := string(sym)
+				if sym_str == "unquote-splicing" || sym_str == "comma-at" {
+					// evaluate the unquote-splicing argument
+					compile_expression(compiler, first_pair.rest.(^Pair).first)
+					is_splicing = true
+				}
 			}
 		}
 

@@ -41,14 +41,6 @@ parse_expression :: proc(
 		return Nil{}
 	case .LEFT_PAREN:
 		return parse_list(p)
-	case .QUOTE:
-		return parse_quote_expr(p, "quote")
-	case .BACKTICK:
-		return parse_quote_expr(p, "quasiquote")
-	case .COMMA:
-		return parse_quote_expr(p, "unquote")
-	case .COMMA_AT:
-		return parse_quote_expr(p, "unquote-splicing")
 	case .SYMBOL:
 		return Symbol(tok.text)
 	case .NUMBER:
@@ -59,17 +51,6 @@ parse_expression :: proc(
 		return parse_vector(p)
 	}
 	return Nil{}
-}
-
-parse_quote_expr :: proc(p: ^Parser, quote_type: string) -> Value {
-	expr := parse_expression(p)
-	quote_sym := Symbol(quote_type)
-
-	pair1, pair2 := new(Pair), new(Pair)
-	pair2.first, pair2.rest = expr, Nil{}
-	pair1.first, pair1.rest = quote_sym, pair2
-
-	return pair1
 }
 
 parse_number_value :: proc(text: string) -> Value {

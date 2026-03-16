@@ -27,12 +27,12 @@
 ;; Higher-order functions
 ; (define (map proc lst)
 ;   (if (is-null lst)
-;       '()
+;       (quote ())
 ;       (cons (proc (car lst)) (map proc (cdr lst)))))
 
 (define (filter pred lst)
   (if (is-null lst)
-      '()
+      (quote ())
       (if (pred (car lst))
           (cons (car lst) (filter pred (cdr lst)))
           (filter pred (cdr lst)))))

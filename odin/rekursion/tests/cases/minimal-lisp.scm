@@ -28,14 +28,14 @@ arr ;; => (1 2 3)
 ; (head-rest 1) ;; => ()
 
 (define t (table)) ;; => t
-(set t 'x 10) ;; => 10
-(get t 'x) ;; => 10
+(set t (quote x) 10) ;; => 10
+(get t (quote x)) ;; => 10
 (define child (table)) ;; => child
 (set-parent child t) ;; => |table|
-(get child 'x) ;; => 10
-(set child 'x 20) ;; => 20
-(get child 'x) ;; => 20
-(get t 'x) ;; => 10
+(get child (quote x)) ;; => 10
+(set child (quote x) 20) ;; => 20
+(get child (quote x)) ;; => 20
+(get t (quote x)) ;; => 10
 (define (all . args) (and args)) ;; => all
 ; (all true false) ;; => false
 
@@ -56,17 +56,17 @@ test ;; => |procedure|
 
 (list 1 2 3) ;; => (1 2 3)
 (length (list 1 2 3)) ;; => 3
-(length '()) ;; => 0
-(length '(a b c)) ;; => 3
+(length (quote ())) ;; => 0
+(length (quote (a b c))) ;; => 3
 
-(append '(1 2) '(3 4)) ;; => (1 2 3 4)
-(reverse '(1 2 3)) ;; => (3 2 1)
+(append (quote (1 2)) (quote (3 4))) ;; => (1 2 3 4)
+(reverse (quote (1 2 3))) ;; => (3 2 1)
 
-(map (lambda (x) (add x 1)) '(1 2 3)) ;; => (2 3 4)
-(map (lambda (x) (add x 1)) '(1 2 3)) ;; => (2 3 4)
-; (filter (lambda (x) (= 0 (modulo x 2))) '(1 2 3 4 5)) ;; => (2 4)
-(foldl (lambda (acc x) (add acc x)) 0 '(1 2 3 4)) ;; => 10
-(foldr (lambda (x acc) (add x acc)) 0 '(1 2 3 4)) ;; => 10
+(map (lambda (x) (add x 1)) (quote (1 2 3))) ;; => (2 3 4)
+(map (lambda (x) (add x 1)) (quote (1 2 3))) ;; => (2 3 4)
+; (filter (lambda (x) (= 0 (modulo x 2))) (quote (1 2 3 4 5))) ;; => (2 4)
+(foldl (lambda (acc x) (add acc x)) 0 (quote (1 2 3 4))) ;; => 10
+(foldr (lambda (x acc) (add x acc)) 0 (quote (1 2 3 4))) ;; => 10
 
 (let ((x 1) (y 2)) (add x y)) ;; => 3
 (and true 3) ;; => 3
