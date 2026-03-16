@@ -23,11 +23,11 @@
         (rev-helper (rest lst) (cons (first lst) acc))))
   (rev-helper lst (quote ())) )
 
-(define map
+(define fmap
   (lambda (proc lst)
     (if (is-null lst)
         (quote ())
-        (cons (proc (first lst)) (map proc (rest lst))))))
+        (cons (proc (first lst)) (fmap proc (rest lst))))))
 
 (define (filter pred lst)
   (if (is-null lst)
@@ -49,13 +49,9 @@
 ;; Macros
 (defmacro let (bindings . body)
   (if (is-symbol bindings)
-      (quasiquote
-       ((lambda ()
-          (define (comma bindings) (comma-at (map first (first body))))
-          (comma-at (rest body))
-          ((comma bindings) (comma-at (map (lambda (b) (first (rest b))) (first body)))))))
-      (cons (cons (quote lambda) (cons (map first bindings) body))
-            (map (lambda (b) (first (rest b))) bindings))))
+      (cons (cons (quote lambda) (cons (quote ()) (cons (cons (quote define) (cons (cons bindings (fmap (lambda (x) (first (rest x))) (first body))) (quote ()))) (rest body)))) (fmap (lambda (x) (first (rest x))) (first body)))
+      (cons (cons (quote lambda) (cons (fmap first bindings) body))
+            (fmap (lambda (b) (first (rest b))) bindings))))
 
 (defmacro and args
   (if (is-null args)
@@ -95,32 +91,42 @@
 
 ;; Delimited Continuations
 (defmacro reset (body)
-  (list (quote creset) (list (quote lambda) (quote ()) body)))
+  (cons (quote creset) (cons (cons (quote lambda) (cons (quote ()) (cons body (quote ())))) (quote ()))))
 
 (defmacro shift (k . body)
-  (list (quote cshift) (list (quote lambda) (list k) (cons (quote begin) body))))
+  (cons (quote cshift) (cons (cons (quote lambda) (cons (cons k (quote ())) (cons (cons (quote begin) body) (quote ())))) (quote ()))))
 
-;; Tables (implemented as tagged lists: ('table data-alist parent))
-(define (table . parent)
-  (list 'table '() (if (is-null parent) '() (first parent))))
+;; Helper for assoc
+(define (assoc key alist)
+  (if (is-null alist)
+      false
+      (if (eq? (first (first alist)) key)
+          (first alist)
+          (assoc key (rest alist)))))
 
-(define (is-table x)
-  (and (is-pair x) (eq? (first x) 'table)))
+;; Maps (implemented as tagged lists: ('map data-alist parent))
+(define (map . parent)
+  (cons (quote map) (cons (quote ()) (if (is-null parent) (quote (())) parent))))
+
+(define (is-map x)
+  (if (is-pair x)
+      (eq? (first x) (quote map))
+      false))
 
 (define (get tbl key)
-  (if (not (is-table tbl))
-      '()
+  (if (is-map tbl)
       (let ((alist (first (rest tbl)))
             (parent (first (rest (rest tbl)))))
         (let ((pair (assoc key alist)))
           (if pair
               (rest pair)
               (if (is-null parent)
-                  '()
-                  (get parent key)))))))
+                  (quote ())
+                  (get parent key)))))
+      (quote ())))
 
 (define (set tbl key val)
-  (if (is-table tbl)
+  (if (is-map tbl)
       (let ((alist (first (rest tbl))))
         (let ((pair (assoc key alist)))
           (if pair
@@ -130,19 +136,11 @@
               (begin
                 (set-first! (rest tbl) (cons (cons key val) alist))
                 val))))
-      '()))
+      (quote ())))
 
 (define (set-parent tbl parent)
-  (if (is-table tbl)
+  (if (is-map tbl)
       (begin
         (set-first! (rest (rest tbl)) parent)
         parent)
-      '()))
-
-;; Helper for assoc
-(define (assoc key alist)
-  (if (is-null alist)
-      false
-      (if (eq? (first (first alist)) key)
-          (first alist)
-          (assoc key (rest alist)))))
+      (quote ())))

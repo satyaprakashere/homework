@@ -31,16 +31,13 @@ Bytecode :: struct {
 Value :: union {
 	Nil,
 	bool,
-	i32,
 	i64,
-	f32,
 	f64,
 	string,
 	Symbol,
 	Array,
 	Builtin,
 	^Pair,
-	^Table,
 	^Macro,
 	^Procedure,
 	^Continuation,
@@ -84,11 +81,6 @@ Continuation :: struct {
 
 Array :: struct {
 	data: [dynamic]Value,
-}
-
-Table :: struct {
-	parent: ^Table,
-	data:   map[string]Value,
 }
 
 CallFrame :: struct {
@@ -180,8 +172,6 @@ complex_value_to_string :: proc(v: Value) -> string {
 		return "|continuation|"
 	case Array:
 		return array_to_string(val)
-	case ^Table:
-		return "|table|"
 	case ^Macro:
 		return "|macro|"
 	}

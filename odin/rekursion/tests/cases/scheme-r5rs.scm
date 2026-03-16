@@ -25,7 +25,7 @@
 
 (let ((x 2) (y 3)) (* x y)) ;; => 6
 
-(map (lambda (x) (+ x 1)) (list 1 2 3)) ;; => (2 3 4)
+(fmap (lambda (x) (+ x 1)) (list 1 2 3)) ;; => (2 3 4)
 (foldl (lambda (acc x) (+ acc x)) 0 (list 1 2 3 4)) ;; => 10
 (foldr (lambda (x acc) (+ acc x)) 0 (list 1 2 3 4)) ;; => 10
 

@@ -27,11 +27,11 @@ arr ;; => (1 2 3)
 ; (head-rest 1 2 3 4) ;; => (2 3 4)
 ; (head-rest 1) ;; => ()
 
-; (define t (table)) ;; => t
-; (set t 'x 10) ;; => 10
-; (get t 'x) ;; => 10
-; (define child (table)) ;; => child
-; (set-parent child t) ;; => |table|
+; (define t (map)) ;; => t
+; (set t (quote x) 10) ;; => 10
+; (get t (quote x)) ;; => 10
+; (define child (map)) ;; => child
+; (set-parent child t) ;; => |map|
 ; (get child 'x) ;; => 10
 ; (set child 'x 20) ;; => 20
 ; (get child 'x) ;; => 20
@@ -62,8 +62,8 @@ test ;; => |procedure|
 (append (quote (1 2)) (quote (3 4))) ;; => (1 2 3 4)
 (reverse (quote (1 2 3))) ;; => (3 2 1)
 
-(map (lambda (x) (add x 1)) (quote (1 2 3))) ;; => (2 3 4)
-(map (lambda (x) (add x 1)) (quote (1 2 3))) ;; => (2 3 4)
+(fmap (lambda (x) (add x 1)) (quote (1 2 3))) ;; => (2 3 4)
+(fmap (lambda (x) (add x 1)) (quote (1 2 3))) ;; => (2 3 4)
 ; (filter (lambda (x) (= 0 (modulo x 2))) (quote (1 2 3 4 5))) ;; => (2 4)
 (foldl (lambda (acc x) (add acc x)) 0 (quote (1 2 3 4))) ;; => 10
 (foldr (lambda (x acc) (add x acc)) 0 (quote (1 2 3 4))) ;; => 10

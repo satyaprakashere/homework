@@ -17,10 +17,10 @@
 (define (cddr x) (cdr (cdr x)))
 
 ;; Higher-order functions
-(define (map proc lst)
+(define (fmap proc lst)
   (if (is-null lst)
       (quote ())
-      (cons (proc (car lst)) (map proc (cdr lst)))))
+      (cons (proc (car lst)) (fmap proc (cdr lst)))))
 
 (define (filter pred lst)
   (if (is-null lst)
@@ -60,8 +60,8 @@
 
 ;; Macros
 (defmacro let (bindings . body)
-  (cons (cons (quote lambda) (cons (map car bindings) body))
-        (map cadr bindings)))
+  (cons (cons (quote lambda) (cons (fmap car bindings) body))
+        (fmap cadr bindings)))
 
 (defmacro and args
   (if (is-null args)

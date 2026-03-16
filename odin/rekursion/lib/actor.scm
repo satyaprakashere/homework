@@ -1,10 +1,10 @@
 ;; lib/actor.scm
 ;; Actor model based on Delimited Continuations
 
-(define scheduler (table))
+(define scheduler (map))
 (set scheduler (quote run-queue) (quote ()))
 (set scheduler (quote next-pid) 1)
-(set scheduler (quote actors) (table))
+(set scheduler (quote actors) (map))
 (set scheduler (quote current-pid) (quote ()))
 
 (define enqueue (lambda (thunk)
@@ -30,7 +30,7 @@
 
 (define spawn (lambda (f)
   (let ((pid (get scheduler (quote next-pid)))
-        (info (table)))
+        (info (map)))
     (set scheduler (quote next-pid) (add pid 1))
     
     (set info (quote mailbox) (quote ()))

@@ -1,8 +1,8 @@
-(define t (table)) ;; => t
+(define t (map)) ;; => t
 (set t (quote x) 10) ;; => 10
 (get t (quote x)) ;; => 10
-(define child (table)) ;; => child
-(set-parent child t) ;; => |Table|
+(define child (map)) ;; => child
+(set-parent child t) ;; => (map ((x . 10)) nil)
 (get child (quote x)) ;; => 10
 (set child (quote x) 20) ;; => 20
 (get child (quote x)) ;; => 20

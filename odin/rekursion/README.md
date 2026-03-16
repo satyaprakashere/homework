@@ -7,7 +7,7 @@ A Scheme bytecode interpreter written in Odin.
 -   **Core Scheme**: `define`, `lambda`, `if`, `quote`, `cons`, `car`, `cdr`, arithmetic primitives.
 -   **Delimited Continuations**: `shift` and `reset` for advanced control flow.
 -   **Vectors**: Literal syntax `[...]` (e.g., `[1 2 3]`).
--   **Tables**: Hash maps with prototypal inheritance (`table`, `get`, `set`, `set-parent`).
+-   **Maps**: Hash maps with prototypal inheritance (`map`, `get`, `set`, `set-parent`).
 -   **Variadic Functions**: Support for `(define (f . args) ...)` or `(lambda (x . y) ...)`.
 
 ## Build & Run

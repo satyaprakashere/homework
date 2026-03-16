@@ -221,7 +221,9 @@ vm_setup_proc_env :: proc(p: ^Procedure, args: []Value) -> ^Env {
 		new_env.values[p.params[req_args]] = rest_args
 	} else {
 		for sym, i in p.params {
-			if i < len(args) {new_env.values[sym] = args[i]}
+			if i < len(args) {
+				new_env.values[sym] = args[i]
+			}
 		}
 	}
 	return new_env
