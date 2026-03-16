@@ -27,20 +27,20 @@ arr ;; => (1 2 3)
 ; (head-rest 1 2 3 4) ;; => (2 3 4)
 ; (head-rest 1) ;; => ()
 
-(define t (table)) ;; => t
-(set t (quote x) 10) ;; => 10
-(get t (quote x)) ;; => 10
-(define child (table)) ;; => child
-(set-parent child t) ;; => |table|
-(get child (quote x)) ;; => 10
-(set child (quote x) 20) ;; => 20
-(get child (quote x)) ;; => 20
-(get t (quote x)) ;; => 10
-(define (all . args) (and args)) ;; => all
+; (define t (table)) ;; => t
+; (set t 'x 10) ;; => 10
+; (get t 'x) ;; => 10
+; (define child (table)) ;; => child
+; (set-parent child t) ;; => |table|
+; (get child 'x) ;; => 10
+; (set child 'x 20) ;; => 20
+; (get child 'x) ;; => 20
+; (get t 'x) ;; => 10
+; (define (all . args) (and args)) ;; => all
 ; (all true false) ;; => false
 
 (define (test name expected actual)
-  (if (equal expected actual) 
+  (if (equal expected actual)
       (string-append "ML-PASS: " name)
       (string-append "ML-FAIL: " name " expected " expected " got "  actual)))
 test ;; => |procedure|

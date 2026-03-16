@@ -396,8 +396,9 @@ compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 		} else {
 			compile_expression(compiler, body_pair.first, true)
 		}
-	} else {
-		compile_expression(compiler, args.rest.(^Pair).first, true)
+	} else if _, ok := body_list.(Nil); ok {
+		idx := add_constant(compiler, Nil{})
+		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 	}
 	append(&compiler.bytecode.instructions, Instruction{op = .RET})
 
@@ -442,7 +443,6 @@ compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
 }
 
 // Procedures like compile_reset and compile_shift are removed.
-
 
 compile_call :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	curr := p.rest

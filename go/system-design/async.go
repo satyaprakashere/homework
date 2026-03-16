@@ -6,14 +6,15 @@ import "fmt"
 
 func main() {
 	c := make(chan uint)
-	go func() {
-		c <- fibonacci(9876543210)
-	}()
+	go fib(c)
 
 	fmt.Println("Hello There!@")
+	send_req()
+	fmt.Println(<-c)
+}
 
-	fibx := <-c
-	fmt.Println(fibx)
+func fib(c chan uint) {
+	c <- fibonacci(987654321)
 }
 
 func fibonacci(n uint) uint {
@@ -30,5 +31,5 @@ base:
 }
 
 func send_req() {
-	fmt.Println("Sending request")
+	fmt.Println("Sending request...")
 }

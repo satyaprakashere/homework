@@ -46,6 +46,7 @@ main :: proc() {
 }
 
 load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
+	log.info("Loading file: %s", path)
 	data, err := os.read_entire_file(path, context.allocator)
 	assert(err == nil)
 	defer delete(data, context.allocator)

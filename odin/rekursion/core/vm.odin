@@ -3,7 +3,7 @@ package rekursion
 import "core:fmt"
 import "core:mem"
 
-MAX_STEPS :: 100_000
+MAX_STEPS :: 1_000_000
 
 vm_init :: proc(env: ^Env, allocator: mem.Allocator = context.allocator) -> VM {
 	return VM {

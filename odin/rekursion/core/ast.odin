@@ -35,16 +35,6 @@ clone_value :: proc(v: Value, allocator: mem.Allocator = context.allocator) -> V
 		}
 		new_proc.params = cloned_params
 		return new_proc
-	case ^Table:
-		new_table := new(Table)
-		// we don't clone the parent deeply to avoid infinite loops and because parent tables
-		// should already be in the global env if assigned.
-		new_table.parent = val.parent
-		new_table.data = make(map[string]Value, 16, allocator = allocator)
-		for k, v in val.data {
-			new_table.data[k] = clone_value(v, allocator)
-		}
-		return new_table
 	case ^Macro:
 		new_macro := new(Macro)
 		new_macro.is_variadic = val.is_variadic
@@ -57,6 +47,5 @@ clone_value :: proc(v: Value, allocator: mem.Allocator = context.allocator) -> V
 		new_macro.params = cloned_params
 		return new_macro
 	}
-
 	return v
 }

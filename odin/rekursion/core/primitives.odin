@@ -1,12 +1,13 @@
 package rekursion
 
+// import "base:builtin"
 import "core:fmt"
 import "core:strings"
 
 setup_primitives :: proc(env: ^Env) {
 	// basic cpu arithmetic
-	env_define(env, Symbol("add"), builtin_add)
-	env_define(env, Symbol("sub"), builtin_sub)
+	env_define(env, Symbol("add"), builtin_add_i64)
+	env_define(env, Symbol("sub"), builtin_sub_i64)
 	env_define(env, Symbol("mul"), builtin_mul)
 	env_define(env, Symbol("div"), builtin_div)
 
@@ -14,15 +15,11 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("cons"), builtin_cons)
 	env_define(env, Symbol("first"), builtin_first)
 	env_define(env, Symbol("rest"), builtin_rest)
+	env_define(env, Symbol("set-first!"), builtin_set_first)
+	env_define(env, Symbol("set-rest!"), builtin_set_rest)
 
-	// basic array operations
-	env_define(env, Symbol("array"), builtin_array)
 	env_define(env, Symbol("print"), builtin_print)
-	env_define(env, Symbol("table"), builtin_make_table)
-	env_define(env, Symbol("get"), builtin_table_get)
-	env_define(env, Symbol("set"), builtin_table_set)
-	env_define(env, Symbol("set-parent"), builtin_table_set_parent)
-	env_define(env, Symbol("apply"), builtin_apply)
+	env_define(env, Symbol("array"), builtin_array)
 
 	// Constants
 	env_define(env, Symbol("true"), true)
@@ -36,7 +33,6 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("is-boolean"), builtin_is_boolean)
 	env_define(env, Symbol("is-string"), builtin_is_string)
 	env_define(env, Symbol("is-procedure"), builtin_is_procedure)
-	env_define(env, Symbol("is-table"), builtin_is_table)
 
 	// Converters
 	env_define(env, Symbol("number-to-string"), builtin_number_to_string)
@@ -54,9 +50,11 @@ setup_primitives :: proc(env: ^Env) {
 	// Continuations
 	env_define(env, Symbol("cshift"), builtin_shift)
 	env_define(env, Symbol("creset"), builtin_reset)
+
+	env_define(env, Symbol("apply"), builtin_apply)
 }
 
-builtin_add :: proc(vm: ^VM, args: []Value) {
+builtin_add_i64 :: proc(vm: ^VM, args: []Value) {
 	res: i64 = 0
 	for a in args {
 		if val, ok := a.(i64); ok {
@@ -68,7 +66,7 @@ builtin_add :: proc(vm: ^VM, args: []Value) {
 	vm_stack_push(vm, Value(res))
 }
 
-builtin_sub :: proc(vm: ^VM, args: []Value) {
+builtin_sub_i64 :: proc(vm: ^VM, args: []Value) {
 	if len(args) == 0 {vm_stack_push(vm, Value(i64(0))); return}
 	res: i64 = 0
 	if val, ok := args[0].(i64); ok {
@@ -167,6 +165,22 @@ builtin_apply :: proc(vm: ^VM, args: []Value) {
 	vm_exec_call_proc(vm, nil, proc_val, call_args[:], vm.ip)
 }
 
+builtin_set_first :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
+	pair, ok := args[0].(^Pair)
+	if !ok {vm_stack_push(vm, Value(Nil{})); return}
+	pair.first = args[1]
+	vm_stack_push(vm, pair.first)
+}
+
+builtin_set_rest :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
+	pair, ok := args[0].(^Pair)
+	if !ok {vm_stack_push(vm, Value(Nil{})); return}
+	pair.rest = args[1]
+	vm_stack_push(vm, pair.rest)
+}
+
 builtin_array :: proc(vm: ^VM, args: []Value) {
 	if len(args) == 0 {vm_stack_push(vm, Value(Nil{})); return}
 
@@ -194,43 +208,6 @@ builtin_print :: proc(vm: ^VM, args: []Value) {
 	vm_stack_push(vm, Value(Nil{}))
 }
 
-builtin_make_table :: proc(vm: ^VM, args: []Value) {
-	t := new(Table)
-	t.data = make(map[string]Value)
-	vm_stack_push(vm, Value(t))
-}
-
-builtin_table_get :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
-	t, ok := args[0].(^Table)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
-
-	key, key_ok := get_string_key(args[1])
-	if !key_ok {vm_stack_push(vm, Value(Nil{})); return}
-
-	curr := t
-	for curr != nil {
-		if val, found := curr.data[key]; found {
-			vm_stack_push(vm, Value(val))
-			return
-		}
-		curr = curr.parent
-	}
-	vm_stack_push(vm, Value(Nil{}))
-}
-
-builtin_table_set :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 3 {vm_stack_push(vm, Value(Nil{})); return}
-	t, ok := args[0].(^Table)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
-
-	key, key_ok := get_string_key(args[1])
-	if !key_ok {vm_stack_push(vm, Value(Nil{})); return}
-
-	val := args[2]
-	t.data[key] = val
-	vm_stack_push(vm, Value(val))
-}
 
 get_string_key :: proc(v: Value) -> (string, bool) {
 	#partial switch k in v {
@@ -244,27 +221,6 @@ get_string_key :: proc(v: Value) -> (string, bool) {
 		return fmt.aprintf("%f", k), true
 	}
 	return "", false
-}
-
-builtin_table_set_parent :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
-
-	t, ok := args[0].(^Table)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
-
-	parent, ok_p := args[1].(^Table)
-	if !ok_p {
-		if _, is_nil := args[1].(Nil); is_nil {
-			t.parent = nil
-			vm_stack_push(vm, Value(Nil{}))
-			return
-		}
-		vm_stack_push(vm, Value(Nil{}))
-		return
-	}
-
-	t.parent = parent
-	vm_stack_push(vm, Value(parent))
 }
 
 // Predicates
@@ -313,12 +269,6 @@ builtin_is_procedure :: proc(vm: ^VM, args: []Value) {
 		return
 	}
 	vm_stack_push(vm, bool(false))
-}
-
-builtin_is_table :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {vm_stack_push(vm, bool(false)); return}
-	_, ok := args[0].(^Table)
-	vm_stack_push(vm, Value(ok))
 }
 
 // Converters
@@ -386,8 +336,6 @@ builtin_eq :: proc(vm: ^VM, args: []Value) {
 		vb, ok := b.(^Procedure); res = ok && va == vb
 	case ^Continuation:
 		vb, ok := b.(^Continuation); res = ok && va == vb
-	case ^Table:
-		vb, ok := b.(^Table); res = ok && va == vb
 	}
 	vm_stack_push(vm, Value(res))
 }
@@ -426,14 +374,6 @@ rekursion_value_equal :: proc(vm: ^VM, a, b: Value) -> bool {
 			if !rekursion_value_equal(vm, va.data[i], vb.data[i]) {return false}
 		}
 		return true
-	case ^Table, ^Procedure, ^Continuation, Builtin:
-		a_b_args := []Value{a, b}
-		old_sp := len(vm.stack)
-		builtin_eq(vm, a_b_args)
-		res_val := vm.stack[len(vm.stack) - 1]
-		res := res_val.(bool)
-		resize(&vm.stack, old_sp)
-		return res
 	}
 	return false
 }

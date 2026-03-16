@@ -18,7 +18,7 @@ test:
 
 test-features: build
 	cat tests/cases/macro.scm | out/rekursion
-# 	cat tests/cases/actor.scm | out/rekursion
+	cat tests/cases/actor.scm | out/rekursion
 # 	cat tests/cases/continuations.scm | out/rekursion
 # 	cat tests/cases/quotes.scm | out/rekursion
 # 	cat tests/cases/aliasing.scm | out/rekursion

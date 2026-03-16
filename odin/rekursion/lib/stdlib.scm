@@ -99,3 +99,50 @@
 
 (defmacro shift (k . body)
   (list (quote cshift) (list (quote lambda) (list k) (cons (quote begin) body))))
+
+;; Tables (implemented as tagged lists: ('table data-alist parent))
+(define (table . parent)
+  (list 'table '() (if (is-null parent) '() (first parent))))
+
+(define (is-table x)
+  (and (is-pair x) (eq? (first x) 'table)))
+
+(define (get tbl key)
+  (if (not (is-table tbl))
+      '()
+      (let ((alist (first (rest tbl)))
+            (parent (first (rest (rest tbl)))))
+        (let ((pair (assoc key alist)))
+          (if pair
+              (rest pair)
+              (if (is-null parent)
+                  '()
+                  (get parent key)))))))
+
+(define (set tbl key val)
+  (if (is-table tbl)
+      (let ((alist (first (rest tbl))))
+        (let ((pair (assoc key alist)))
+          (if pair
+              (begin
+                (set-rest! pair val)
+                val)
+              (begin
+                (set-first! (rest tbl) (cons (cons key val) alist))
+                val))))
+      '()))
+
+(define (set-parent tbl parent)
+  (if (is-table tbl)
+      (begin
+        (set-first! (rest (rest tbl)) parent)
+        parent)
+      '()))
+
+;; Helper for assoc
+(define (assoc key alist)
+  (if (is-null alist)
+      false
+      (if (eq? (first (first alist)) key)
+          (first alist)
+          (assoc key (rest alist)))))
