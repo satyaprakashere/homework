@@ -1,8 +1,6 @@
 package rekursion
 
 import "core:fmt"
-import "core:mem"
-import "core:reflect"
 
 STACK_LIMIT :: 1024
 

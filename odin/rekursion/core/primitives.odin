@@ -22,6 +22,7 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("get"), builtin_table_get)
 	env_define(env, Symbol("set"), builtin_table_set)
 	env_define(env, Symbol("set-parent"), builtin_table_set_parent)
+	env_define(env, Symbol("apply"), builtin_apply)
 
 	// Constants
 	env_define(env, Symbol("true"), true)
@@ -141,6 +142,29 @@ builtin_rest :: proc(vm: ^VM, args: []Value) {
 	pair, ok := args[0].(^Pair)
 	if !ok {vm_stack_push(vm, Value(Nil{})); return}
 	vm_stack_push(vm, pair.rest)
+}
+
+builtin_apply :: proc(vm: ^VM, args: []Value) {
+	if len(args) < 2 {
+		vm_stack_push(vm, Value(Nil{}))
+		return
+	}
+
+	proc_val := args[0]
+	list_val := args[1]
+
+	call_args := make([dynamic]Value, context.temp_allocator)
+	curr := list_val
+	for {
+		if p, ok := curr.(^Pair); ok {
+			append(&call_args, p.first)
+			curr = p.rest
+		} else {
+			break
+		}
+	}
+
+	vm_exec_call_proc(vm, nil, proc_val, call_args[:], vm.ip)
 }
 
 builtin_array :: proc(vm: ^VM, args: []Value) {

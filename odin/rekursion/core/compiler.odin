@@ -1,7 +1,6 @@
 package rekursion
 
 import "core:fmt"
-import "core:strings"
 
 Compiler :: struct {
 	bytecode: Bytecode,
@@ -38,10 +37,7 @@ compile_expression :: proc(compiler: ^Compiler, expr: Value) {
 		// Emit call to 'array' primitive
 		idx := add_constant(compiler, Symbol("array"))
 		append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
-		append(
-			&compiler.bytecode.instructions,
-			Instruction{op = .CALL, arg = i32(len(e.data))},
-		)
+		append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = i32(len(e.data))})
 	}
 }
 

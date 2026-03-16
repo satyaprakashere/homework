@@ -1,6 +1,5 @@
 package rekursion
 
-
 Token :: struct {
 	type: TokenType,
 	text: string,
