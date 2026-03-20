@@ -43,6 +43,11 @@ main :: proc() {
 	load_file("lib/actor.scm", &c, &vm)
 	load_file("lib/recursion.scm", &c, &vm)
 	load_file("lib/combinator.scm", &c, &vm)
+	load_file("lib/church.scm", &c, &vm)
+	load_file("lib/logic.scm", &c, &vm)
+	load_file("lib/peano.scm", &c, &vm)
+	load_file("lib/math.scm", &c, &vm)
+	load_file("lib/fixed.scm", &c, &vm)
 
 	for {repl_step(&reader, &c, &vm)}
 }

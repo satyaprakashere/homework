@@ -1,6 +1,7 @@
 package tests
 
 import "../core"
+import "core:fmt"
 import "core:log"
 import "core:mem/virtual"
 import "core:os"
@@ -11,22 +12,22 @@ run_scm_tests :: proc(t: ^testing.T, filename: string, extra_libs: []string = ni
 	// context.logger = log.create_console_logger()
 	// defer log.destroy_console_logger(context.logger)
 
-	// Prepare an arena allocator
-	arena: virtual.Arena
-	err := virtual.arena_init_growing(&arena)
-	assert(err == nil, "Failed to init arena")
-	defer virtual.arena_destroy(&arena)
+	// Persistent arena (Global Env, Compiler, VM, Bytecode)
+	persistent_arena: virtual.Arena
+	if err := virtual.arena_init_growing(&persistent_arena); err != nil {
+		assert(err == nil, "Failed to init persistent arena")
+	}
+	defer virtual.arena_destroy(&persistent_arena)
+	context.allocator = virtual.arena_allocator(&persistent_arena)
 
-	// Save original context to restore it for defers if needed (though defers capture implicitly?)
-	// Actually, in Odin, context is restored automatically when returning, BUT deferred statements
-	// execute with the context AT THE TIME OF DEFER execution, which is at the end.
-	// So let's push the context correctly.
+	// Temporary arena (Per-expression flight memory)
+	temp_arena: virtual.Arena
+	if err := virtual.arena_init_growing(&temp_arena); err != nil {
+		assert(err == nil, "Failed to init temp arena")
+	}
+	defer virtual.arena_destroy(&temp_arena)
 
-	// Create environment BEFORE swapping allocator, if we want it to persist or be destroyed
-	// Wait, we want everything to be in the arena.
-
-	context.temp_allocator = context.allocator
-	context.allocator = virtual.arena_allocator(&arena)
+	context.temp_allocator = virtual.arena_allocator(&temp_arena)
 
 	global_env := new(core.Env)
 	global_env.values = make(map[core.Symbol]core.Value)
@@ -37,8 +38,6 @@ run_scm_tests :: proc(t: ^testing.T, filename: string, extra_libs: []string = ni
 
 	// TOOD: improve testing time by caching the stdlib
 	core.load_file("lib/lambda.scm", &c, &vm)
-	core.load_file("lib/recursion.scm", &c, &vm)
-	core.load_file("lib/combinator.scm", &c, &vm)
 
 	for lib in extra_libs {
 		core.load_file(lib, &c, &vm)

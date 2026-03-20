@@ -10,6 +10,8 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("sub"), builtin_sub_i64)
 	env_define(env, Symbol("mul"), builtin_mul)
 	env_define(env, Symbol("div"), builtin_div)
+	env_define(env, Symbol("rem"), builtin_rem)
+	env_define(env, Symbol("mod"), builtin_mod)
 
 	// basic list operations
 	env_define(env, Symbol("cons"), builtin_cons)
@@ -148,6 +150,48 @@ builtin_div :: proc(vm: ^VM, args: []Value) {
 	vm_stack_push(vm, Value(res))
 }
 
+builtin_rem :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 2 {
+		vm_error(vm, "rem expects 2 arguments, got %d", len(args))
+		return
+	}
+	a, ok1 := args[0].(i64)
+	b, ok2 := args[1].(i64)
+	if ok1 && ok2 {
+		if b == 0 {
+			vm_error(vm, "Division by zero in rem")
+			return
+		}
+		vm_stack_push(vm, Value(a % b))
+	} else {
+		vm_error(vm, "rem expects integers, got %v and %v", args[0], args[1])
+	}
+}
+
+builtin_mod :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 2 {
+		vm_error(vm, "mod expects 2 arguments, got %d", len(args))
+		return
+	}
+	a, ok1 := args[0].(i64)
+	b, ok2 := args[1].(i64)
+	if ok1 && ok2 {
+		if b == 0 {
+			vm_error(vm, "Division by zero in mod")
+			return
+		}
+		res := a % b
+		if res < 0 && b > 0 {
+			res += b
+		} else if res > 0 && b < 0 {
+			res += b
+		}
+		vm_stack_push(vm, Value(res))
+	} else {
+		vm_error(vm, "mod expects integers, got %v and %v", args[0], args[1])
+	}
+}
+
 builtin_cons :: proc(vm: ^VM, args: []Value) {
 	if len(args) != 2 {
 		vm_error(vm, "cons expects 2 arguments, got %d", len(args))
@@ -195,6 +239,7 @@ builtin_apply :: proc(vm: ^VM, args: []Value) {
 	list_val := args[1]
 
 	call_args := make([dynamic]Value, context.temp_allocator)
+	defer delete(call_args)
 	curr := list_val
 	for {
 		p := curr.(^Pair) or_break
@@ -334,10 +379,10 @@ builtin_number_to_string :: proc(vm: ^VM, args: []Value) {
 	}
 	#partial switch n in args[0] {
 	case i64:
-		vm_stack_push(vm, Value(fmt.tprintf("%d", n)))
+		vm_stack_push(vm, Value(fmt.aprintf("%d", n, allocator = context.allocator)))
 		return
 	case f64:
-		vm_stack_push(vm, Value(fmt.tprintf("%f", n)))
+		vm_stack_push(vm, Value(fmt.aprintf("%f", n, allocator = context.allocator)))
 		return
 	}
 	vm_error(vm, "number-to-string expects a number, got %v", args[0])

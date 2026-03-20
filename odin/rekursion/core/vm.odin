@@ -3,11 +3,72 @@ package rekursion
 import "core:fmt"
 import "core:mem"
 
+Instruction :: struct {
+	op:  Op_Code,
+	arg: i32,
+}
+
+Bytecode :: struct {
+	instructions: [dynamic]Instruction,
+	constants:    [dynamic]Value,
+}
+
+Env :: struct {
+	parent: ^Env,
+	values: map[Symbol]Value,
+}
+
+Continuation :: struct {
+	stack:  [dynamic]Value,
+	frames: [dynamic]CallFrame,
+	ip:     int,
+}
+
+CallFrame :: struct {
+	return_ip: int,
+	env:       ^Env,
+	is_reset:  bool,
+	sp:        int,
+	procedure: ^Procedure,
+}
+
+VM :: struct {
+	stack:     [dynamic]Value,
+	frames:    [dynamic]CallFrame,
+	env:       ^Env,
+	ip:        int,
+	errored:   bool,
+	error_msg: string,
+}
+
+Builtin :: proc(vm: ^VM, args: []Value)
+
+vm_stack_push :: proc(vm: ^VM, val: Value) {
+	n := len(vm.stack)
+	resize(&vm.stack, n + 1)
+	vm.stack[n] = val
+}
+
+vm_pop :: proc(vm: ^VM) -> Value {
+	if len(vm.stack) == 0 {
+		vm.errored = true
+		vm.error_msg = "Error: Stack underflow"
+		fmt.eprintln(vm.error_msg)
+		return Nil{}
+	}
+	val := vm.stack[len(vm.stack) - 1]
+	resize(&vm.stack, len(vm.stack) - 1)
+	return val
+}
+
 MAX_STEPS :: 1_000_000
 
 vm_error :: proc(vm: ^VM, format: string, args: ..any) {
 	vm.errored = true
-	vm.error_msg = fmt.tprintf(format, ..args)
+	if vm.error_msg != "" {
+		delete(vm.error_msg)
+	}
+	vm.error_msg = fmt.aprintf(format, ..args, allocator = context.allocator)
 	fmt.eprintln(vm.error_msg)
 }
 
@@ -111,8 +172,7 @@ vm_exec_env :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 		val := vm_pop(vm)
 		if vm.env.parent == nil {
 			// Global environment: copy out of the current arena
-			// TODO: ??
-			val = clone_value(val)
+			val = clone_value(val, vm.env.values.allocator)
 		}
 		env_define(vm.env, symbol, val)
 		vm_stack_push(vm, symbol)
@@ -176,6 +236,7 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 	num_args := int(inst.arg)
 	assert(len(vm.stack) >= num_args)
 	args := make([]Value, num_args, context.temp_allocator)
+	defer delete(args, context.temp_allocator)
 
 	is_tail := (inst.op == .TAIL_CALL || inst.op == .RECUR)
 	is_recur := (inst.op == .RECUR)
@@ -311,7 +372,10 @@ env_set :: proc(vm: ^VM, sym: Symbol, val: Value) {
 	}
 	// Error if not found
 	vm.errored = true
-	vm.error_msg = fmt.tprintf("Unbound variable: %s", sym)
+	if vm.error_msg != "" {
+		delete(vm.error_msg)
+	}
+	vm.error_msg = fmt.aprintf("Unbound variable: %s", sym, allocator = context.allocator)
 	fmt.eprintln(vm.error_msg)
 }
 

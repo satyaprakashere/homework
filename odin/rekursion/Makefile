@@ -25,6 +25,7 @@ test-features: build
 	cat tests/cases/lambda.scm | out/rekursion
 	cat tests/cases/functions.scm | out/rekursion
 	cat tests/cases/r5rs.scm | out/rekursion
+	cat tests/cases/fibonacci.scm | out/rekursion
 
 # 	for f in tests/cases/*.scm; do \
 # 		echo "Running $$f..."; \

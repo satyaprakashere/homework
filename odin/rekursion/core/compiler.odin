@@ -48,7 +48,7 @@ add_constant :: proc(compiler: ^Compiler, val: Value) -> int {
 		}
 	}
 
-	cloned_val := clone_value(val)
+	cloned_val := clone_value(val, compiler.bytecode.constants.allocator)
 	append(&compiler.bytecode.constants, cloned_val)
 	return len(compiler.bytecode.constants) - 1
 }
@@ -342,7 +342,7 @@ compile_defmacro :: proc(compiler: ^Compiler, p: ^Pair) {
 
 	final_macro := macro_val
 	if compiler.env.parent == nil {
-		final_macro = clone_value(macro_val).(^Macro)
+		final_macro = clone_value(macro_val, compiler.env.values.allocator).(^Macro)
 	}
 
 	env_define(compiler.env, name, final_macro)
@@ -605,6 +605,7 @@ compile_let :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	// We need to collect symbols first to do it in reverse or just handle it.
 	// Actually, let's collect symbols first.
 	symbols := make([dynamic]Symbol, context.temp_allocator)
+	defer delete(symbols)
 	curr = bindings
 	for {
 		b_p := curr.(^Pair) or_break
