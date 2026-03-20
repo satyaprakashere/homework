@@ -10,28 +10,28 @@
   (define (len-helper lst acc)
     (if (is-null lst)
         acc
-        (len-helper (rest lst) (+ 1 acc))))
+        (recur (rest lst) (+ 1 acc))))
   (len-helper lst 0))
 
 (define (append lst1 lst2)
   (define (app-helper lst acc)
     (if (is-null lst)
         acc
-        (app-helper (rest lst) (cons (first lst) acc))))
+        (recur (rest lst) (cons (first lst) acc))))
   (app-helper (reverse lst1) lst2))
 
 (define (reverse lst)
   (define (rev-helper lst acc)
     (if (is-null lst)
         acc
-        (rev-helper (rest lst) (cons (first lst) acc))))
+        (recur (rest lst) (cons (first lst) acc))))
   (rev-helper lst (quote ())) )
 
 (define (fmap proc lst)
   (define (map-helper lst acc)
     (if (is-null lst)
         (reverse acc)
-        (map-helper (rest lst) (cons (proc (first lst)) acc))))
+        (recur (rest lst) (cons (proc (first lst)) acc))))
   (map-helper lst (quote ())))
 
 (define (filter pred lst)
@@ -39,31 +39,26 @@
     (if (is-null lst)
         (reverse acc)
         (if (pred (first lst))
-            (filter-helper (rest lst) (cons (first lst) acc))
-            (filter-helper (rest lst) acc))))
+            (recur (rest lst) (cons (first lst) acc))
+            (recur (rest lst) acc))))
   (filter-helper lst (quote ())))
 
 (define (foldl proc init lst)
   (if (is-null lst)
       init
-      (foldl proc (proc init (first lst)) (rest lst))))
+      (recur proc (proc init (first lst)) (rest lst))))
 
 (define (foldr proc init lst)
   (foldl (lambda (acc x) (proc x acc)) init (reverse lst)))
 
 ;; Macros
-(defmacro let (bindings . body)
-  (if (is-symbol bindings)
-      (cons (cons (quote lambda) (cons (quote ()) (cons (cons (quote define) (cons (cons bindings (fmap (lambda (x) (first (rest x))) (first body))) (quote ()))) (rest body)))) (fmap (lambda (x) (first (rest x))) (first body)))
-      (cons (cons (quote lambda) (cons (fmap first bindings) body))
-            (fmap (lambda (b) (first (rest b))) bindings))))
-
 (defmacro and args
   (if (is-null args)
       true
       (if (is-null (rest args))
           (first args)
           (cons (quote if) (cons (first args) (cons (cons (quote and) (rest args)) (cons false (quote ()))))))))
+
 
 (defmacro or args
   (if (is-null args)
@@ -107,7 +102,7 @@
       false
       (if (eq? (first (first alist)) key)
           (first alist)
-          (assoc key (rest alist)))))
+          (recur key (rest alist)))))
 
 ;; Maps (implemented as tagged lists: ('map data-alist parent))
 (define (map . parent)
@@ -127,7 +122,7 @@
               (rest pair)
               (if (is-null parent)
                   (quote ())
-                  (get parent key)))))
+                  (recur parent key)))))
       (quote ())))
 
 (define (set tbl key val)

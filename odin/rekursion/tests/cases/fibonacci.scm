@@ -1,10 +1,9 @@
-(define (fib a b n)
+(define (fib-helper a b n)
   (if (less_than n 1)
       a
-      (fib b (add a b) (sub n 1))))
+      (recur b (add a b) (sub n 1))))
 
-(define (fib-iter n) (fib 0 1 n))
-(define fib fib-iter)
+(define (fib n) (fib-helper 0 1 n))
 
 (fib 0) ;; => 0
 (fib 1) ;; => 1

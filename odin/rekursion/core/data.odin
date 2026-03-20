@@ -3,30 +3,6 @@ package rekursion
 import "core:fmt"
 import "core:strings"
 
-Op_Code :: enum u8 {
-	NOP,
-	PUSH_CONST,
-	POP,
-	LOAD_VAR,
-	STORE_VAR,
-	DEF_VAR,
-	CALL,
-	RET,
-	JUMP,
-	JUMP_IF_FALSE,
-	CLOSE_PROC,
-}
-
-Instruction :: struct {
-	op:  Op_Code,
-	arg: i32,
-}
-
-Bytecode :: struct {
-	instructions: [dynamic]Instruction,
-	constants:    [dynamic]Value,
-}
-
 Value :: union {
 	Nil,
 	bool,
@@ -41,6 +17,17 @@ Value :: union {
 	^Procedure,
 	^Continuation,
 }
+
+Instruction :: struct {
+	op:  Op_Code,
+	arg: i32,
+}
+
+Bytecode :: struct {
+	instructions: [dynamic]Instruction,
+	constants:    [dynamic]Value,
+}
+
 
 Nil :: struct {}
 
@@ -87,6 +74,7 @@ CallFrame :: struct {
 	env:       ^Env,
 	is_reset:  bool,
 	sp:        int,
+	procedure: ^Procedure,
 }
 
 VM :: struct {

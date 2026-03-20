@@ -94,6 +94,12 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 			compile_lambda(compiler, p); return
 		case "do":
 			compile_do(compiler, p, is_tail); return
+		case "let":
+			compile_let(compiler, p, is_tail); return
+		case "recur":
+			compile_recur(compiler, p, is_tail); return
+		case "where":
+			compile_where_error(compiler, p); return
 		}
 		if macro_val, found := env_lookup(compiler.env, h); found {
 			if m, is_macro := macro_val.(^Macro); is_macro {
@@ -106,6 +112,43 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	case:
 		compile_call(compiler, p, is_tail)
 	}
+}
+
+compile_where_error :: proc(compiler: ^Compiler, p: ^Pair) {
+	fmt.eprintln("Error: 'where' can only be used at the end of a 'define' block")
+	idx := add_constant(compiler, Nil{})
+	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
+}
+
+reconstruct_body_without_where :: proc(body: Value) -> Value {
+	curr := body
+	head: ^Pair = nil
+	tail: ^Pair = nil
+
+	for {
+		p_curr, is_pair := curr.(^Pair)
+		if !is_pair do break
+
+		// If this is the last element (which we know is 'where'), don't add it
+		if _, next_is_pair := p_curr.rest.(^Pair); !next_is_pair {
+			break
+		}
+
+		new_node := new(Pair)
+		new_node.first = p_curr.first
+		new_node.rest = Nil{}
+
+		if head == nil {
+			head = new_node
+			tail = new_node
+		} else {
+			tail.rest = new_node
+			tail = new_node
+		}
+		curr = p_curr.rest
+	}
+
+	return head == nil ? Value(Nil{}) : Value(head)
 }
 
 compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
@@ -121,8 +164,60 @@ compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
 		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
 	case ^Pair:
 		name := def_head.first.(Symbol)
+		
+		body := args.rest
+		// Check for trailing (where ...)
+		curr := body
+		var_bindings: Value = Nil{}
+		new_body: Value = Nil{}
+		
+		found_where := false
+		for {
+			p_curr, is_pair := curr.(^Pair)
+			if !is_pair do break
+			
+			if p_next, next_is_pair := p_curr.rest.(^Pair); next_is_pair {
+				curr = p_curr.rest
+			} else {
+				// Last element
+				if last_p, ok := p_curr.first.(^Pair); ok {
+					if sym, s_ok := last_p.first.(Symbol); s_ok && string(sym) == "where" {
+						var_bindings = last_p.rest
+						found_where = true
+					}
+				}
+				break
+			}
+		}
+
 		lambda_args := new(Pair)
-		lambda_args.first, lambda_args.rest = def_head.rest, args.rest
+		body_list: ^Pair = nil
+		
+		if found_where {
+			new_body = reconstruct_body_without_where(body)
+			
+			let_expr := new(Pair)
+			let_expr.first = Symbol("let")
+			let_tail := new(Pair)
+			let_tail.first = var_bindings
+			let_tail.rest = new_body
+			let_expr.rest = let_tail
+			
+			body_list = new(Pair)
+			body_list.first = Value(let_expr)
+			body_list.rest = Nil{}
+		} else {
+			// No where clause, use original body
+			if p_body, ok := body.(^Pair); ok {
+				body_list = p_body
+			} else {
+				body_list = new(Pair)
+				body_list.first = body
+				body_list.rest = Nil{}
+			}
+		}
+
+		lambda_args.first, lambda_args.rest = def_head.rest, Value(body_list)
 		lambda_expr := new(Pair)
 		lambda_expr.first, lambda_expr.rest = Symbol("lambda"), lambda_args
 		compile_expression(compiler, lambda_expr)
@@ -441,4 +536,68 @@ compile_call :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	}
 	compile_expression(compiler, p.first, false)
 	append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = i32(num_args)})
+}
+
+compile_recur :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
+	if !is_tail {
+		fmt.eprintln("Error: 'recur' can only be used in tail position")
+	}
+
+	curr := p.rest
+	num_args := 0
+	for {
+		list := curr.(^Pair) or_break
+		compile_expression(compiler, list.first)
+		num_args += 1
+		curr = list.rest
+	}
+
+	append(&compiler.bytecode.instructions, Instruction{op = .TAIL_CALL, arg = i32(num_args)})
+}
+
+compile_let :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
+	// (let ((x 1) (y 2)) body...)
+	args := p.rest.(^Pair)
+	bindings := args.first
+	body := args.rest
+
+	// 1. Evaluate all binding values first
+	num_bindings := 0
+	curr := bindings
+	for {
+		b_p := curr.(^Pair) or_break
+		binding := b_p.first.(^Pair)
+		val_expr := binding.rest.(^Pair).first
+		compile_expression(compiler, val_expr, false)
+		num_bindings += 1
+		curr = b_p.rest
+	}
+
+	// 2. Push new environment
+	append(&compiler.bytecode.instructions, Instruction{op = .PUSH_ENV})
+
+	// 3. Define variables in REVERSE order (since values are on stack)
+	// We need to collect symbols first to do it in reverse or just handle it.
+	// Actually, let's collect symbols first.
+	symbols := make([dynamic]Symbol, context.temp_allocator)
+	curr = bindings
+	for {
+		b_p := curr.(^Pair) or_break
+		binding := b_p.first.(^Pair)
+		name := binding.first.(Symbol)
+		append(&symbols, name)
+		curr = b_p.rest
+	}
+
+	for i := len(symbols) - 1; i >= 0; i -= 1 {
+		idx := add_constant(compiler, symbols[i])
+		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
+		append(&compiler.bytecode.instructions, Instruction{op = .POP}) // DEF_VAR pushes name
+	}
+
+	// 4. Compile body
+	compile_do(compiler, &Pair{first = Symbol("do"), rest = body}, is_tail)
+
+	// 5. Pop environment
+	append(&compiler.bytecode.instructions, Instruction{op = .POP_ENV})
 }
