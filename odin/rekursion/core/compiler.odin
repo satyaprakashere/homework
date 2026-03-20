@@ -7,11 +7,11 @@ Compiler :: struct {
 	env:      ^Env,
 }
 
-compiler_init :: proc(env: ^Env) -> Compiler {
+compiler_init :: proc(env: ^Env, allocator := context.allocator) -> Compiler {
 	return Compiler {
 		bytecode = Bytecode {
-			instructions = make([dynamic]Instruction),
-			constants = make([dynamic]Value),
+			instructions = make([dynamic]Instruction, allocator),
+			constants = make([dynamic]Value, allocator),
 		},
 		env = env,
 	}
@@ -43,7 +43,7 @@ compile_expression :: proc(compiler: ^Compiler, expr: Value, is_tail := false) {
 
 add_constant :: proc(compiler: ^Compiler, val: Value) -> int {
 	for v, i in compiler.bytecode.constants {
-		if value_equals(v, val) {
+		if value_equal(v, val) {
 			return i
 		}
 	}
@@ -51,28 +51,6 @@ add_constant :: proc(compiler: ^Compiler, val: Value) -> int {
 	cloned_val := clone_value(val, compiler.bytecode.constants.allocator)
 	append(&compiler.bytecode.constants, cloned_val)
 	return len(compiler.bytecode.constants) - 1
-}
-
-value_equals :: proc(a, b: Value) -> bool {
-	res := false
-	// Simple equality for atoms
-	#partial switch va in a {
-	case Nil:
-		_, ok := b.(Nil); res = ok
-	case bool:
-		vb, ok := b.(bool); res = ok && va == vb
-	case i64:
-		vb, ok := b.(i64); res = ok && va == vb
-	case f64:
-		vb, ok := b.(f64); res = ok && va == vb
-	case string:
-		vb, ok := b.(string); res = ok && va == vb
-	case Symbol:
-		if vb, ok := b.(Symbol); ok {
-			res = (string(va) == string(vb))
-		}
-	}
-	return res
 }
 
 compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {

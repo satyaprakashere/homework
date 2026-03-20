@@ -29,13 +29,13 @@ parser_advance :: proc(p: ^Parser) -> Token {
 	return lexer_next_token(&p.lexer)
 }
 
-parse_expression :: proc(p: ^Parser) ->  Value {// consume )
+parse_expression :: proc(p: ^Parser, allocator := context.allocator) -> Value {
 	tok := parser_advance(p)
 	#partial switch tok.type {
 	case .LEFT_PAREN:
-		return parse_list(p)
+		return parse_list(p, allocator)
 	case .LEFT_BRACKET:
-		return parse_array(p)
+		return parse_array(p, allocator)
 	case .SYMBOL:
 		return Symbol(tok.text)
 	case .NUMBER:
@@ -56,16 +56,16 @@ parse_number_value :: proc(text: string) -> Value {
 	return i
 }
 
-parse_list :: proc(p: ^Parser) -> Value {
+parse_list :: proc(p: ^Parser, allocator := context.allocator) -> Value {
 	if parser_peek(p).type == .RIGHT_PAREN {
 		parser_advance(p)
 		return Nil{}
 	}
 
-	head := new(Pair)
+	head := new(Pair, allocator)
 	curr := head
 	for {
-		curr.first = parse_expression(p)
+		curr.first = parse_expression(p, allocator)
 		tok := parser_peek(p)
 		if tok.type == .RIGHT_PAREN {
 			parser_advance(p)
@@ -73,29 +73,29 @@ parse_list :: proc(p: ^Parser) -> Value {
 			break
 		} else if tok.type == .DOT {
 			parser_advance(p)
-			curr.rest = parse_expression(p)
+			curr.rest = parse_expression(p, allocator)
 			parser_advance(p)
 			break
 		} else if tok.type == .EOF {
 			curr.rest = Nil{}
 			break
 		}
-		next := new(Pair)
+		next := new(Pair, allocator)
 		curr.rest = next
 		curr = next
 	}
 	return head
 }
 
-parse_array :: proc(p: ^Parser) -> Value {
-	vals := make([dynamic]Value)
+parse_array :: proc(p: ^Parser, allocator := context.allocator) -> Value {
+	vals := make([dynamic]Value, allocator)
 	for {
 		tok := parser_peek(p)
 		if tok.type == .RIGHT_BRACKET || tok.type == .EOF {
 			if tok.type == .RIGHT_BRACKET {parser_advance(p)}
 			break
 		}
-		append(&vals, parse_expression(p))
+		append(&vals, parse_expression(p, allocator))
 	}
 	return Array{data = vals}
 }

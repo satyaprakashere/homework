@@ -91,7 +91,7 @@ clone_value :: proc(v: Value, allocator: mem.Allocator = context.allocator) -> V
 	return v
 }
 
-array_to_string :: proc(v: Array) -> string {
+array_to_string :: proc(v: Array, allocator := context.allocator) -> string {
 	sb: strings.Builder
 	strings.builder_init(&sb, context.temp_allocator)
 	defer strings.builder_destroy(&sb)
@@ -103,7 +103,7 @@ array_to_string :: proc(v: Array) -> string {
 		}
 	}
 	strings.write_string(&sb, "]")
-	return strings.clone(strings.to_string(sb), context.allocator)
+	return strings.clone(strings.to_string(sb), allocator)
 }
 
 is_false :: proc(v: Value) -> bool {
@@ -122,33 +122,33 @@ is_symbol_char :: proc(r: rune) -> bool {
 	return strings.contains_rune("+-*/<=>?!_#$", r)
 }
 
-value_to_string :: proc(v: Value) -> string {
-	if s, ok := simple_value_to_string(v); ok {return s}
-	return complex_value_to_string(v)
+value_to_string :: proc(v: Value, allocator := context.allocator) -> string {
+	if s, ok := simple_value_to_string(v, allocator); ok {return s}
+	return complex_value_to_string(v, allocator)
 }
 
-simple_value_to_string :: proc(v: Value) -> (string, bool) {
+simple_value_to_string :: proc(v: Value, allocator := context.allocator) -> (string, bool) {
 	#partial switch val in v {
 	case Nil:
 		return "nil", true
 	case bool:
 		return val ? "true" : "false", true
 	case i64:
-		return fmt.aprintf("%v", val, allocator = context.allocator), true
+		return fmt.aprintf("%v", val, allocator = allocator), true
 	case f64:
-		return fmt.aprintf("%v", val, allocator = context.allocator), true
+		return fmt.aprintf("%v", val, allocator = allocator), true
 	case string:
-		return fmt.aprintf("\"%v\"", val, allocator = context.allocator), true
+		return fmt.aprintf("\"%v\"", val, allocator = allocator), true
 	case Symbol:
 		return string(val), true
 	}
 	return "||unknown simple value|", false
 }
 
-complex_value_to_string :: proc(v: Value) -> string {
+complex_value_to_string :: proc(v: Value, allocator := context.allocator) -> string {
 	#partial switch val in v {
 	case ^Pair:
-		return pair_to_string(val)
+		return pair_to_string(val, allocator)
 	case ^Procedure:
 		return "|procedure|"
 	case Builtin:
@@ -156,14 +156,52 @@ complex_value_to_string :: proc(v: Value) -> string {
 	case ^Continuation:
 		return "|continuation|"
 	case Array:
-		return array_to_string(val)
+		return array_to_string(val, allocator)
 	case ^Macro:
 		return "|macro|"
 	}
 	return "||unknown complex value||"
 }
 
-pair_to_string :: proc(p: ^Pair) -> string {
+value_equal :: proc(a, b: Value) -> bool {
+	#partial switch va in a {
+	case Nil:
+		_, ok := b.(Nil); return ok
+	case bool:
+		vb, ok := b.(bool); return ok && va == vb
+	case i64:
+		vb, ok := b.(i64); return ok && va == vb
+	case f64:
+		vb, ok := b.(f64); return ok && va == vb
+	case Symbol:
+		vb, ok := b.(Symbol); return ok && va == vb
+	case string:
+		vb, ok := b.(string); return ok && va == vb
+	case ^Pair:
+		vb, ok := b.(^Pair)
+		if !ok {return false}
+		if va == vb {return true}
+		return value_equal(va.first, vb.first) && value_equal(va.rest, vb.rest)
+	case Array:
+		vb, ok := b.(Array)
+		if !ok || len(va.data) != len(vb.data) {return false}
+		for i in 0 ..< len(va.data) {
+			if !value_equal(va.data[i], vb.data[i]) {return false}
+		}
+		return true
+	case ^Procedure:
+		vb, ok := b.(^Procedure); return ok && va == vb
+	case Builtin:
+		vb, ok := b.(Builtin); return ok && (rawptr(va) == rawptr(vb))
+	case ^Continuation:
+		vb, ok := b.(^Continuation); return ok && va == vb
+	case ^Macro:
+		vb, ok := b.(^Macro); return ok && va == vb
+	}
+	return false
+}
+
+pair_to_string :: proc(p: ^Pair, allocator := context.allocator) -> string {
 	sb: strings.Builder
 	strings.builder_init(&sb, context.temp_allocator)
 	defer strings.builder_destroy(&sb)
@@ -175,7 +213,7 @@ pair_to_string :: proc(p: ^Pair) -> string {
 		if done {break}
 		curr = next
 	}
-	return strings.clone(strings.to_string(sb), context.allocator)
+	return strings.clone(strings.to_string(sb), allocator)
 }
 
 format_pair_rest :: proc(sb: ^strings.Builder, curr: ^Pair) -> (^Pair, bool) {

@@ -4,56 +4,61 @@ package rekursion
 import "core:fmt"
 import "core:strings"
 
+Primitive_Record :: struct {
+	name: string,
+	handler: Builtin,
+}
+
+PRIMITIVES :: []Primitive_Record {
+	{"add", builtin_add_i64},
+	{"sub", builtin_sub_i64},
+	{"mul", builtin_mul},
+	{"div", builtin_div},
+	{"rem", builtin_rem},
+	{"mod", builtin_mod},
+	{"+", builtin_add_i64},
+	{"-", builtin_sub_i64},
+	{"*", builtin_mul},
+	{"/", builtin_div},
+	{"cons", builtin_cons},
+	{"first", builtin_first},
+	{"rest", builtin_rest},
+	{"set-first!", builtin_set_first},
+	{"set-rest!", builtin_set_rest},
+	{"print", builtin_print},
+	{"array", builtin_array},
+	{"is-null", builtin_is_null},
+	{"is-pair", builtin_is_pair},
+	{"is-number", builtin_is_number},
+	{"is-symbol", builtin_is_symbol},
+	{"is-boolean", builtin_is_boolean},
+	{"is-string", builtin_is_string},
+	{"is-procedure", builtin_is_procedure},
+	{"number-to-string", builtin_number_to_string},
+	{"symbol-to-string", builtin_symbol_to_string},
+	{"string-append", builtin_string_append},
+	{"eq", builtin_eq},
+	{"eq?", builtin_eq},
+	{"equal", builtin_equal},
+	{"numeq", builtin_numeq},
+	{"=", builtin_numeq},
+	{"less_than", builtin_less_than},
+	{"<", builtin_less_than},
+	{"greater_than", builtin_greater_than},
+	{">", builtin_greater_than},
+	{"cshift", builtin_shift},
+	{"creset", builtin_reset},
+	{"apply", builtin_apply},
+}
+
 setup_primitives :: proc(env: ^Env) {
-	// basic cpu arithmetic
-	env_define(env, Symbol("add"), builtin_add_i64)
-	env_define(env, Symbol("sub"), builtin_sub_i64)
-	env_define(env, Symbol("mul"), builtin_mul)
-	env_define(env, Symbol("div"), builtin_div)
-	env_define(env, Symbol("rem"), builtin_rem)
-	env_define(env, Symbol("mod"), builtin_mod)
-
-	// basic list operations
-	env_define(env, Symbol("cons"), builtin_cons)
-	env_define(env, Symbol("first"), builtin_first)
-	env_define(env, Symbol("rest"), builtin_rest)
-	env_define(env, Symbol("set-first!"), builtin_set_first)
-	env_define(env, Symbol("set-rest!"), builtin_set_rest)
-
-	env_define(env, Symbol("print"), builtin_print)
-	env_define(env, Symbol("array"), builtin_array)
+	for p in PRIMITIVES {
+		env_define(env, Symbol(p.name), p.handler)
+	}
 
 	// Constants
 	env_define(env, Symbol("true"), true)
 	env_define(env, Symbol("false"), false)
-
-	// Predicates
-	env_define(env, Symbol("is-null"), builtin_is_null)
-	env_define(env, Symbol("is-pair"), builtin_is_pair)
-	env_define(env, Symbol("is-number"), builtin_is_number)
-	env_define(env, Symbol("is-symbol"), builtin_is_symbol)
-	env_define(env, Symbol("is-boolean"), builtin_is_boolean)
-	env_define(env, Symbol("is-string"), builtin_is_string)
-	env_define(env, Symbol("is-procedure"), builtin_is_procedure)
-
-	// Converters
-	env_define(env, Symbol("number-to-string"), builtin_number_to_string)
-	env_define(env, Symbol("symbol-to-string"), builtin_symbol_to_string)
-	env_define(env, Symbol("string-append"), builtin_string_append)
-
-	// Equality
-	env_define(env, Symbol("eq"), builtin_eq)
-	env_define(env, Symbol("eq?"), builtin_eq)
-	env_define(env, Symbol("equal"), builtin_equal)
-	env_define(env, Symbol("numeq"), builtin_numeq)
-	env_define(env, Symbol("less_than"), builtin_less_than)
-	env_define(env, Symbol("greater_than"), builtin_greater_than)
-
-	// Continuations
-	env_define(env, Symbol("cshift"), builtin_shift)
-	env_define(env, Symbol("creset"), builtin_reset)
-
-	env_define(env, Symbol("apply"), builtin_apply)
 }
 
 builtin_add_i64 :: proc(vm: ^VM, args: []Value) {
@@ -197,7 +202,7 @@ builtin_cons :: proc(vm: ^VM, args: []Value) {
 		vm_error(vm, "cons expects 2 arguments, got %d", len(args))
 		return
 	}
-	pair := new(Pair)
+	pair := new(Pair, context.allocator)
 	pair.first = args[0]
 	pair.rest = args[1]
 	vm_stack_push(vm, Value(pair))
@@ -284,12 +289,12 @@ builtin_array :: proc(vm: ^VM, args: []Value) {
 		return
 	}
 
-	head := new(Pair)
+	head := new(Pair, context.allocator)
 	head.first = args[0]
 
 	curr := head
 	for i in 1 ..< len(args) {
-		next := new(Pair)
+		next := new(Pair, context.allocator)
 		next.first = args[i]
 		curr.rest = next
 		curr = next
@@ -403,16 +408,18 @@ builtin_symbol_to_string :: proc(vm: ^VM, args: []Value) {
 builtin_string_append :: proc(vm: ^VM, args: []Value) {
 	if len(args) == 0 {vm_stack_push(vm, Value(string(""))); return}
 	sb: strings.Builder
-	strings.builder_init(&sb)
+	strings.builder_init(&sb, context.temp_allocator)
 	defer strings.builder_destroy(&sb)
 	for a in args {
 		if s, ok := a.(string); ok {
 			strings.write_string(&sb, s)
 		} else {
-			strings.write_string(&sb, value_to_string(a))
+			// value_to_string might allocate, but we'll use temp for its internal parts if we can
+			// for now, we just write to builder
+			strings.write_string(&sb, value_to_string(a, context.temp_allocator))
 		}
 	}
-	vm_stack_push(vm, Value(strings.clone(strings.to_string(sb))))
+	vm_stack_push(vm, Value(strings.clone(strings.to_string(sb), context.allocator)))
 }
 
 // Equality
@@ -448,40 +455,7 @@ builtin_eq :: proc(vm: ^VM, args: []Value) {
 
 builtin_equal :: proc(vm: ^VM, args: []Value) {
 	if len(args) != 2 {vm_stack_push(vm, bool(false)); return}
-	vm_stack_push(vm, Value(rekursion_value_equal(vm, args[0], args[1])))
-}
-
-rekursion_value_equal :: proc(vm: ^VM, a, b: Value) -> bool {
-	#partial switch va in a {
-	case Nil:
-		_, ok := b.(Nil); return ok
-	case bool:
-		vb, ok := b.(bool); return ok && va == vb
-	case i64:
-		vb, ok := b.(i64); return ok && va == vb
-	case f64:
-		vb, ok := b.(f64); return ok && va == vb
-	case Symbol:
-		vb, ok := b.(Symbol); return ok && va == vb
-	case string:
-		vb, ok := b.(string); return ok && va == vb
-	case ^Pair:
-		vb, ok := b.(^Pair)
-		if !ok {return false}
-		if va == vb {return true}
-		return(
-			rekursion_value_equal(vm, va.first, vb.first) &&
-			rekursion_value_equal(vm, va.rest, vb.rest) \
-		)
-	case Array:
-		vb, ok := b.(Array)
-		if !ok || len(va.data) != len(vb.data) {return false}
-		for i in 0 ..< len(va.data) {
-			if !rekursion_value_equal(vm, va.data[i], vb.data[i]) {return false}
-		}
-		return true
-	}
-	return false
+	vm_stack_push(vm, Value(value_equal(args[0], args[1])))
 }
 
 builtin_numeq :: proc(vm: ^VM, args: []Value) {
@@ -607,7 +581,7 @@ builtin_shift :: proc(vm: ^VM, args: []Value) {
 	reset_frame := vm.frames[reset_idx]
 
 	// Capture frames from reset_idx + 1 up to current
-	captured_frames := make([dynamic]CallFrame)
+	captured_frames := make([dynamic]CallFrame, context.allocator)
 	for i in reset_idx + 1 ..< len(vm.frames) {
 		frame := vm.frames[i]
 		frame.sp -= reset_frame.sp
@@ -615,13 +589,13 @@ builtin_shift :: proc(vm: ^VM, args: []Value) {
 	}
 
 	// Capture stack from reset_frame.sp up to current
-	captured_stack := make([dynamic]Value)
+	captured_stack := make([dynamic]Value, context.allocator)
 	for i in reset_frame.sp ..< len(vm.stack) {
 		vm_stack_push_dynamic(&captured_stack, vm.stack[i])
 	}
 
 	// Create continuation
-	cont := new(Continuation)
+	cont := new(Continuation, context.allocator)
 	cont.frames = captured_frames
 	cont.stack = captured_stack
 	cont.ip = vm.ip

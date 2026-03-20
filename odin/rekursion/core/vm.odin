@@ -177,9 +177,9 @@ vm_exec_env :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 		env_define(vm.env, symbol, val)
 		vm_stack_push(vm, symbol)
 	case .PUSH_ENV:
-		new_env := new(Env)
+		new_env := new(Env, context.allocator)
 		new_env.parent = vm.env
-		new_env.values = make(map[Symbol]Value, 8)
+		new_env.values = make(map[Symbol]Value, 8, context.allocator)
 		vm.env = new_env
 	case .POP_ENV:
 		if vm.env.parent != nil {
@@ -222,7 +222,7 @@ vm_exec_close_proc :: proc(vm: ^VM) -> Value {
 	if vm.errored do return Nil{}
 	#partial switch p in proc_val {
 	case ^Procedure:
-		new_proc := new(Procedure)
+		new_proc := new(Procedure, context.allocator)
 		new_proc^ = p^
 		new_proc.env = vm.env
 		vm_stack_push(vm, new_proc)
