@@ -11,5 +11,5 @@ fn fib(n: u64) -> Num {
 }
 
 fn main() {
-    println!("{}", fib(98765));
+    println!("Fibonacci {}", fib(9876));
 }

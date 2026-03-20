@@ -7,14 +7,18 @@
 
 ;; List operations
 (define (length lst)
-  (if (is-null lst)
-      0
-      (+ 1 (length (rest lst)))))
+  (define (len-helper lst acc)
+    (if (is-null lst)
+        acc
+        (len-helper (rest lst) (+ 1 acc))))
+  (len-helper lst 0))
 
 (define (append lst1 lst2)
-  (if (is-null lst1)
-      lst2
-      (cons (first lst1) (append (rest lst1) lst2))))
+  (define (app-helper lst acc)
+    (if (is-null lst)
+        acc
+        (app-helper (rest lst) (cons (first lst) acc))))
+  (app-helper (reverse lst1) lst2))
 
 (define (reverse lst)
   (define (rev-helper lst acc)
@@ -23,18 +27,21 @@
         (rev-helper (rest lst) (cons (first lst) acc))))
   (rev-helper lst (quote ())) )
 
-(define fmap
-  (lambda (proc lst)
+(define (fmap proc lst)
+  (define (map-helper lst acc)
     (if (is-null lst)
-        (quote ())
-        (cons (proc (first lst)) (fmap proc (rest lst))))))
+        (reverse acc)
+        (map-helper (rest lst) (cons (proc (first lst)) acc))))
+  (map-helper lst (quote ())))
 
 (define (filter pred lst)
-  (if (is-null lst)
-      (quote ())
-      (if (pred (first lst))
-          (cons (first lst) (filter pred (rest lst)))
-          (filter pred (rest lst)))))
+  (define (filter-helper lst acc)
+    (if (is-null lst)
+        (reverse acc)
+        (if (pred (first lst))
+            (filter-helper (rest lst) (cons (first lst) acc))
+            (filter-helper (rest lst) acc))))
+  (filter-helper lst (quote ())))
 
 (define (foldl proc init lst)
   (if (is-null lst)
@@ -42,9 +49,7 @@
       (foldl proc (proc init (first lst)) (rest lst))))
 
 (define (foldr proc init lst)
-  (if (is-null lst)
-      init
-      (proc (first lst) (foldr proc init (rest lst)))))
+  (foldl (lambda (acc x) (proc x acc)) init (reverse lst)))
 
 ;; Macros
 (defmacro let (bindings . body)

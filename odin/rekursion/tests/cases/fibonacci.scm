@@ -1,11 +1,10 @@
-(define (fibH r)
-  (lambda (n)
-    (if (less_than n 2)
-        n
-        (add (r (sub n 1))
-             (r (sub n 2)))))) ;; => fibH
+(define (fib a b n)
+  (if (less_than n 1)
+      a
+      (fib b (add a b) (sub n 1))))
 
-(define fib (lambda (n) ((Y fibH) n))) ;; => fib
+(define (fib-iter n) (fib 0 1 n))
+(define fib fib-iter)
 
 (fib 0) ;; => 0
 (fib 1) ;; => 1

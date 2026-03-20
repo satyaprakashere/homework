@@ -49,7 +49,7 @@ vm_exec_inst :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return vm_exec_ret(vm)
 	case .CLOSE_PROC:
 		return vm_exec_close_proc(vm), false
-	case .CALL, .TAIL_CALL:
+	case .CALL:
 		return vm_exec_call(vm, bytecode, inst)
 	case:
 		return Nil{}, false
@@ -136,37 +136,34 @@ vm_exec_close_proc :: proc(vm: ^VM) -> Value {
 }
 
 vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value, bool) {
-	proc_val := pop(&vm.stack)
+	// check stack underflow
+	// this should not happen, so it should panic instead of returning Nil{}
+	// TODO: panic instead of returning Nil{}
+	// TODO: logs should be in a different layer of code, it should clutter the main code
 	num_args := int(inst.arg)
-	if len(vm.stack) < num_args {
-		fmt.println(
-			"Error: Stack underflow in CALL. Expected args:",
-			num_args,
-			"stack has:",
-			len(vm.stack),
-		)
-		// fmt.printf("TRACE CALL DUMP: func type=%T\n", proc_val)
-		for i in 0 ..< len(vm.stack) {
-			fmt.printf("  stack[%d] type=%T\n", i, vm.stack[i])
-		}
-		return Nil{}, true
-	}
+	assert(len(vm.stack) >= num_args)
+	// if len(vm.stack) < num_args {
+	// 	log_stack_underflow(vm, num_args)
+	// 	return Nil{}, true
+	// }
+
+	procedure := pop(&vm.stack)
 	args := make([]Value, num_args)
-	defer delete(args, context.allocator)
+	defer delete(args)
 	for i in 0 ..< num_args {
 		args[num_args - 1 - i] = pop(&vm.stack)
 	}
 
-	if inst.op == .TAIL_CALL && len(vm.frames) > 0 {
-		if p, ok := proc_val.(^Procedure); ok {
-			last_frame := pop(&vm.frames)
-			vm.env = last_frame.env
-			vm_exec_call_proc(vm, bytecode, proc_val, args, last_frame.return_ip)
-			return Nil{}, false
-		}
+	if p, ok := procedure.(^Procedure); ok && len(vm.frames) > 0 {
+		// Tail call optimization: reuse the current frame's return address
+		last_frame := pop(&vm.frames)
+		vm.env = last_frame.env // Restore parent environment BEFORE the new call
+		vm_exec_call_proc(vm, bytecode, procedure, args, last_frame.return_ip)
+		return Nil{}, false
 	}
 
-	vm_exec_call_proc(vm, bytecode, proc_val, args, vm.ip)
+	// Default case (Builtins or first call)
+	vm_exec_call_proc(vm, bytecode, procedure, args, vm.ip)
 	return Nil{}, false
 }
 
@@ -255,4 +252,17 @@ env_set :: proc(env: ^Env, sym: Symbol, val: Value) {
 	}
 	// Error if not found
 	fmt.eprintf("Unbound variable: %s\n", sym)
+}
+
+log_stack_underflow :: proc(vm: ^VM, num_args: int) {
+	fmt.eprintln(
+		"Error: Stack underflow in CALL. Expected args:",
+		num_args,
+		"stack has:",
+		len(vm.stack),
+	)
+	// fmt.printf("TRACE CALL DUMP: func type=%T\n", procedure)
+	for i in 0 ..< len(vm.stack) {
+		fmt.eprintf("  stack[%d] type=%T\n", i, vm.stack[i])
+	}
 }

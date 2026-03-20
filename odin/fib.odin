@@ -12,12 +12,25 @@ fib_tail_recursive :: proc(a, b, n: uint) -> uint {
     return fib_tail_recursive(b, a+b, n-1)
 }
 
+fib_iterative :: proc(n: uint) -> uint {
+    if n < 2 {
+        return n
+    }
+
+    a, b: uint = 0, 1
+    for i := 2; i <= int(n); i+=1 {
+        a, b = b, a+b
+    }
+
+    return b
+}
+
 main :: proc() {
-    n:uint = 10
+    n:uint = 5
     result := fib_recursive(n)
     fmt.printf("Fibonacci of %v is %v\n", n, result)
 
-    n = 55
-    result = fib_tail_recursive(0, 1, n)
+    n = 98765432
+    result = fib_iterative(n)
     fmt.printf("Fibonacci of %v is %v\n", n, result)
 }

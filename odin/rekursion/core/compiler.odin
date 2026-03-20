@@ -440,6 +440,5 @@ compile_call :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 		curr = list.rest
 	}
 	compile_expression(compiler, p.first, false)
-	op: Op_Code = is_tail ? .TAIL_CALL : .CALL
-	append(&compiler.bytecode.instructions, Instruction{op = op, arg = i32(num_args)})
+	append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = i32(num_args)})
 }

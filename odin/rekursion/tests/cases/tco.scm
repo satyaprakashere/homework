@@ -14,9 +14,9 @@
 (count-down 2000) ;; => done
 
 ;; tco fibonacci
-(define (fib n a b)
+(define (fib a b n)
   (if (less_than n 1)
-      a
-      (fib (sub n 1) b (add a b)))) ;; fib
+      a 
+      (fib b (add a b) (sub n 1)))) ;; fib
 
-(fib 98 0 1) ;; => 6174643828739884737
+(fib 0 1 98) ;; => 6174643828739884737

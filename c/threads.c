@@ -4,7 +4,7 @@
 
 void* thread_function(void* arg) {
     int id = *(int*)arg;
-    printf("Thread %d is running\n", id);
+    printf("Thread %d is running!\n", id);
     return NULL;
 }
 
