@@ -1,6 +1,7 @@
 ;; Church Encoding Tests
 
-(church->int (church-succ church2)) ;; => 3
+(assert (eq (church->int (church-succ church3)) 4))
+;; => 3
 (church->int (church-add church2 church3)) ;; => 5
 (church->int (church-mul church2 church3)) ;; => 6
 (church->int (church-pow church2 church3)) ;; => 8

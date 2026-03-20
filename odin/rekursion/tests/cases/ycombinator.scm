@@ -12,7 +12,7 @@
 
 (define (sumH r)
   (lambda (lst)
-    (if (is-null lst)
+    (if (is_null lst)
         0
         (add (first lst) (r (rest lst)))))) ;; => sumH
 

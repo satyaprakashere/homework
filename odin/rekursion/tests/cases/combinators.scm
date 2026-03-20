@@ -9,7 +9,7 @@
 
 (let ((fact (Z (lambda (f)
                  (lambda (n)
-                   (if (eq? n 0)
+                   (if (eq n 0)
                        1
                         (mul  n (f (sub n 1)))))))))
     (fact 5)) ;; => 120

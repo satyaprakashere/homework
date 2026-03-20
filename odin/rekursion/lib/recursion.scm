@@ -12,7 +12,7 @@
 (define (proj n i)
   (lambda args
     (define (nth lst k)
-       (if (eq? k 1)
+       (if (eq k 1)
            (first lst)
            (recur (rest lst) (sub k 1))))
     (nth args i)))
@@ -30,7 +30,7 @@
 (define (prim-rec f g)
   (lambda (n . x)
     (define (helper m current-val)
-       (if (eq? m n)
+       (if (eq m n)
            current-val
            (recur (add m 1) (apply g (cons m (cons current-val x))))))
     (helper 0 (apply f x))))
@@ -40,7 +40,7 @@
 (define (mu-operator pred)
   (lambda args
     (define (helper n)
-       (if (eq? 0 (apply pred (cons n args)))
+       (if (eq 0 (apply pred (cons n args)))
            n
            (recur (add n 1))))
     (helper 0)))

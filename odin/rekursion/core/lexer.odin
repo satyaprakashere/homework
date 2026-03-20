@@ -106,15 +106,39 @@ lexer_read_string :: proc(l: ^Lexer) -> Token {
 lexer_skip_whitespace :: proc(l: ^Lexer) {
 	for l.offset < len(l.source) {
 		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
+		
 		if unicode.is_white_space(r) {
-			if r == '\n' {l.line += 1; l.col = 1} else {l.col += 1}
+			lexer_advance_line_col(l, r)
 			l.offset += size
-		} else if r == ';' {
-			for l.offset < len(l.source) {
-				r2, s2 := utf8.decode_rune_in_string(l.source[l.offset:])
-				l.offset += s2
-				if r2 == '\n' {l.line += 1; l.col = 1; break}
-			}
-		} else {break}
+			continue
+		}
+
+		if r == ';' {
+			lexer_skip_comment(l)
+			continue
+		}
+
+		break
+	}
+}
+
+lexer_advance_line_col :: proc(l: ^Lexer, r: rune) {
+	if r == '\n' {
+		l.line += 1
+		l.col = 1
+		return
+	}
+	l.col += 1
+}
+
+lexer_skip_comment :: proc(l: ^Lexer) {
+	for l.offset < len(l.source) {
+		r, size := utf8.decode_rune_in_string(l.source[l.offset:])
+		l.offset += size
+		if r == '\n' {
+			l.line += 1
+			l.col = 1
+			break
+		}
 	}
 }

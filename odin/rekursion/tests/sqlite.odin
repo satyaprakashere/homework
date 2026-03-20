@@ -7,7 +7,7 @@ import "core:os"
 import "core:testing"
 
 @(test)
-test_sqlite :: proc(t: ^testing.T) {
+sqlite :: proc(t: ^testing.T) {
 	// Ensure directory exists
 	os.make_directory("tests/db")
 	db, status := sqlite.open(DB_FILE); if status != nil {

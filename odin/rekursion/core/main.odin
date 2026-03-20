@@ -73,23 +73,26 @@ repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 
 		strings.write_string(&full_source, line)
 
-		// Count parentheses in the new line, being careful about strings and comments
+		// Count parentheses in the new line
 		for i := 0; i < len(line); i += 1 {
 			char := line[i]
+			
 			if in_string {
-				if char == '"' && (i == 0 || line[i - 1] != '\\') {
-					in_string = false
-				}
-			} else {
-				if char == '"' {
-					in_string = true
-				} else if char == '(' || char == '[' {
-					paren_balance += 1
-				} else if char == ')' || char == ']' {
-					paren_balance -= 1
-				} else if char == ';' {
-					break // Comment, rest of line is ignored
-				}
+				in_string = !(char == '"' && (i == 0 || line[i - 1] != '\\'))
+				continue
+			}
+
+			if char == '"' {
+				in_string = true
+				continue
+			}
+
+			if char == '(' || char == '[' {
+				paren_balance += 1
+			} else if char == ')' || char == ']' {
+				paren_balance -= 1
+			} else if char == ';' {
+				break // Comment, rest of line is ignored
 			}
 		}
 
@@ -145,6 +148,7 @@ load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
 		vm_run(vm, &compiler.bytecode)
 		if vm.errored {
 			fmt.eprintf("Error loading file %s: %s\n", path, vm.error_msg)
+			vm.errored = false
 			return
 		}
 	}

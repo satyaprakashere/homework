@@ -15,45 +15,49 @@
 ;; List Errors
 (first 10) ;; => nil
 (rest "string") ;; => nil
-(set-first! (quote x) 10) ;; => nil
-(set-rest! true 20) ;; => nil
+(set_first (quote x) 10) ;; => nil
+(set_rest true 20) ;; => nil
 (cons 1 2 3) ;; => nil
 (first) ;; => nil
 (rest (quote (1 2)) (quote (3 4))) ;; => nil
 
 ;; Predicates
-(is-null (quote ())) ;; => true
-(is-null 10) ;; => false
-(is-pair (cons 1 2)) ;; => true
-(is-pair (array 1 2)) ;; => true
-(is-number 1) ;; => true
-(is-number 1.5) ;; => true
-(is-number "1") ;; => false
-(is-symbol (quote x)) ;; => true
-(is-symbol "x") ;; => false
-(is-boolean true) ;; => true
-(is-boolean 0) ;; => false
-(is-string "hi") ;; => true
-(is-string (quote hi)) ;; => false
-(is-procedure add) ;; => true
-(is-procedure (lambda (x) x)) ;; => true
-(is-procedure (quote x)) ;; => false
+(is_null (quote ())) ;; => true
+(is_null 10) ;; => false
+(is_pair (cons 1 2)) ;; => true
+(is_pair (array 1 2)) ;; => true
+(is_number 1) ;; => true
+(is_number 1.5) ;; => true
+(is_number "1") ;; => false
+(is_symbol (quote x)) ;; => true
+(is_symbol "x") ;; => false
+(is_boolean true) ;; => true
+(is_boolean 0) ;; => false
+(is_string "hi") ;; => true
+(is_string (quote hi)) ;; => false
+(is_procedure add) ;; => true
+(is_procedure (lambda (x) x)) ;; => true
+(is_procedure (quote x)) ;; => false
 
 ;; Converters
-(number-to-string 123) ;; => "123"
-(number-to-string 1.25) ;; => "1.250"
-(number-to-string (quote x)) ;; => nil
-(symbol-to-string (quote hello)) ;; => "hello"
-(symbol-to-string 123) ;; => nil
-(string-append "a" "b" "c") ;; => "abc"
-(string-append "x" 10) ;; => "x10"
-(string-append) ;; => ""
+(number_to_string 123) ;; => "123"
+(number_to_string 1.25) ;; => "1.250"
+(number_to_string (quote x)) ;; => nil
+(symbol_to_string (quote hello)) ;; => "hello"
+(symbol_to_string 123) ;; => nil
+(string_append "a" "b" "c") ;; => "abc"
+(string_append "x" 10) ;; => "x10"
+(string_append) ;; => ""
 
 ;; Equality
-(eq? (quote ()) (quote ())) ;; => true
-(eq? 1 1) ;; => true
-(eq? 1 1.0) ;; => false
-(eq? (cons 1 2) (cons 1 2)) ;; => false
+(eq (quote ()) (quote ()))
+ ;; => true
+(eq 1 1)
+ ;; => true
+(eq 1 1.0)
+ ;; => false
+(eq (cons 1 2) (cons 1 2))
+ ;; => false
 (equal (cons 1 (cons 2 3)) (cons 1 (cons 2 3))) ;; => true
 (equal (array 1 2) (array 1 2)) ;; => true
 (equal (array 1 2) (array 1 3)) ;; => false

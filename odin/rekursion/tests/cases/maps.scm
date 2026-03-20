@@ -2,7 +2,8 @@
 (set t (quote x) 10) ;; => 10
 (get t (quote x)) ;; => 10
 (define child (map)) ;; => child
-(set-parent child t) ;; => (map ((x . 10)) nil)
+(set_parent
+ child t) ;; => (map ((x . 10)) nil)
 (get child (quote x)) ;; => 10
 (set child (quote x) 20) ;; => 20
 (get child (quote x)) ;; => 20

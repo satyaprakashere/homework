@@ -3,6 +3,6 @@ package tests
 import "core:testing"
 
 @(test)
-test_arrays :: proc(t: ^testing.T) {
+arrays :: proc(t: ^testing.T) {
 	run_scm_tests(t, "tests/cases/arrays.scm")
 }

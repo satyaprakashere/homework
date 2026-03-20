@@ -39,8 +39,8 @@ arr ;; => (1 2 3)
 
 (define (test name expected actual)
   (if (equal expected actual)
-      (string-append "ML-PASS: " name)
-      (string-append "ML-FAIL: " name " expected " expected " got "  actual)))
+      (string_append "ML-PASS: " name)
+      (string_append "ML-FAIL: " name " expected " expected " got "  actual)))
 test ;; => |procedure|
 
 (reset 1) ;; => 1

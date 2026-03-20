@@ -19,32 +19,41 @@ PRIMITIVES :: []Primitive_Record {
 	{"cons", builtin_cons},
 	{"first", builtin_first},
 	{"rest", builtin_rest},
-	{"set-first!", builtin_set_first},
-	{"set-rest!", builtin_set_rest},
+	{"set_first", builtin_set_first},
+	{"set_rest", builtin_set_rest},
 	{"print", builtin_print},
+	{"display", builtin_display},
+	{"newline", builtin_newline},
 	{"array", builtin_array},
-	{"is-null", builtin_is_null},
-	{"is-pair", builtin_is_pair},
-	{"is-number", builtin_is_number},
-	{"is-symbol", builtin_is_symbol},
-	{"is-boolean", builtin_is_boolean},
-	{"is-string", builtin_is_string},
-	{"is-procedure", builtin_is_procedure},
-	{"number-to-string", builtin_number_to_string},
-	{"symbol-to-string", builtin_symbol_to_string},
-	{"string-append", builtin_string_append},
+	{"length", builtin_length},
+	{"append", builtin_append},
+	{"reverse", builtin_reverse},
+	{"list_ref", builtin_list_ref},
+	{"member", builtin_member},
+	{"memv", builtin_memv},
+	{"memq", builtin_memq},
+	{"assoc", builtin_assoc},
+	{"assv", builtin_assv},
+	{"assq", builtin_assq},
+	{"is_null", builtin_is_null},
+	{"is_pair", builtin_is_pair},
+	{"is_number", builtin_is_number},
+	{"is_symbol", builtin_is_symbol},
+	{"is_boolean", builtin_is_boolean},
+	{"is_string", builtin_is_string},
+	{"is_procedure", builtin_is_procedure},
+	{"number_to_string", builtin_number_to_string},
+	{"symbol_to_string", builtin_symbol_to_string},
+	{"string_append", builtin_string_append},
 	{"eq", builtin_eq},
-	{"eq?", builtin_eq},
 	{"equal", builtin_equal},
 	{"numeq", builtin_numeq},
-	{"=", builtin_numeq},
 	{"less_than", builtin_less_than},
-	{"<", builtin_less_than},
 	{"greater_than", builtin_greater_than},
-	{">", builtin_greater_than},
 	{"cshift", builtin_shift},
 	{"creset", builtin_reset},
 	{"apply", builtin_apply},
+	{"error", builtin_error},
 }
 
 setup_primitives :: proc(env: ^Env) {
@@ -64,103 +73,87 @@ NumericOp :: enum {
 	DIV,
 }
 
-fold_numeric :: proc(vm: ^VM, args: []Value, op: NumericOp) {
-	if len(args) == 0 {
-		switch op {
-		case .ADD:
-			vm_stack_push(vm, i64(0))
-		case .MUL:
-			vm_stack_push(vm, i64(1))
-		case .SUB, .DIV:
-			vm_error(vm, "%v expects at least 1 argument", op)
-		}
+fold_numeric_f64 :: proc(vm: ^VM, args: []Value, op: NumericOp) {
+	res: f64 = 0
+	start_idx: int = 1
+
+	first := args[0]
+	val0 := first.(f64) or_else f64(first.(i64))
+
+	if len(args) == 1 && (op == .SUB || op == .DIV) {
+		res = -val0 if op == .SUB else 1.0 / val0
+		vm_stack_push(vm, res)
 		return
 	}
 
-	is_float := false
+	res = val0
+	for i in start_idx ..< len(args) {
+		val := args[i].(f64) or_else f64(args[i].(i64))
+		switch op {
+		case .ADD: res += val
+		case .SUB: res -= val
+		case .MUL: res *= val
+		case .DIV:
+			if val == 0 {
+				vm_error(vm, "Division by zero")
+				return
+			}
+			res /= val
+		}
+	}
+	vm_stack_push(vm, res)
+}
+
+fold_numeric_i64 :: proc(vm: ^VM, args: []Value, op: NumericOp) {
+	res: i64 = 0
+	start_idx: int = 1
+
+	val0 := args[0].(i64)
+
+	if len(args) == 1 && (op == .SUB || op == .DIV) {
+		if op == .DIV && val0 == 0 {
+			vm_error(vm, "Division by zero")
+			return
+		}
+		res = -val0 if op == .SUB else 1 / val0
+		vm_stack_push(vm, res)
+		return
+	}
+
+	res = val0
+	for i in start_idx ..< len(args) {
+		val := args[i].(i64)
+		switch op {
+		case .ADD: res += val
+		case .SUB: res -= val
+		case .MUL: res *= val
+		case .DIV:
+			if val == 0 {
+				vm_error(vm, "Division by zero")
+				return
+			}
+			res /= val
+		}
+	}
+	vm_stack_push(vm, res)
+}
+
+fold_numeric :: proc(vm: ^VM, args: []Value, op: NumericOp) {
+	if len(args) == 0 {
+		if op == .ADD do vm_stack_push(vm, i64(0))
+		if op == .MUL do vm_stack_push(vm, i64(1))
+		if op == .SUB || op == .DIV do vm_error(vm, "%v expects at least 1 argument", op)
+		return
+	}
+
 	for a in args {
 		if _, ok := a.(f64); ok {
-			is_float = true
-			break
+			fold_numeric_f64(vm, args, op)
+			return
 		}
 	}
 
-	if is_float {
-		res: f64 = 0
-		start_idx := 0
-
-		if op == .SUB || op == .DIV {
-			first := args[0]
-			res = first.(f64) or_else f64(first.(i64))
-			start_idx = 1
-			if len(args) == 1 {
-				if op == .SUB do res = -res
-				if op == .DIV do res = 1.0 / res
-			}
-		} else if op == .MUL {
-			res = 1.0
-		}
-
-		for i in start_idx ..< len(args) {
-			val := args[i].(f64) or_else f64(args[i].(i64))
-			switch op {
-			case .ADD:
-				res += val
-			case .SUB:
-				res -= val
-			case .MUL:
-				res *= val
-			case .DIV:
-				if val == 0 {
-					vm_error(vm, "Division by zero")
-					return
-				}
-				res /= val
-			}
-		}
-		vm_stack_push(vm, res)
-	} else {
-		res: i64 = 0
-		start_idx := 0
-
-		if op == .SUB || op == .DIV {
-			res = args[0].(i64)
-			start_idx = 1
-			if len(args) == 1 {
-				if op == .SUB {
-					res = -res
-				} else {
-					// Integer division 1/x is usually 0 if x > 1
-					if res == 0 {
-						vm_error(vm, "Division by zero")
-						return
-					}
-					res = 1 / res
-				}
-			}
-		} else if op == .MUL {
-			res = 1
-		}
-
-		for i in start_idx ..< len(args) {
-			val := args[i].(i64)
-			switch op {
-			case .ADD:
-				res += val
-			case .SUB:
-				res -= val
-			case .MUL:
-				res *= val
-			case .DIV:
-				if val == 0 {
-					vm_error(vm, "Division by zero")
-					return
-				}
-				res /= val
-			}
-		}
-		vm_stack_push(vm, res)
-	}
+	fold_numeric_i64(vm, args, op)
 }
 
 builtin_add :: proc(vm: ^VM, args: []Value) {
@@ -632,5 +625,165 @@ builtin_shift :: proc(vm: ^VM, args: []Value) {
 
 	// Call the shift-lambda with the continuation.
 	// It should return to wherever the reset was going to return.
+	// Call the shift-lambda with the continuation.
+	// It should return to wherever the reset was going to return.
 	vm_exec_call_proc(vm, nil, proc_val, []Value{Value(cont)}, reset_frame.return_ip)
+}
+
+builtin_display :: proc(vm: ^VM, args: []Value) {
+	for arg in args {
+		if s, ok := arg.(string); ok {
+			fmt.print(s)
+		} else {
+			fmt.print(value_to_string(arg, context.temp_allocator))
+		}
+	}
+	vm_stack_push(vm, Nil{})
+}
+
+builtin_newline :: proc(vm: ^VM, args: []Value) {
+	fmt.println()
+	vm_stack_push(vm, Nil{})
+}
+
+builtin_error :: proc(vm: ^VM, args: []Value) {
+	if len(args) > 0 {
+		vm_error(vm, "%s", value_to_string(args[0], context.temp_allocator))
+	} else {
+		vm_error(vm, "Error")
+	}
+}
+
+builtin_length :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 1 {
+		vm_error(vm, "length expects 1 argument")
+		return
+	}
+	count: i64 = 0
+	curr := args[0]
+	for {
+		p, ok := curr.(^Pair)
+		if !ok do break
+		count += 1
+		curr = p.rest
+	}
+	vm_stack_push(vm, count)
+}
+
+builtin_append :: proc(vm: ^VM, args: []Value) {
+	if len(args) == 0 {vm_stack_push(vm, Nil{}); return}
+	if len(args) == 1 {vm_stack_push(vm, args[0]); return}
+
+	// We'll build a new list for all but the last argument
+	head: ^Pair = nil
+	tail: ^Pair = nil
+
+	for i in 0 ..< len(args) - 1 {
+		curr := args[i]
+		for {
+			p, ok := curr.(^Pair)
+			if !ok do break
+			
+			new_p := new(Pair)
+			new_p.first = p.first
+			if head == nil {
+				head = new_p
+			} else {
+				tail.rest = new_p
+			}
+			tail = new_p
+			curr = p.rest
+		}
+	}
+
+	if head == nil {
+		vm_stack_push(vm, args[len(args) - 1])
+	} else {
+		tail.rest = args[len(args) - 1]
+		vm_stack_push(vm, head)
+	}
+}
+
+builtin_reverse :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 1 {vm_error(vm, "reverse expects 1 argument"); return}
+	res: Value = Nil{}
+	curr := args[0]
+	for {
+		p, ok := curr.(^Pair)
+		if !ok do break
+		new_p := new(Pair)
+		new_p.first, new_p.rest = p.first, res
+		res = new_p
+		curr = p.rest
+	}
+	vm_stack_push(vm, res)
+}
+
+builtin_list_ref :: proc(vm: ^VM, args: []Value) {
+	if len(args) != 2 {vm_error(vm, "list-ref expects 2 arguments"); return}
+	idx := args[1].(i64) or_else 0
+	curr := args[0]
+	for i in 0 ..< idx {
+		p, ok := curr.(^Pair)
+		if !ok {vm_error(vm, "list-ref index out of range"); return}
+		curr = p.rest
+	}
+	if p, ok := curr.(^Pair); ok {
+		vm_stack_push(vm, p.first)
+	} else {
+		vm_error(vm, "list-ref index out of range")
+	}
+}
+
+builtin_memq :: proc(vm: ^VM, args: []Value) { builtin_member_internal(vm, args, .EQ) }
+builtin_memv :: proc(vm: ^VM, args: []Value) { builtin_member_internal(vm, args, .EQV) }
+builtin_member :: proc(vm: ^VM, args: []Value) { builtin_member_internal(vm, args, .EQUAL) }
+
+builtin_assq :: proc(vm: ^VM, args: []Value) { builtin_assoc_internal(vm, args, .EQ) }
+builtin_assv :: proc(vm: ^VM, args: []Value) { builtin_assoc_internal(vm, args, .EQV) }
+builtin_assoc :: proc(vm: ^VM, args: []Value) { builtin_assoc_internal(vm, args, .EQUAL) }
+
+CompareMode :: enum { EQ, EQV, EQUAL }
+
+builtin_member_internal :: proc(vm: ^VM, args: []Value, mode: CompareMode) {
+	if len(args) != 2 {vm_error(vm, "member/memq/memv expects 2 arguments"); return}
+	key, list := args[0], args[1]
+	curr := list
+	for {
+		p, ok := curr.(^Pair)
+		if !ok do break
+		if compare_values(key, p.first, mode) {
+			vm_stack_push(vm, curr)
+			return
+		}
+		curr = p.rest
+	}
+	vm_stack_push(vm, bool(false))
+}
+
+builtin_assoc_internal :: proc(vm: ^VM, args: []Value, mode: CompareMode) {
+	if len(args) != 2 {vm_error(vm, "assoc/assq/assv expects 2 arguments"); return}
+	key, alist := args[0], args[1]
+	curr := alist
+	for {
+		p, ok := curr.(^Pair)
+		if !ok do break
+		if entry, eok := p.first.(^Pair); eok {
+			if compare_values(key, entry.first, mode) {
+				vm_stack_push(vm, p.first)
+				return
+			}
+		}
+		curr = p.rest
+	}
+	vm_stack_push(vm, bool(false))
+}
+
+compare_values :: proc(a, b: Value, mode: CompareMode) -> bool {
+	if mode == .EQUAL do return value_equal(a, b)
+	// For EQ and EQV, in this interpreter they are mostly the same as value_equal for primitives
+	// and pointer equality for pairs/procs.
+	// Actually, value_equal already does pointer equality for pairs/procs.
+	// Let's just use value_equal for now, but in a real R5RS it differs for numbers/chars.
+	return value_equal(a, b)
 }

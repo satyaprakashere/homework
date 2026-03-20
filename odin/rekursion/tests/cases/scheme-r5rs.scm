@@ -5,8 +5,8 @@
 (and #t #f) ;; => false
 (or #f #f) ;; => false
 
-(eq? (quote a) (quote a)) ;; => true
-(eq? (quote ()) (quote ())) ;; => true
+(eq (quote a) (quote a)) ;; => true
+(eq (quote ()) (quote ())) ;; => true
 
 (cons (quote a) (quote ())) ;; => (a)
 (car (cons (quote a) (quote b))) ;; => a

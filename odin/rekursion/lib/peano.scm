@@ -12,13 +12,13 @@
 (define (is-peano-zero n)
   (eq? (first n) (quote peano-zero)))
 
-;; Comparison
-(define (peano-eq? n m)
-  (if (is-peano-zero n)
-      (is-peano-zero m)
-      (if (is-peano-zero m)
+;; 3. Equality
+(define (peano-eq n m)
+  (if (is-null n)
+      (is-null m)
+      (if (is-null m)
           false
-          (recur (first (rest n)) (first (rest m))))))
+          (recur (rest n) (rest m)))))
 
 ;; Addition: n + m
 (define (peano-add n m)

@@ -9,13 +9,13 @@
 
 (define enqueue (lambda (thunk)
   (let ((q (get scheduler (quote run-queue))))
-    (if (is-null q)
+    (if (is_null q)
         (set scheduler (quote run-queue) (list thunk))
         (set scheduler (quote run-queue) (append q (list thunk)))))))
 
 (define dequeue (lambda ()
   (let ((q (get scheduler (quote run-queue))))
-    (if (is-null q)
+    (if (is_null q)
         (quote ())
         (let ((head (first q))
               (tail (rest q)))
@@ -24,7 +24,7 @@
 
 (define schedule-next (lambda ()
   (let ((next-thunk (dequeue)))
-    (if (is-null next-thunk)
+    (if (is_null next-thunk)
         (quote all-actors-finished)
         (next-thunk)))))
 
@@ -47,11 +47,11 @@
 
 (define (send pid msg)
   (let ((info (get (get scheduler (quote actors)) pid)))
-    (if (is-null info)
+    (if (is_null info)
         false
         (do
           (let ((mbox (get info (quote mailbox))))
-            (if (is-null mbox)
+            (if (is_null mbox)
                 (set info (quote mailbox) (list msg))
                 (set info (quote mailbox) (append mbox (list msg)))))))
           
@@ -71,7 +71,7 @@
   (let ((pid (get scheduler (quote current-pid))))
     (let ((info (get (get scheduler (quote actors)) pid)))
       (let ((mbox (get info (quote mailbox))))
-        (if (is-null mbox)
+        (if (is_null mbox)
             (do
               (shift k
                      (do

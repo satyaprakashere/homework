@@ -40,7 +40,7 @@
 ;; Iterative conversion from int to church
 (define (int->church n)
   (define (helper m acc)
-    (if (eq? m 0)
+    (if (eq m 0)
         acc
         (recur (sub m 1) (church-succ acc))))
   (helper n church0))

@@ -57,41 +57,36 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	head := p.first
 	#partial switch h in head {
 	case Symbol:
-		switch string(h) {
-		case "define":
-			compile_define(compiler, p); return
-		case "if":
-			compile_if(compiler, p, is_tail); return
-		case "defmacro":
-			compile_defmacro(compiler, p); return
-		case "quote":
-			compile_quote(compiler, p); return
-		case "quasiquote":
-			compile_quasiquote(compiler, p); return
-		case "lambda":
-			compile_lambda(compiler, p); return
-		case "do":
-			compile_do(compiler, p, is_tail); return
-		case "let":
-			compile_let(compiler, p, is_tail); return
-		case "recur":
-			compile_recur(compiler, p, is_tail); return
-		case "goto":
-			compile_goto(compiler, p, is_tail); return
-		case "where":
-			compile_where_error(compiler, p); return
+		if compile_special_form(compiler, p, string(h), is_tail) do return
+		
+		macro_val, found := env_lookup(compiler.env, h)
+		if m, ok := macro_val.(^Macro); found && ok {
+			expanded_expr := compiler_evaluate_macro(compiler, m, p.rest)
+			compile_expression(compiler, expanded_expr, is_tail)
+			return
 		}
-		if macro_val, found := env_lookup(compiler.env, h); found {
-			if m, is_macro := macro_val.(^Macro); is_macro {
-				expanded_expr := compiler_evaluate_macro(compiler, m, p.rest)
-				compile_expression(compiler, expanded_expr, is_tail)
-				return
-			}
-		}
+		
 		compile_call(compiler, p, is_tail)
 	case:
 		compile_call(compiler, p, is_tail)
 	}
+}
+
+compile_special_form :: proc(compiler: ^Compiler, p: ^Pair, name: string, is_tail: bool) -> bool {
+	switch name {
+	case "define":      compile_define(compiler, p); return true
+	case "if":          compile_if(compiler, p, is_tail); return true
+	case "defmacro":    compile_defmacro(compiler, p); return true
+	case "quote":       compile_quote(compiler, p); return true
+	case "quasiquote":  compile_quasiquote(compiler, p); return true
+	case "lambda":      compile_lambda(compiler, p); return true
+	case "do":          compile_do(compiler, p, is_tail); return true
+	case "let":         compile_let(compiler, p, is_tail); return true
+	case "recur":       compile_recur(compiler, p, is_tail); return true
+	case "goto":        compile_goto(compiler, p, is_tail); return true
+	case "where":       compile_where_error(compiler, p); return true
+	}
+	return false
 }
 
 compile_where_error :: proc(compiler: ^Compiler, p: ^Pair) {
@@ -102,33 +97,49 @@ compile_where_error :: proc(compiler: ^Compiler, p: ^Pair) {
 
 reconstruct_body_without_where :: proc(body: Value) -> Value {
 	curr := body
-	head: ^Pair = nil
-	tail: ^Pair = nil
+	head, tail: ^Pair = nil, nil
 
 	for {
 		p_curr, is_pair := curr.(^Pair)
 		if !is_pair do break
 
-		// If this is the last element (which we know is 'where'), don't add it
-		if _, next_is_pair := p_curr.rest.(^Pair); !next_is_pair {
-			break
-		}
+		// Check if next is the last (the 'where' clause)
+		_, next_is_pair := p_curr.rest.(^Pair)
+		if !next_is_pair do break
 
 		new_node := new(Pair)
 		new_node.first = p_curr.first
 		new_node.rest = Nil{}
 
 		if head == nil {
-			head = new_node
-			tail = new_node
+			head, tail = new_node, new_node
 		} else {
-			tail.rest = new_node
-			tail = new_node
+			tail.rest, tail = new_node, new_node
 		}
 		curr = p_curr.rest
 	}
 
-	return head == nil ? Value(Nil{}) : Value(head)
+	return Value(head) if head != nil else Nil{}
+}
+
+find_where_clause :: proc(body: Value) -> (Value, bool) {
+	curr := body
+	for {
+		p_curr, is_pair := curr.(^Pair)
+		if !is_pair do break
+
+		// If this is the last element
+		p_next, next_is_pair := p_curr.rest.(^Pair)
+		if !next_is_pair {
+			last_p, ok := p_curr.first.(^Pair)
+			if !ok do break
+			sym, s_ok := last_p.first.(Symbol)
+			if s_ok && string(sym) == "where" do return last_p.rest, true
+			break
+		}
+		curr = p_curr.rest
+	}
+	return Nil{}, false
 }
 
 compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
@@ -144,63 +155,28 @@ compile_define :: proc(compiler: ^Compiler, p: ^Pair) {
 		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
 	case ^Pair:
 		name := def_head.first.(Symbol)
-		
 		body := args.rest
-		// Check for trailing (where ...)
-		curr := body
-		var_bindings: Value = Nil{}
-		new_body: Value = Nil{}
-		
-		found_where := false
-		for {
-			p_curr, is_pair := curr.(^Pair)
-			if !is_pair do break
-			
-			if p_next, next_is_pair := p_curr.rest.(^Pair); next_is_pair {
-				curr = p_curr.rest
-			} else {
-				// Last element
-				if last_p, ok := p_curr.first.(^Pair); ok {
-					if sym, s_ok := last_p.first.(Symbol); s_ok && string(sym) == "where" {
-						var_bindings = last_p.rest
-						found_where = true
-					}
-				}
-				break
-			}
+
+		var_bindings, found_where := find_where_clause(body)
+		new_body := reconstruct_body_without_where(body) if found_where else body
+
+		lambda_body: Value = new_body
+		if found_where {
+			let_expr := new(Pair)
+			let_expr.first, let_expr.rest = Symbol("let"), new(Pair)
+			let_tail := let_expr.rest.(^Pair)
+			let_tail.first, let_tail.rest = var_bindings, new_body
+			lambda_body = new(Pair)
+			lambda_body.(^Pair).first, lambda_body.(^Pair).rest = Value(let_expr), Nil{}
 		}
 
 		lambda_args := new(Pair)
-		body_list: ^Pair = nil
-		
-		if found_where {
-			new_body = reconstruct_body_without_where(body)
-			
-			let_expr := new(Pair)
-			let_expr.first = Symbol("let")
-			let_tail := new(Pair)
-			let_tail.first = var_bindings
-			let_tail.rest = new_body
-			let_expr.rest = let_tail
-			
-			body_list = new(Pair)
-			body_list.first = Value(let_expr)
-			body_list.rest = Nil{}
-		} else {
-			// No where clause, use original body
-			if p_body, ok := body.(^Pair); ok {
-				body_list = p_body
-			} else {
-				body_list = new(Pair)
-				body_list.first = body
-				body_list.rest = Nil{}
-			}
-		}
+		lambda_args.first, lambda_args.rest = def_head.rest, lambda_body
 
-		lambda_args.first, lambda_args.rest = def_head.rest, Value(body_list)
 		lambda_expr := new(Pair)
 		lambda_expr.first, lambda_expr.rest = Symbol("lambda"), lambda_args
 		compile_expression(compiler, lambda_expr)
+		
 		idx := add_constant(compiler, name)
 		append(&compiler.bytecode.instructions, Instruction{op = .DEF_VAR, arg = i32(idx)})
 	case:
@@ -225,20 +201,21 @@ compiler_evaluate_macro :: proc(compiler: ^Compiler, m: ^Macro, args_val: Value)
 	// Bind parameters
 	curr_arg := args_val
 	for param in m.params {
-		if m.is_variadic && param == m.params[len(m.params) - 1] {
+		is_last_variadic := m.is_variadic && param == m.params[len(m.params) - 1]
+		if is_last_variadic {
 			env_define(call_env, param, curr_arg)
 			curr_arg = Nil{}
 			break
 		}
 
-		#partial switch pair in curr_arg {
-		case ^Pair:
-			env_define(call_env, param, pair.first)
-			curr_arg = pair.rest
-		case:
+		pair, is_pair := curr_arg.(^Pair)
+		if !is_pair {
 			fmt.println("Macro error: Not enough arguments")
 			return Nil{}
 		}
+		
+		env_define(call_env, param, pair.first)
+		curr_arg = pair.rest
 	}
 
 	// Compile the macro body into the current compiler to share constant IPs
@@ -262,60 +239,36 @@ compiler_evaluate_macro :: proc(compiler: ^Compiler, m: ^Macro, args_val: Value)
 }
 
 compile_defmacro :: proc(compiler: ^Compiler, p: ^Pair) {
-	// (defmacro (name args...) body...) OR (defmacro name (lambda (args...) body...))
-	// Standard Lisp: (defmacro name (args...) body...) -> wait, racket uses define-macro.
-	// Let's support: `(defmacro name (args...) body...)`
 	args := p.rest.(^Pair)
 	name := args.first.(Symbol)
 
 	macro_val := new(Macro)
 	macro_val.env = compiler.env // Evaluate in current environment
 
-	if pair, ok := args.rest.(^Pair); ok {
-		// (args...)
-		arg_list := pair.first
+	macro_args_pair, ok := args.rest.(^Pair)
+	if !ok {
+		fmt.println("Error: defmacro missing arguments or body for", name)
+		return
+	}
 
-		// Parse params
-		params := make([dynamic]Symbol)
-		curr := arg_list
-		is_variadic := false
+	params, is_variadic := parse_params_to_symbols(macro_args_pair.first)
+	macro_val.params, macro_val.is_variadic = params, is_variadic
 
-		for curr != nil {
-			if _, is_nil := curr.(Nil); is_nil {
-				break
-			} else if sym, is_sym := curr.(Symbol); is_sym {
-				append(&params, sym)
-				is_variadic = true
-				break
-			} else if p_arg, is_pair := curr.(^Pair); is_pair {
-				if sym, is_sym := p_arg.first.(Symbol); is_sym {
-					append(&params, sym)
-				}
-				curr = p_arg.rest
-			} else {
-				break
-			}
-		}
+	body_list := macro_args_pair.rest
+	body_pair, is_pair := body_list.(^Pair)
 
-		macro_val.params = make([]Symbol, len(params))
-		for sym, i in params {
-			macro_val.params[i] = sym
-		}
-		macro_val.is_variadic = is_variadic
+	is_rest_nil := false
+	if is_pair {
+		_, is_rest_nil = body_pair.rest.(Nil)
+	}
 
-		// We want an implicit `do` block if there are multiple body statements
-		body_list := pair.rest
-		if body_pair, is_pair := body_list.(^Pair); is_pair {
-			if _, is_nil := body_pair.rest.(Nil); is_nil {
-				macro_val.body = body_pair.first
-			} else {
-				begin_sym := Symbol("do")
-				begin_pair := new(Pair)
-				begin_pair.first = begin_sym
-				begin_pair.rest = body_list
-				macro_val.body = begin_pair
-			}
-		}
+	if !is_pair || is_rest_nil {
+		macro_val.body = body_pair.first if is_pair else body_list
+	} else {
+		// Implicit (do ...)
+		do_expr := new(Pair)
+		do_expr.first, do_expr.rest = Symbol("do"), body_list
+		macro_val.body = do_expr
 	}
 
 	final_macro := macro_val
@@ -381,25 +334,11 @@ compile_quasiquote :: proc(compiler: ^Compiler, p: ^Pair) {
 compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 	#partial switch e in expr {
 	case ^Pair:
-		if sym, ok := e.first.(Symbol); ok {
-			sym_str := string(sym)
-			if sym_str == "unquote" || sym_str == "comma" {
-				// evaluate unquote
-				compile_expression(compiler, e.rest.(^Pair).first)
-				return
-			}
-		}
+		if compile_unquote_expr(compiler, e) do return
 
 		is_splicing := false
 		if first_pair, ok := e.first.(^Pair); ok {
-			if sym, is_sym := first_pair.first.(Symbol); is_sym {
-				sym_str := string(sym)
-				if sym_str == "unquote-splicing" || sym_str == "comma-at" {
-					// evaluate the unquote-splicing argument
-					compile_expression(compiler, first_pair.rest.(^Pair).first)
-					is_splicing = true
-				}
-			}
+			is_splicing = compile_unquote_splicing_expr(compiler, first_pair)
 		}
 
 		if !is_splicing {
@@ -408,20 +347,36 @@ compile_quasiquote_expr :: proc(compiler: ^Compiler, expr: Value) {
 
 		compile_quasiquote_expr(compiler, e.rest)
 
-		if is_splicing {
-			idx := add_constant(compiler, Symbol("append"))
-			append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
-			append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = 2})
-		} else {
-			idx := add_constant(compiler, Symbol("cons"))
-			append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
-			append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = 2})
-		}
+		op_sym := Symbol("append") if is_splicing else Symbol("cons")
+		idx := add_constant(compiler, op_sym)
+		append(&compiler.bytecode.instructions, Instruction{op = .LOAD_VAR, arg = i32(idx)})
+		append(&compiler.bytecode.instructions, Instruction{op = .CALL, arg = 2})
 	case:
-		// atoms are just quoted
 		idx := add_constant(compiler, e)
 		append(&compiler.bytecode.instructions, Instruction{op = .PUSH_CONST, arg = i32(idx)})
 	}
+}
+
+compile_unquote_expr :: proc(compiler: ^Compiler, e: ^Pair) -> bool {
+	sym, ok := e.first.(Symbol)
+	if !ok do return false
+	
+	sym_str := string(sym)
+	if sym_str != "unquote" && sym_str != "comma" do return false
+	
+	compile_expression(compiler, e.rest.(^Pair).first)
+	return true
+}
+
+compile_unquote_splicing_expr :: proc(compiler: ^Compiler, first_pair: ^Pair) -> bool {
+	sym, is_sym := first_pair.first.(Symbol)
+	if !is_sym do return false
+	
+	sym_str := string(sym)
+	if sym_str != "unquote-splicing" && sym_str != "comma-at" do return false
+	
+	compile_expression(compiler, first_pair.rest.(^Pair).first)
+	return true
 }
 
 compile_do :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
@@ -475,32 +430,42 @@ compile_lambda :: proc(compiler: ^Compiler, p: ^Pair) {
 }
 
 compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
+	symbols, is_variadic := parse_params_to_symbols(params_val)
+	
+	proc_val := new(Procedure)
+	proc_val.params = symbols
+	proc_val.is_variadic = is_variadic
+	proc_val.body = i64(start_ip)
+	return proc_val
+}
+
+parse_params_to_symbols :: proc(params_val: Value) -> (symbols: []Symbol, is_variadic: bool) {
 	params: [dynamic]Symbol
-	is_variadic := false
+	is_var: bool = false
 	curr := params_val
+	
 	for {
-		if sym, is_sym := curr.(Symbol); is_sym {
+		if sym, ok := curr.(Symbol); ok {
 			append(&params, sym)
-			is_variadic = true
+			is_var = true
 			break
 		}
 
-		list := curr.(^Pair) or_break
-		append(&params, list.first.(Symbol))
+		list, ok := curr.(^Pair)
+		if !ok do break
+		
+		#partial switch s in list.first {
+		case Symbol: append(&params, s)
+		case: fmt.println("Error: expected symbol in parameter list")
+		}
 		curr = list.rest
 	}
-	proc_val := new(Procedure)
 
-	// Copy dynamic array to temp allocated slice
 	perm_params := make([]Symbol, len(params))
 	for p, i in params {
 		perm_params[i] = p
 	}
-
-	proc_val.params = perm_params
-	proc_val.is_variadic = is_variadic
-	proc_val.body = i64(start_ip)
-	return proc_val
+	return perm_params, is_var
 }
 
 // Procedures like compile_reset and compile_shift are removed.

@@ -3,6 +3,6 @@ package tests
 import "core:testing"
 
 @(test)
-test_macro :: proc(t: ^testing.T) {
+macro :: proc(t: ^testing.T) {
 	run_scm_tests(t, "tests/cases/macro.scm")
 }

@@ -241,17 +241,13 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 	is_tail := (inst.op == .TAIL_CALL || inst.op == .RECUR)
 	is_recur := (inst.op == .RECUR)
 
-	procedure: Value
-	if is_recur {
-		if len(vm.frames) == 0 {
-			vm_error(vm, "Error: 'recur' outside of a function")
-			return Nil{}, true
-		}
-		procedure = vm.frames[len(vm.frames) - 1].procedure
-	} else {
-		procedure = vm_pop(vm)
-		if vm.errored do return Nil{}, true
+	if is_recur && len(vm.frames) == 0 {
+		vm_error(vm, "Error: 'recur' outside of a function")
+		return Nil{}, true
 	}
+	
+	procedure: Value = vm.frames[len(vm.frames) - 1].procedure if is_recur else vm_pop(vm)
+	if vm.errored do return Nil{}, true
 
 	for i in 0 ..< num_args {
 		args[num_args - 1 - i] = vm_pop(vm)
@@ -259,7 +255,8 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 	}
 
 	// Verify identity for non-explicit calls to prevent accidental recursion
-	if !is_recur && len(vm.frames) > 0 {
+	is_accidental_recur := !is_recur && len(vm.frames) > 0
+	if is_accidental_recur {
 		current_proc := vm.frames[len(vm.frames) - 1].procedure
 		if p, ok := procedure.(^Procedure); ok && p == current_proc {
 			vm_error(vm, "Error: Recursion requires 'recur' keyword")
@@ -268,18 +265,19 @@ vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		}
 	}
 
-	if is_tail {
-		if len(vm.frames) == 0 {
-			vm_error(vm, "Error: tail call outside of a function")
-			return Nil{}, true
-		}
-		last_frame := pop(&vm.frames)
-		vm.env = last_frame.env // Restore parent environment before calling
-		vm_exec_call_proc(vm, bytecode, procedure, args, last_frame.return_ip)
-	} else {
-		vm_exec_call_proc(vm, bytecode, procedure, args, vm.ip)
+	if is_tail && len(vm.frames) == 0 {
+		vm_error(vm, "Error: tail call outside of a function")
+		return Nil{}, true
 	}
 
+	return_ip := vm.ip
+	if is_tail {
+		last_frame := pop(&vm.frames)
+		vm.env = last_frame.env
+		return_ip = last_frame.return_ip
+	}
+
+	vm_exec_call_proc(vm, bytecode, procedure, args, return_ip)
 	return Nil{}, false
 }
 

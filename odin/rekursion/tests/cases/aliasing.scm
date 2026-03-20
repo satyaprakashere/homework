@@ -9,6 +9,6 @@
 (define y x) ;; => y
 y ;; => 100
 
-(define is-num? is-number) ;; => is-num?
-(is-num? 42) ;; => true
-(is-num? "foo") ;; => false
+(define is_num is_number) ;; => is_num
+(is_num 42) ;; => true
+(is_num "foo") ;; => false
