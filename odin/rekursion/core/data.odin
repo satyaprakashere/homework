@@ -78,10 +78,12 @@ CallFrame :: struct {
 }
 
 VM :: struct {
-	stack:  [dynamic]Value,
-	frames: [dynamic]CallFrame,
-	env:    ^Env,
-	ip:     int,
+	stack:     [dynamic]Value,
+	frames:    [dynamic]CallFrame,
+	env:       ^Env,
+	ip:        int,
+	errored:   bool,
+	error_msg: string,
 }
 
 // destroy_env :: proc(e: ^Env) {
@@ -115,6 +117,18 @@ vm_stack_push :: proc(vm: ^VM, val: Value) {
 	n := len(vm.stack)
 	resize(&vm.stack, n + 1)
 	vm.stack[n] = val
+}
+
+vm_pop :: proc(vm: ^VM) -> Value {
+	if len(vm.stack) == 0 {
+		vm.errored = true
+		vm.error_msg = "Error: Stack underflow"
+		fmt.eprintln(vm.error_msg)
+		return Nil{}
+	}
+	val := vm.stack[len(vm.stack) - 1]
+	resize(&vm.stack, len(vm.stack) - 1)
+	return val
 }
 
 // Low-level stack helper for dynamic arrays to avoid ambiguity

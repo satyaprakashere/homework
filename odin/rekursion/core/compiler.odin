@@ -98,6 +98,8 @@ compile_list :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 			compile_let(compiler, p, is_tail); return
 		case "recur":
 			compile_recur(compiler, p, is_tail); return
+		case "goto":
+			compile_goto(compiler, p, is_tail); return
 		case "where":
 			compile_where_error(compiler, p); return
 		}
@@ -525,6 +527,29 @@ compile_lambda_params :: proc(params_val: Value, start_ip: int) -> ^Procedure {
 
 // Procedures like compile_reset and compile_shift are removed.
 
+compile_goto :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
+	if !is_tail {
+		fmt.eprintln("Error: 'goto' can only be used in tail position")
+	}
+
+	args := p.rest.(^Pair)
+	// (goto func arg1 arg2...)
+	target := args.first
+
+	num_args := 0
+	curr := args.rest
+	for {
+		list := curr.(^Pair) or_break
+		compile_expression(compiler, list.first)
+		num_args += 1
+		curr = list.rest
+	}
+
+	compile_expression(compiler, target) // push proc last (on top)
+
+	append(&compiler.bytecode.instructions, Instruction{op = .TAIL_CALL, arg = i32(num_args)})
+}
+
 compile_call :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 	curr := p.rest
 	num_args := 0
@@ -552,7 +577,7 @@ compile_recur :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {
 		curr = list.rest
 	}
 
-	append(&compiler.bytecode.instructions, Instruction{op = .TAIL_CALL, arg = i32(num_args)})
+	append(&compiler.bytecode.instructions, Instruction{op = .RECUR, arg = i32(num_args)})
 }
 
 compile_let :: proc(compiler: ^Compiler, p: ^Pair, is_tail := false) {

@@ -61,18 +61,27 @@ builtin_add_i64 :: proc(vm: ^VM, args: []Value) {
 			res += val
 		} else if fval, fok := a.(f64); fok {
 			res += i64(fval)
+		} else {
+			vm_error(vm, "add expects numbers, got %v", a)
+			return
 		}
 	}
 	vm_stack_push(vm, Value(res))
 }
 
 builtin_sub_i64 :: proc(vm: ^VM, args: []Value) {
-	if len(args) == 0 {vm_stack_push(vm, Value(i64(0))); return}
+	if len(args) == 0 {
+		vm_stack_push(vm, Value(i64(0)))
+		return
+	}
 	res: i64 = 0
 	if val, ok := args[0].(i64); ok {
 		res = val
 	} else if fval, fok := args[0].(f64); fok {
 		res = i64(fval)
+	} else {
+		vm_error(vm, "sub expects numbers, got %v", args[0])
+		return
 	}
 
 	for i in 1 ..< len(args) {
@@ -80,6 +89,9 @@ builtin_sub_i64 :: proc(vm: ^VM, args: []Value) {
 			res -= val
 		} else if fval, fok := args[i].(f64); fok {
 			res -= i64(fval)
+		} else {
+			vm_error(vm, "sub expects numbers, got %v", args[i])
+			return
 		}
 	}
 	vm_stack_push(vm, Value(res))
@@ -92,36 +104,55 @@ builtin_mul :: proc(vm: ^VM, args: []Value) {
 			res *= val
 		} else if fval, fok := a.(f64); fok {
 			res *= i64(fval)
+		} else {
+			vm_error(vm, "mul expects numbers, got %v", a)
+			return
 		}
 	}
 	vm_stack_push(vm, Value(res))
 }
 
 builtin_div :: proc(vm: ^VM, args: []Value) {
-	if len(args) == 0 {vm_stack_push(vm, Value(i64(1))); return}
+	if len(args) == 0 {
+		vm_stack_push(vm, Value(i64(1)))
+		return
+	}
 	res: i64 = 1
 	if val, ok := args[0].(i64); ok {
 		res = val
 	} else if fval, fok := args[0].(f64); fok {
 		res = i64(fval)
+	} else {
+		vm_error(vm, "div expects numbers, got %v", args[0])
+		return
 	}
+
 	for i in 1 ..< len(args) {
 		denominator: i64 = 1
 		if val, ok := args[i].(i64); ok {
 			denominator = val
 		} else if fval, fok := args[i].(f64); fok {
 			denominator = i64(fval)
+		} else {
+			vm_error(vm, "div expects numbers, got %v", args[i])
+			return
 		}
 
 		if denominator != 0 {
 			res /= denominator
+		} else {
+			vm_error(vm, "Division by zero")
+			return
 		}
 	}
 	vm_stack_push(vm, Value(res))
 }
 
 builtin_cons :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) != 2 {
+		vm_error(vm, "cons expects 2 arguments, got %d", len(args))
+		return
+	}
 	pair := new(Pair)
 	pair.first = args[0]
 	pair.rest = args[1]
@@ -129,22 +160,34 @@ builtin_cons :: proc(vm: ^VM, args: []Value) {
 }
 
 builtin_first :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) != 1 {
+		vm_error(vm, "first expects 1 argument, got %d", len(args))
+		return
+	}
 	pair, ok := args[0].(^Pair)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
+	if !ok {
+		vm_error(vm, "first expects a pair, got %v", args[0])
+		return
+	}
 	vm_stack_push(vm, pair.first)
 }
 
 builtin_rest :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) != 1 {
+		vm_error(vm, "rest expects 1 argument, got %d", len(args))
+		return
+	}
 	pair, ok := args[0].(^Pair)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
+	if !ok {
+		vm_error(vm, "rest expects a pair, got %v", args[0])
+		return
+	}
 	vm_stack_push(vm, pair.rest)
 }
 
 builtin_apply :: proc(vm: ^VM, args: []Value) {
 	if len(args) < 2 {
-		vm_stack_push(vm, Value(Nil{}))
+		vm_error(vm, "apply expects at least 2 arguments, got %d", len(args))
 		return
 	}
 
@@ -163,23 +206,38 @@ builtin_apply :: proc(vm: ^VM, args: []Value) {
 }
 
 builtin_set_first :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) != 2 {
+		vm_error(vm, "set-first! expects 2 arguments, got %d", len(args))
+		return
+	}
 	pair, ok := args[0].(^Pair)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
+	if !ok {
+		vm_error(vm, "set-first! expects a pair, got %v", args[0])
+		return
+	}
 	pair.first = args[1]
 	vm_stack_push(vm, pair.first)
 }
 
 builtin_set_rest :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 2 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) != 2 {
+		vm_error(vm, "set-rest! expects 2 arguments, got %d", len(args))
+		return
+	}
 	pair, ok := args[0].(^Pair)
-	if !ok {vm_stack_push(vm, Value(Nil{})); return}
+	if !ok {
+		vm_error(vm, "set-rest! expects a pair, got %v", args[0])
+		return
+	}
 	pair.rest = args[1]
 	vm_stack_push(vm, pair.rest)
 }
 
 builtin_array :: proc(vm: ^VM, args: []Value) {
-	if len(args) == 0 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) == 0 {
+		vm_error(vm, "array expects at least 1 argument")
+		return
+	}
 
 	head := new(Pair)
 	head.first = args[0]
@@ -270,7 +328,10 @@ builtin_is_procedure :: proc(vm: ^VM, args: []Value) {
 
 // Converters
 builtin_number_to_string :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {vm_stack_push(vm, Nil{}); return}
+	if len(args) != 1 {
+		vm_error(vm, "number-to-string expects 1 argument, got %d", len(args))
+		return
+	}
 	#partial switch n in args[0] {
 	case i64:
 		vm_stack_push(vm, Value(fmt.tprintf("%d", n)))
@@ -279,16 +340,19 @@ builtin_number_to_string :: proc(vm: ^VM, args: []Value) {
 		vm_stack_push(vm, Value(fmt.tprintf("%f", n)))
 		return
 	}
-	vm_stack_push(vm, Value(Nil{}))
+	vm_error(vm, "number-to-string expects a number, got %v", args[0])
 }
 
 builtin_symbol_to_string :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {vm_stack_push(vm, Value(Nil{})); return}
+	if len(args) != 1 {
+		vm_error(vm, "symbol-to-string expects 1 argument, got %d", len(args))
+		return
+	}
 	if s, ok := args[0].(Symbol); ok {
 		vm_stack_push(vm, Value(string(s)))
 		return
 	}
-	vm_stack_push(vm, Value(Nil{}))
+	vm_error(vm, "symbol-to-string expects a symbol, got %v", args[0])
 }
 
 builtin_string_append :: proc(vm: ^VM, args: []Value) {
@@ -458,7 +522,10 @@ builtin_greater_than :: proc(vm: ^VM, args: []Value) {
 // Delimited Continuations
 
 builtin_reset :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {return}
+	if len(args) != 1 {
+		vm_error(vm, "reset expects 1 argument, got %d", len(args))
+		return
+	}
 	proc_val := args[0]
 
 	// Push a boundary frame that will eventually return to the caller of reset
@@ -472,7 +539,10 @@ builtin_reset :: proc(vm: ^VM, args: []Value) {
 }
 
 builtin_shift :: proc(vm: ^VM, args: []Value) {
-	if len(args) != 1 {return}
+	if len(args) != 1 {
+		vm_error(vm, "shift expects 1 argument, got %d", len(args))
+		return
+	}
 	proc_val := args[0]
 
 	// Find the nearest reset frame (boundary)

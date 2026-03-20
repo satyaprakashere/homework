@@ -86,6 +86,10 @@ run_scm_tests :: proc(t: ^testing.T, filename: string, extra_libs: []string = ni
 		// Track which code segment this IP range belongs to
 		vm.ip = start_ip
 		final_result := core.vm_run(&vm, &c.bytecode)
+		if vm.errored {
+			// If it errored, the result is Nil (already pushed by LOAD_VAR or handled in CALL)
+			vm.errored = false
+		}
 
 		if found_exp {
 			actual := core.value_to_string(final_result)

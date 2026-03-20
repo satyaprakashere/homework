@@ -9,8 +9,8 @@
 (mul 2 3.5) ;; => 6
 (div) ;; => 1
 (div 10 2) ;; => 5
-(div 10 0) ;; => 10
-(div 10 2 0 5) ;; => 1
+(div 10 0) ;; => nil
+(div 10 2 0 5) ;; => nil
 
 ;; List Errors
 (first 10) ;; => nil

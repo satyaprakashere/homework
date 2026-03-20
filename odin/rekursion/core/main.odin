@@ -48,26 +48,72 @@ main :: proc() {
 repl_step :: proc(reader: ^bufio.Reader, c: ^Compiler, vm: ^VM) {
 	fmt.print("> ")
 
-	line, err := bufio.reader_read_string(reader, '\n')
-	if err != nil {
-		if err != .EOF {log.info("Error reading: %v\n", err)}
-		os.exit(0)
+	full_source: strings.Builder
+	strings.builder_init(&full_source)
+	defer strings.builder_destroy(&full_source)
+
+	paren_balance := 0
+	in_string := false
+	first_line := true
+
+	for {
+		line, err := bufio.reader_read_string(reader, '\n')
+		if err != nil {
+			if err != .EOF {log.info("Error reading: %v\n", err)}
+			if strings.builder_len(full_source) == 0 do os.exit(0)
+			break
+		}
+
+		strings.write_string(&full_source, line)
+
+		// Count parentheses in the new line, being careful about strings and comments
+		for i := 0; i < len(line); i += 1 {
+			char := line[i]
+			if in_string {
+				if char == '"' && (i == 0 || line[i - 1] != '\\') {
+					in_string = false
+				}
+			} else {
+				if char == '"' {
+					in_string = true
+				} else if char == '(' || char == '[' {
+					paren_balance += 1
+				} else if char == ')' || char == ']' {
+					paren_balance -= 1
+				} else if char == ';' {
+					break // Comment, rest of line is ignored
+				}
+			}
+		}
+
+		if paren_balance <= 0 && strings.trim_space(strings.to_string(full_source)) != "" {
+			break
+		}
+		fmt.print("  ") // Indent for multi-line input
 	}
-	// defer delete(line)
 
-	line = strings.trim_space(line)
-	if line == "" {return}
+	source := strings.to_string(full_source)
+	if strings.trim_space(source) == "" {return}
 
-	p := parser_init(line)
-	expr := parse_expression(&p)
-	start_ip := len(c.bytecode.instructions)
+	p := parser_init(source)
+	for {
+		tok := parser_peek(&p)
+		if tok.type == .EOF do break
 
-	compile_expression(c, expr)
-	append(&c.bytecode.instructions, Instruction{op = .RET})
+		expr := parse_expression(&p)
+		start_ip := len(c.bytecode.instructions)
 
-	vm.ip = start_ip
-	result := vm_run(vm, &c.bytecode)
-	log.info("=> %s\n", value_to_string(result))
+		compile_expression(c, expr)
+		append(&c.bytecode.instructions, Instruction{op = .RET})
+
+		vm.ip = start_ip
+		result := vm_run(vm, &c.bytecode)
+		if vm.errored {
+			vm.errored = false
+			return
+		}
+		log.info("=> %s\n", value_to_string(result))
+	}
 }
 
 load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
@@ -90,5 +136,9 @@ load_file :: proc(path: string, compiler: ^Compiler, vm: ^VM) {
 
 		vm.ip = start_ip
 		vm_run(vm, &compiler.bytecode)
+		if vm.errored {
+			fmt.eprintf("Error loading file %s: %s\n", path, vm.error_msg)
+			return
+		}
 	}
 }

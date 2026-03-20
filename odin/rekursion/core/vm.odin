@@ -5,6 +5,12 @@ import "core:mem"
 
 MAX_STEPS :: 1_000_000
 
+vm_error :: proc(vm: ^VM, format: string, args: ..any) {
+	vm.errored = true
+	vm.error_msg = fmt.tprintf(format, ..args)
+	fmt.eprintln(vm.error_msg)
+}
+
 Op_Code :: enum u8 {
 	NOP,
 	PUSH_CONST,
@@ -13,6 +19,7 @@ Op_Code :: enum u8 {
 	STORE_VAR,
 	DEF_VAR,
 	CALL,
+	RECUR, // Added RECUR opcode
 	RET,
 	JUMP,
 	JUMP_IF_FALSE,
@@ -35,6 +42,7 @@ vm_run :: proc(vm: ^VM, bytecode: ^Bytecode) -> Value {
 	// fmt.println("DEBUG: vm_run starting with", len(bytecode.instructions), "instructions")
 	steps := 0
 	for vm.ip >= 0 && vm.ip < len(bytecode.instructions) {
+		if vm.errored do break
 		steps += 1
 		if steps > MAX_STEPS {
 			fmt.eprintf(
@@ -66,7 +74,7 @@ vm_exec_inst :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value,
 		return vm_exec_ret(vm)
 	case .CLOSE_PROC:
 		return vm_exec_close_proc(vm), false
-	case .CALL, .TAIL_CALL:
+	case .CALL, .TAIL_CALL, .RECUR:
 		return vm_exec_call(vm, bytecode, inst)
 	case:
 		return Nil{}, false
@@ -79,7 +87,7 @@ vm_exec_stack :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value 
 	case .PUSH_CONST:
 		vm_stack_push(vm, bytecode.constants[inst.arg])
 	case .POP:
-		pop(&vm.stack)
+		vm_pop(vm)
 	}
 
 	return Nil{}
@@ -92,15 +100,15 @@ vm_exec_env :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> Value {
 		if val, ok := env_lookup(vm.env, symbol); ok {
 			vm_stack_push(vm, val)
 		} else {
-			fmt.eprintf("Unbound variable: %s\n", symbol)
+			vm_error(vm, "Unbound variable: %s", symbol)
 			vm_stack_push(vm, Nil{})
 		}
 	case .STORE_VAR:
 		symbol := bytecode.constants[inst.arg].(Symbol)
-		env_set(vm.env, symbol, pop(&vm.stack))
+		env_set(vm, symbol, vm_pop(vm))
 	case .DEF_VAR:
 		symbol := bytecode.constants[inst.arg].(Symbol)
-		val := pop(&vm.stack)
+		val := vm_pop(vm)
 		if vm.env.parent == nil {
 			// Global environment: copy out of the current arena
 			// TODO: ??
@@ -126,14 +134,14 @@ vm_exec_control :: proc(vm: ^VM, inst: Instruction) -> Value {
 	case .JUMP:
 		vm.ip = int(inst.arg)
 	case .JUMP_IF_FALSE:
-		if is_false(pop(&vm.stack)) {vm.ip = int(inst.arg)}
+		if is_false(vm_pop(vm)) {vm.ip = int(inst.arg)}
 	case:
 	}
 	return Nil{}
 }
 
 vm_exec_ret :: proc(vm: ^VM) -> (Value, bool) {
-	val := pop(&vm.stack)
+	val := vm_pop(vm)
 	if len(vm.frames) == 0 {return val, true}
 	frame := pop(&vm.frames)
 	vm.env = frame.env
@@ -150,7 +158,8 @@ vm_exec_ret :: proc(vm: ^VM) -> (Value, bool) {
 
 
 vm_exec_close_proc :: proc(vm: ^VM) -> Value {
-	proc_val := pop(&vm.stack)
+	proc_val := vm_pop(vm)
+	if vm.errored do return Nil{}
 	#partial switch p in proc_val {
 	case ^Procedure:
 		new_proc := new(Procedure)
@@ -158,57 +167,58 @@ vm_exec_close_proc :: proc(vm: ^VM) -> Value {
 		new_proc.env = vm.env
 		vm_stack_push(vm, new_proc)
 	case:
-		fmt.println("Error: expected procedure for CLOSE_PROC")
+		vm_error(vm, "Error: expected procedure for CLOSE_PROC, got %v", proc_val)
 	}
 	return Nil{}
 }
 
 vm_exec_call :: proc(vm: ^VM, bytecode: ^Bytecode, inst: Instruction) -> (Value, bool) {
-	// check stack underflow
-	// this should not happen, so it should panic instead of returning Nil{}
-	// TODO: panic instead of returning Nil{}
-	// TODO: logs should be in a different layer of code, it should clutter the main code
 	num_args := int(inst.arg)
 	assert(len(vm.stack) >= num_args)
-	// if len(vm.stack) < num_args {
-	// 	log_stack_underflow(vm, num_args)
-	// 	return Nil{}, true
-	// }
-
 	args := make([]Value, num_args, context.temp_allocator)
 
-	if inst.op == .TAIL_CALL {
+	is_tail := (inst.op == .TAIL_CALL || inst.op == .RECUR)
+	is_recur := (inst.op == .RECUR)
+
+	procedure: Value
+	if is_recur {
 		if len(vm.frames) == 0 {
-			fmt.eprintf("Error: 'recur' outside of a function\n")
+			vm_error(vm, "Error: 'recur' outside of a function")
 			return Nil{}, true
 		}
-		procedure := vm.frames[len(vm.frames) - 1].procedure
-		for i in 0 ..< num_args {
-			args[num_args - 1 - i] = pop(&vm.stack)
-		}
-		// Tail call optimization: reuse the current frame's return address
-		last_frame := pop(&vm.frames)
-		vm.env = last_frame.env // Restore parent environment BEFORE the new call
-		vm_exec_call_proc(vm, bytecode, procedure, args, last_frame.return_ip)
-		return Nil{}, false
+		procedure = vm.frames[len(vm.frames) - 1].procedure
+	} else {
+		procedure = vm_pop(vm)
+		if vm.errored do return Nil{}, true
 	}
 
-	// Normal CALL
-	procedure := pop(&vm.stack)
 	for i in 0 ..< num_args {
-		args[num_args - 1 - i] = pop(&vm.stack)
+		args[num_args - 1 - i] = vm_pop(vm)
+		if vm.errored do return Nil{}, true
 	}
 
-	if len(vm.frames) > 0 {
+	// Verify identity for non-explicit calls to prevent accidental recursion
+	if !is_recur && len(vm.frames) > 0 {
 		current_proc := vm.frames[len(vm.frames) - 1].procedure
 		if p, ok := procedure.(^Procedure); ok && p == current_proc {
-			fmt.eprintf("Error: Recursion requires 'recur' keyword\n")
+			vm_error(vm, "Error: Recursion requires 'recur' keyword")
 			vm_stack_push(vm, Nil{})
 			return Nil{}, true
 		}
 	}
 
-	vm_exec_call_proc(vm, bytecode, procedure, args, vm.ip)
+	if is_tail {
+		if len(vm.frames) == 0 {
+			vm_error(vm, "Error: tail call outside of a function")
+			return Nil{}, true
+		}
+		last_frame := pop(&vm.frames)
+		vm.env = last_frame.env // Restore parent environment before calling
+		vm_exec_call_proc(vm, bytecode, procedure, args, last_frame.return_ip)
+	} else {
+		vm_exec_call_proc(vm, bytecode, procedure, args, vm.ip)
+	}
+
 	return Nil{}, false
 }
 
@@ -245,7 +255,7 @@ vm_exec_call_proc :: proc(
 		vm_stack_push(vm, args[0])
 		vm.ip = p.ip
 	case:
-		fmt.println("Error: expected procedure")
+		vm_error(vm, "Error: expected procedure, got %v", proc_val)
 		vm_stack_push(vm, Nil{})
 	}
 }
@@ -267,6 +277,7 @@ vm_setup_proc_env :: proc(p: ^Procedure, args: []Value) -> ^Env {
 	} else {
 		for sym, i in p.params {
 			if i < len(args) {
+				// fmt.printf("DEBUG: Binding %s to %v\n", sym, args[i])
 				new_env.values[sym] = args[i]
 			}
 		}
@@ -289,8 +300,8 @@ env_define :: proc(env: ^Env, sym: Symbol, val: Value) {
 	env.values[sym] = val
 }
 
-env_set :: proc(env: ^Env, sym: Symbol, val: Value) {
-	curr := env
+env_set :: proc(vm: ^VM, sym: Symbol, val: Value) {
+	curr := vm.env
 	for curr != nil {
 		if _, ok := curr.values[sym]; ok {
 			curr.values[sym] = val
@@ -299,7 +310,9 @@ env_set :: proc(env: ^Env, sym: Symbol, val: Value) {
 		curr = curr.parent
 	}
 	// Error if not found
-	fmt.eprintf("Unbound variable: %s\n", sym)
+	vm.errored = true
+	vm.error_msg = fmt.tprintf("Unbound variable: %s", sym)
+	fmt.eprintln(vm.error_msg)
 }
 
 log_stack_underflow :: proc(vm: ^VM, num_args: int) {
