@@ -13,13 +13,11 @@ x ;; => 10
 (rest (cons 1 2)) ;; => 2
 (array 1 2 3) ;; => (1 2 3)
 
-(define (+ a b) (add a b)) ;; => +
-(+ 11 8) ;; => 19
-(+ x 8) ;; => 18
+ (add 11 8) ;; => 19
 
 (define arr (array 1 2 3)) ;; => arr
 arr ;; => (1 2 3)
-(+ x 1) ;; => 11
+ (add  x 1) ;; => 11
 (define (list . x) x) ;; => list
 (array 1 2 4 3) ;; => (1 2 4 3)
 
@@ -46,10 +44,10 @@ arr ;; => (1 2 3)
 test ;; => |procedure|
 
 (reset 1) ;; => 1
-(reset (+ 1 2)) ;; => 3
-(reset (+ 1 (shift k 5))) ;; => 5
-(reset (+ 1 (shift k (k 2)))) ;; => 3
-(reset (+ 1 (shift k (+ (k 2) (k 2))))) ;; => 6
+(reset  (add  1 2)) ;; => 3
+(reset  (add  1 (shift k 5))) ;; => 5
+(reset  (add  1 (shift k (k 2)))) ;; => 3
+(reset  (add  1 (shift k  (add  (k 2) (k 2))))) ;; => 6
 
 (not true) ;; => false
 (not false) ;; => true

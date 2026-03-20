@@ -40,7 +40,7 @@
                        (lambda (n)
                          (if (eq? n 0)
                              1
-                             (* n (f (sub n 1)))))))))
+                              (mul  n (f (sub n 1)))))))))
     (check "Theta fact" (fact 5) 120))
 )
 

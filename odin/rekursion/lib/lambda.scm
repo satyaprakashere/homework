@@ -10,7 +10,7 @@
   (define (len-helper lst acc)
     (if (is-null lst)
         acc
-        (recur (rest lst) (+ 1 acc))))
+        (recur (rest lst) (add 1 acc))))
   (len-helper lst 0))
 
 (define (append lst1 lst2)

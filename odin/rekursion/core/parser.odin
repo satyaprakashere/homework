@@ -48,12 +48,14 @@ parse_expression :: proc(p: ^Parser, allocator := context.allocator) -> Value {
 }
 
 parse_number_value :: proc(text: string) -> Value {
-	if strings.contains(text, ".") {
-		f, _ := strconv.parse_f64(text)
-		return f
+	if i_val, i_ok := strconv.parse_i64(text); i_ok {
+		return i_val
 	}
-	i, _ := strconv.parse_i64(text)
-	return i
+	if f_val, f_ok := strconv.parse_f64(text); f_ok {
+		return f_val
+	}
+	// Fallback to symbol if it matches NUMBER pattern but fails to parse (e.g. out of range)
+	return Symbol(text)
 }
 
 parse_list :: proc(p: ^Parser, allocator := context.allocator) -> Value {

@@ -16,18 +16,18 @@
 (append (list 1 2) (list 3 4)) ;; => (1 2 3 4)
 (reverse (list 1 2 3)) ;; => (3 2 1)
 
-((lambda (x) (+ x x)) 4) ;; => 8
+((lambda (x)  (add  x x)) 4) ;; => 8
 
 (if #t (quote yes) (quote no)) ;; => yes
 (if #f (quote yes) (quote no)) ;; => no
 (cond (#f 1) (#t 2) (else 3)) ;; => 2
 (cond (#f 1) (#f 2) (else 3)) ;; => 3
 
-(let ((x 2) (y 3)) (* x y)) ;; => 6
+(let ((x 2) (y 3))  (mul  x y)) ;; => 6
 
-(fmap (lambda (x) (+ x 1)) (list 1 2 3)) ;; => (2 3 4)
-(foldl (lambda (acc x) (+ acc x)) 0 (list 1 2 3 4)) ;; => 10
-(foldr (lambda (x acc) (+ acc x)) 0 (list 1 2 3 4)) ;; => 10
+(fmap (lambda (x)  (add  x 1)) (list 1 2 3)) ;; => (2 3 4)
+(foldl (lambda (acc x)  (add  acc x)) 0 (list 1 2 3 4)) ;; => 10
+(foldr (lambda (x acc)  (add  acc x)) 0 (list 1 2 3 4)) ;; => 10
 
 (caar (quote ((1 2) 3))) ;; => 1
 (cadr (quote (1 2 3))) ;; => 2

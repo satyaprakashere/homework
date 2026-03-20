@@ -10,16 +10,12 @@ Primitive_Record :: struct {
 }
 
 PRIMITIVES :: []Primitive_Record {
-	{"add", builtin_add_i64},
-	{"sub", builtin_sub_i64},
+	{"add", builtin_add},
+	{"sub", builtin_sub},
 	{"mul", builtin_mul},
 	{"div", builtin_div},
 	{"rem", builtin_rem},
 	{"mod", builtin_mod},
-	{"+", builtin_add_i64},
-	{"-", builtin_sub_i64},
-	{"*", builtin_mul},
-	{"/", builtin_div},
 	{"cons", builtin_cons},
 	{"first", builtin_first},
 	{"rest", builtin_rest},
@@ -61,99 +57,129 @@ setup_primitives :: proc(env: ^Env) {
 	env_define(env, Symbol("false"), false)
 }
 
-builtin_add_i64 :: proc(vm: ^VM, args: []Value) {
-	res: i64 = 0
-	for a in args {
-		if val, ok := a.(i64); ok {
-			res += val
-		} else if fval, fok := a.(f64); fok {
-			res += i64(fval)
-		} else {
-			vm_error(vm, "add expects numbers, got %v", a)
-			return
-		}
-	}
-	vm_stack_push(vm, Value(res))
+NumericOp :: enum {
+	ADD,
+	SUB,
+	MUL,
+	DIV,
 }
 
-builtin_sub_i64 :: proc(vm: ^VM, args: []Value) {
+fold_numeric :: proc(vm: ^VM, args: []Value, op: NumericOp) {
 	if len(args) == 0 {
-		vm_stack_push(vm, Value(i64(0)))
-		return
-	}
-	res: i64 = 0
-	if val, ok := args[0].(i64); ok {
-		res = val
-	} else if fval, fok := args[0].(f64); fok {
-		res = i64(fval)
-	} else {
-		vm_error(vm, "sub expects numbers, got %v", args[0])
+		switch op {
+		case .ADD:
+			vm_stack_push(vm, i64(0))
+		case .MUL:
+			vm_stack_push(vm, i64(1))
+		case .SUB, .DIV:
+			vm_error(vm, "%v expects at least 1 argument", op)
+		}
 		return
 	}
 
-	for i in 1 ..< len(args) {
-		if val, ok := args[i].(i64); ok {
-			res -= val
-		} else if fval, fok := args[i].(f64); fok {
-			res -= i64(fval)
-		} else {
-			vm_error(vm, "sub expects numbers, got %v", args[i])
-			return
+	is_float := false
+	for a in args {
+		if _, ok := a.(f64); ok {
+			is_float = true
+			break
 		}
 	}
-	vm_stack_push(vm, Value(res))
+
+	if is_float {
+		res: f64 = 0
+		start_idx := 0
+
+		if op == .SUB || op == .DIV {
+			first := args[0]
+			res = first.(f64) or_else f64(first.(i64))
+			start_idx = 1
+			if len(args) == 1 {
+				if op == .SUB do res = -res
+				if op == .DIV do res = 1.0 / res
+			}
+		} else if op == .MUL {
+			res = 1.0
+		}
+
+		for i in start_idx ..< len(args) {
+			val := args[i].(f64) or_else f64(args[i].(i64))
+			switch op {
+			case .ADD:
+				res += val
+			case .SUB:
+				res -= val
+			case .MUL:
+				res *= val
+			case .DIV:
+				if val == 0 {
+					vm_error(vm, "Division by zero")
+					return
+				}
+				res /= val
+			}
+		}
+		vm_stack_push(vm, res)
+	} else {
+		res: i64 = 0
+		start_idx := 0
+
+		if op == .SUB || op == .DIV {
+			res = args[0].(i64)
+			start_idx = 1
+			if len(args) == 1 {
+				if op == .SUB {
+					res = -res
+				} else {
+					// Integer division 1/x is usually 0 if x > 1
+					if res == 0 {
+						vm_error(vm, "Division by zero")
+						return
+					}
+					res = 1 / res
+				}
+			}
+		} else if op == .MUL {
+			res = 1
+		}
+
+		for i in start_idx ..< len(args) {
+			val := args[i].(i64)
+			switch op {
+			case .ADD:
+				res += val
+			case .SUB:
+				res -= val
+			case .MUL:
+				res *= val
+			case .DIV:
+				if val == 0 {
+					vm_error(vm, "Division by zero")
+					return
+				}
+				res /= val
+			}
+		}
+		vm_stack_push(vm, res)
+	}
+}
+
+builtin_add :: proc(vm: ^VM, args: []Value) {
+	fold_numeric(vm, args, .ADD)
+}
+
+builtin_sub :: proc(vm: ^VM, args: []Value) {
+	fold_numeric(vm, args, .SUB)
 }
 
 builtin_mul :: proc(vm: ^VM, args: []Value) {
-	res: i64 = 1
-	for a in args {
-		if val, ok := a.(i64); ok {
-			res *= val
-		} else if fval, fok := a.(f64); fok {
-			res *= i64(fval)
-		} else {
-			vm_error(vm, "mul expects numbers, got %v", a)
-			return
-		}
-	}
-	vm_stack_push(vm, Value(res))
+	fold_numeric(vm, args, .MUL)
 }
 
 builtin_div :: proc(vm: ^VM, args: []Value) {
-	if len(args) == 0 {
-		vm_stack_push(vm, Value(i64(1)))
-		return
-	}
-	res: i64 = 1
-	if val, ok := args[0].(i64); ok {
-		res = val
-	} else if fval, fok := args[0].(f64); fok {
-		res = i64(fval)
-	} else {
-		vm_error(vm, "div expects numbers, got %v", args[0])
-		return
-	}
-
-	for i in 1 ..< len(args) {
-		denominator: i64 = 1
-		if val, ok := args[i].(i64); ok {
-			denominator = val
-		} else if fval, fok := args[i].(f64); fok {
-			denominator = i64(fval)
-		} else {
-			vm_error(vm, "div expects numbers, got %v", args[i])
-			return
-		}
-
-		if denominator != 0 {
-			res /= denominator
-		} else {
-			vm_error(vm, "Division by zero")
-			return
-		}
-	}
-	vm_stack_push(vm, Value(res))
+	fold_numeric(vm, args, .DIV)
 }
+
+
 
 builtin_rem :: proc(vm: ^VM, args: []Value) {
 	if len(args) != 2 {

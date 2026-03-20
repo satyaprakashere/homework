@@ -2,15 +2,15 @@
 
 ;; Arithmetic Edge Cases
 (add) ;; => 0
-(add 1.5 2.5) ;; => 3
-(sub) ;; => 0
-(sub 10 2.5) ;; => 8
+(add 1.5 2.5) ;; => 4
+(sub 0) ;; => 0
+(sub 10 2.5) ;; => 7.5
 (mul) ;; => 1
-(mul 2 3.5) ;; => 6
-(div) ;; => 1
+(mul 2 3.5) ;; => 7
+(div 1) ;; => 1
 (div 10 2) ;; => 5
-(div 10 0) ;; => nil
-(div 10 2 0 5) ;; => nil
+(div 10 0.0) ;; => nil
+(div 10.0 2 0 5) ;; => nil
 
 ;; List Errors
 (first 10) ;; => nil
