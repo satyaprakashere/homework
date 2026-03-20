@@ -36,7 +36,9 @@ run_scm_tests :: proc(t: ^testing.T, filename: string, extra_libs: []string = ni
 	vm := core.vm_init(global_env)
 
 	// TOOD: improve testing time by caching the stdlib
-	core.load_file("lib/stdlib.scm", &c, &vm)
+	core.load_file("lib/lambda.scm", &c, &vm)
+	core.load_file("lib/recursion.scm", &c, &vm)
+	core.load_file("lib/combinator.scm", &c, &vm)
 
 	for lib in extra_libs {
 		core.load_file(lib, &c, &vm)

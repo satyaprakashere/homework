@@ -78,16 +78,7 @@
                   (cons (cons (quote do) (rest clause))
                   (cons (cons (quote cond) (rest clauses)) (quote ())))))))))
 
-;; Recursion
-(define Y
-  (lambda (f)
-    ((lambda (x) (f (lambda args (apply (x x) args))))
-     (lambda (x) (f (lambda args (apply (x x) args)))))))
 
-(define Z
-  (lambda (f)
-    ((lambda (x) (f (lambda args (apply (x x) args))))
-     (lambda (x) (f (lambda args (apply (x x) args)))))))
 
 ;; Delimited Continuations
 (defmacro reset (body)

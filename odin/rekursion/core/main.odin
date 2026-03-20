@@ -38,9 +38,11 @@ main :: proc() {
 	c := compiler_init(global_env)
 	vm := vm_init(global_env)
 
-	load_file("lib/stdlib.scm", &c, &vm)
+	load_file("lib/lambda.scm", &c, &vm)
 	load_file("lib/scheme.scm", &c, &vm)
 	load_file("lib/actor.scm", &c, &vm)
+	load_file("lib/recursion.scm", &c, &vm)
+	load_file("lib/combinator.scm", &c, &vm)
 
 	for {repl_step(&reader, &c, &vm)}
 }
