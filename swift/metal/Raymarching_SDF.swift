@@ -109,7 +109,7 @@ func main() {
     let region = MTLRegionMake2D(0, 0, width, height)
     outTexture.getBytes(&rawPixels, bytesPerRow: bytesPerRow, from: region, mipmapLevel: 0)
 
-    let ppmPath = "/Users/prakash/Documents/homework/swift/metal/raymarch_output.ppm"
+    let ppmPath = "raymarch_output.ppm"
     var ppmData = "P3\n\(width) \(height)\n255\n"
     for y in 0..<height {
         for x in 0..<width {

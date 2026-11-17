@@ -20,8 +20,8 @@
 - **Collections API**: `List`, `Set`, `Map`, `Queue`.
 
 ### Advanced Features
-- **[Generics Wildcards](file:///Users/prakash/Documents/homework/java/advanced/GenericsDemo.java)**: `? extends` (Producer) and `? super` (Consumer).
-- **[Stream API](file:///Users/prakash/Documents/homework/java/advanced/StreamDemo.java)**: Declarative data processing with `filter`, `map`, `collect`.
+- **[Generics Wildcards](./advanced/GenericsDemo.java)**: `? extends` (Producer) and `? super` (Consumer).
+- **[Stream API](./advanced/StreamDemo.java)**: Declarative data processing with `filter`, `map`, `collect`.
 - **CompletableFuture**: Asynchronous programming and task chaining.
 - **Virtual Threads (Java 21)**: Lightweight concurrency (Project Loom).
 - **Reflection**: Inspecting and modifying code behavior at runtime.

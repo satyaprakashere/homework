@@ -20,12 +20,12 @@
 - **Methods**: Functions with a receiver: `func (u User) Greet() { ... }`.
 
 ### Advanced Features
-- **[Goroutines](file:///Users/prakash/Documents/homework/go/advanced/workerpool.go)**: Lightweight threads with `go func()`.
+- **[Goroutines](./advanced/workerpool.go)**: Lightweight threads with `go func()`.
 - **Channels**: Synchronous communication between goroutines.
-- **[Interfaces](file:///Users/prakash/Documents/homework/go/advanced/di.go)**: Implicit satisfaction for decoupling.
-- **[Generics](file:///Users/prakash/Documents/homework/go/advanced/generics.go)**: Reusable code with `[T any]`.
-- **[Context](file:///Users/prakash/Documents/homework/go/advanced/workerpool.go)**: Deadlines and cancellation signals.
-- **[Functional Options](file:///Users/prakash/Documents/homework/go/advanced/options.go)**: Clean configuration pattern.
+- **[Interfaces](./advanced/di.go)**: Implicit satisfaction for decoupling.
+- **[Generics](./advanced/generics.go)**: Reusable code with `[T any]`.
+- **[Context](./advanced/workerpool.go)**: Deadlines and cancellation signals.
+- **[Functional Options](./advanced/options.go)**: Clean configuration pattern.
 
 ## 💡 Quick Tips
 

@@ -10,7 +10,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Concurrency](file:///Users/prakash/Documents/homework/erlang/advanced/concurrency.erl)**: Processes and message passing.
+- **[Concurrency](./advanced/concurrency.erl)**: Processes and message passing.
 
 ## 💡 Quick Tips
 

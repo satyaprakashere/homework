@@ -9,7 +9,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Arrays](file:///Users/prakash/Documents/homework/fortran/advanced/arrays.f90)**: Slicing and dynamic allocation.
+- **[Arrays](./advanced/arrays.f90)**: Slicing and dynamic allocation.
 
 ## 💡 Quick Tips
 

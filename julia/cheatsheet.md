@@ -10,7 +10,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Multiple Dispatch](file:///Users/prakash/Documents/homework/julia/advanced/multiple_dispatch.jl)**: Dynamic dispatch based on all argument types.
+- **[Multiple Dispatch](./advanced/multiple_dispatch.jl)**: Dynamic dispatch based on all argument types.
 
 ## 💡 Quick Tips
 

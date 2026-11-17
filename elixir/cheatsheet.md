@@ -19,7 +19,7 @@
 - **Lists & Maps**: Linked lists `[1, 2]` and key-value maps `%{a: 1}`.
 
 ### Advanced Features
-- **[GenServer](file:///Users/prakash/Documents/homework/elixir/advanced/worker.ex)**: Generic server behavior for stateful processes.
+- **[GenServer](./advanced/worker.ex)**: Generic server behavior for stateful processes.
 - **Supervisors**: Managing process lifecycles and recovery.
 - **OTP (Open Telecom Platform)**: The framework for building fault-tolerant systems.
 - **Macros**: Compile-time code generation: `quote` and `unquote`.

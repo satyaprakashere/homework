@@ -11,7 +11,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[TypeScript Generics](file:///Users/prakash/Documents/homework/web/advanced/Generics.ts)**: Reusable components with type safety.
+- **[TypeScript Generics](./advanced/Generics.ts)**: Reusable components with type safety.
 
 ## 💡 Quick Tips
 

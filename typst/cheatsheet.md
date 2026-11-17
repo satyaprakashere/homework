@@ -9,7 +9,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Layout Functions](file:///Users/prakash/Documents/homework/typst/advanced/layout.typ)**: Programmatic styling and layouts.
+- **[Layout Functions](./advanced/layout.typ)**: Programmatic styling and layouts.
 
 ## 💡 Quick Tips
 

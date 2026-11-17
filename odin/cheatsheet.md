@@ -10,7 +10,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Procedures](file:///Users/prakash/Documents/homework/odin/advanced/procedures.odin)**: Multiple return values and procedure overloading.
+- **[Procedures](./advanced/procedures.odin)**: Multiple return values and procedure overloading.
 
 ## 💡 Quick Tips
 

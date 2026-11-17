@@ -19,8 +19,8 @@
 - **Namespaces**: Avoiding name collisions with `namespace`.
 
 ### Advanced Features
-- **[Templates](file:///Users/prakash/Documents/homework/cpp/advanced/templates.hpp)**: Variadic templates and Metaprogramming.
-- **[Smart Pointers](file:///Users/prakash/Documents/homework/cpp/advanced/smart_pointers.hpp)**: `unique_ptr`, `shared_ptr` (RAII).
+- **[Templates](./advanced/templates.hpp)**: Variadic templates and Metaprogramming.
+- **[Smart Pointers](./advanced/smart_pointers.hpp)**: `unique_ptr`, `shared_ptr` (RAII).
 - **Move Semantics**: `std::move` and Rvalue references for efficiency.
 - **Lambdas**: Anonymous functions with captures.
 - **Concepts (C++20)**: Constraints on template parameters.

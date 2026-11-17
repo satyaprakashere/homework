@@ -8,7 +8,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Blocks](file:///Users/prakash/Documents/homework/obj-c/advanced/blocks.m)**: Inline closures and callbacks.
+- **[Blocks](../obj-c/advanced/blocks.m)**: Inline closures and callbacks.
 
 ## 💡 Quick Tips
 

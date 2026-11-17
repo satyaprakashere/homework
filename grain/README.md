@@ -49,16 +49,16 @@ All examples are verified and tested against Grain 0.7:
 
 | File | Concepts Covered |
 | :--- | :--- |
-| [`hello_world.gr`](file:///Users/prakash/Documents/projects/homework/grain/hello_world.gr) | Module declarations (`module Main`), printing values, top-level execution. |
-| [`variables_and_mutability.gr`](file:///Users/prakash/Documents/projects/homework/grain/variables_and_mutability.gr) | Immutable `let` bindings, mutable variables (`let mut`), variable shadowing, block expressions. |
-| [`primitive_types.gr`](file:///Users/prakash/Documents/projects/homework/grain/primitive_types.gr) | Exact rational numbers (`1/3`), integers, floats, fixed-width types (`Int32`, `Float64`), `Char`, `String`, `Bool`, `Void`. |
-| [`functions_and_closures.gr`](file:///Users/prakash/Documents/projects/homework/grain/functions_and_closures.gr) | Arrow function syntax, block bodies, closures, lexical scoping, recursion with `let rec`, higher-order functions. |
-| [`tuples_and_records.gr`](file:///Users/prakash/Documents/projects/homework/grain/tuples_and_records.gr) | Heterogeneous tuples, tuple destructuring, typed records, mutable record fields (`mut`), functional record updates (`...record`). |
-| [`enums_and_pattern_matching.gr`](file:///Users/prakash/Documents/projects/homework/grain/enums_and_pattern_matching.gr) | Simple enums, algebraic data types (variants with payloads), pattern matching with `match`, guards (`when`), wildcard patterns (`_`). |
-| [`lists_and_arrays.gr`](file:///Users/prakash/Documents/projects/homework/grain/lists_and_arrays.gr) | Singly-linked lists (`[...]`), mutable arrays (`[> ...]`), standard library imports (`from "list" include List`), custom pipeline operator `(\|>`). |
-| [`option_and_result.gr`](file:///Users/prakash/Documents/projects/homework/grain/option_and_result.gr) | Safe error handling without nulls: `Some`/`None` options, `Ok`/`Err` results, unwrapping, pattern matching outcomes. |
-| [`wasm_interop.gr`](file:///Users/prakash/Documents/projects/homework/grain/wasm_interop.gr) | Exporting functions with `provide`, compiling to `.wasm`, inspecting module exports and WASI imports. |
-| [`run_wasm.mjs`](file:///Users/prakash/Documents/projects/homework/grain/run_wasm.mjs) | Standalone Node.js script to load and execute compiled Grain WebAssembly binaries via WASI preview1. |
+| [`hello_world.gr`](./hello_world.gr) | Module declarations (`module Main`), printing values, top-level execution. |
+| [`variables_and_mutability.gr`](./variables_and_mutability.gr) | Immutable `let` bindings, mutable variables (`let mut`), variable shadowing, block expressions. |
+| [`primitive_types.gr`](./primitive_types.gr) | Exact rational numbers (`1/3`), integers, floats, fixed-width types (`Int32`, `Float64`), `Char`, `String`, `Bool`, `Void`. |
+| [`functions_and_closures.gr`](./functions_and_closures.gr) | Arrow function syntax, block bodies, closures, lexical scoping, recursion with `let rec`, higher-order functions. |
+| [`tuples_and_records.gr`](./tuples_and_records.gr) | Heterogeneous tuples, tuple destructuring, typed records, mutable record fields (`mut`), functional record updates (`...record`). |
+| [`enums_and_pattern_matching.gr`](./enums_and_pattern_matching.gr) | Simple enums, algebraic data types (variants with payloads), pattern matching with `match`, guards (`when`), wildcard patterns (`_`). |
+| [`lists_and_arrays.gr`](./lists_and_arrays.gr) | Singly-linked lists (`[...]`), mutable arrays (`[> ...]`), standard library imports (`from "list" include List`), custom pipeline operator `(\|>`). |
+| [`option_and_result.gr`](./option_and_result.gr) | Safe error handling without nulls: `Some`/`None` options, `Ok`/`Err` results, unwrapping, pattern matching outcomes. |
+| [`wasm_interop.gr`](./wasm_interop.gr) | Exporting functions with `provide`, compiling to `.wasm`, inspecting module exports and WASI imports. |
+| [`run_wasm.mjs`](./run_wasm.mjs) | Standalone Node.js script to load and execute compiled Grain WebAssembly binaries via WASI preview1. |
 
 ---
 

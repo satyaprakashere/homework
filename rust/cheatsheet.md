@@ -20,10 +20,10 @@
 - **Options & Results**: Safe handling of nulls and errors.
 
 ### Advanced Features
-- **[Traits](file:///Users/prakash/Documents/homework/rust/advanced/generics.rs)**: Defining shared behavior (polymorphism).
-- **[Generics](file:///Users/prakash/Documents/homework/rust/advanced/generics.rs)**: Reusable components with trait bounds.
-- **[Concurrency](file:///Users/prakash/Documents/homework/rust/advanced/concurrency.rs)**: Safe data sharing with `Arc` and `Mutex`.
-- **[Error Handling](file:///Users/prakash/Documents/homework/rust/advanced/errors.rs)**: Custom `error` types and `Result` wrapping.
+- **[Traits](./advanced/generics.rs)**: Defining shared behavior (polymorphism).
+- **[Generics](./advanced/generics.rs)**: Reusable components with trait bounds.
+- **[Concurrency](./advanced/concurrency.rs)**: Safe data sharing with `Arc` and `Mutex`.
+- **[Error Handling](./advanced/errors.rs)**: Custom `error` types and `Result` wrapping.
 - **Lifetimes**: Ensuring references are valid as long as needed.
 - **Macros**: Metaprogramming with `macro_rules!` or procedural macros.
 

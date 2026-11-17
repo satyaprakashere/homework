@@ -19,7 +19,7 @@
 - **Enums**: Can have raw values and associated values.
 
 ### Advanced Features
-- **[Concurrency](file:///Users/prakash/Documents/homework/swift/advanced/Concurrency.swift)**: Modern `async/await` and `Task` groups.
+- **[Concurrency](./advanced/Concurrency.swift)**: Modern `async/await` and `Task` groups.
 - **Protocols**: Define blueprints of methods (Protocol Oriented Programming).
 - **Generics**: Reusable, type-safe functions and types.
 - **Extensions**: Add functionality to existing types (even those you don't own).

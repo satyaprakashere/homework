@@ -20,7 +20,7 @@
 - **List Comprehensions**: `[x*2 | x <- [1..10], even x]`.
 
 ### Advanced Features
-- **[Monads](file:///Users/prakash/Documents/homework/haskell/advanced/Monads.hs)**: Abstracting computations with side effects (IO, Maybe, State).
+- **[Monads](./advanced/Monads.hs)**: Abstracting computations with side effects (IO, Maybe, State).
 - **Type Classes**: Ad-hoc polymorphism (Eq, Ord, Show, Functor, Monad).
 - **Currying**: All functions technically take one argument and return a function.
 - **Higher-Order Functions**: `map`, `filter`, `foldl`.

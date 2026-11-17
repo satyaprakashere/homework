@@ -4,10 +4,10 @@ Welcome! This workspace contains 4 standalone, production-ready educational proj
 
 | Directory | Framework | Core Paradigm | Reactivity Model | DOM Strategy |
 | :--- | :--- | :--- | :--- | :--- |
-| [`react-ui/`](file:///Users/prakash/Documents/projects/homework/web/typescript/react-ui/) | **React 18/19** | Component Functions + JSX | Hooks (`useState`, `useMemo`) | Virtual DOM Reconciliation |
-| [`vue-ui/`](file:///Users/prakash/Documents/projects/homework/web/typescript/vue-ui/) | **Vue 3** | Single File Components (`.vue`) | Proxies (`ref`, `reactive`, `computed`) | Optimized Virtual DOM with compiler hints |
-| [`svelte-ui/`](file:///Users/prakash/Documents/projects/homework/web/typescript/svelte-ui/) | **Svelte 5** | Compiler-First Svelte Files | Runes (`$state`, `$derived`, `$props`) | Direct DOM surgically updated by compiler |
-| [`solid-ui/`](file:///Users/prakash/Documents/projects/homework/web/typescript/solid-ui/) | **SolidJS** | Reactive JSX | Fine-grained Signals (`createSignal`, `createMemo`) | Direct DOM, components execute once only |
+| [`react-ui/`](./react-ui) | **React 18/19** | Component Functions + JSX | Hooks (`useState`, `useMemo`) | Virtual DOM Reconciliation |
+| [`vue-ui/`](./vue-ui) | **Vue 3** | Single File Components (`.vue`) | Proxies (`ref`, `reactive`, `computed`) | Optimized Virtual DOM with compiler hints |
+| [`svelte-ui/`](./svelte-ui) | **Svelte 5** | Compiler-First Svelte Files | Runes (`$state`, `$derived`, `$props`) | Direct DOM surgically updated by compiler |
+| [`solid-ui/`](./solid-ui) | **SolidJS** | Reactive JSX | Fine-grained Signals (`createSignal`, `createMemo`) | Direct DOM, components execute once only |
 
 ---
 

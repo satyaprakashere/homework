@@ -8,7 +8,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Abilities](file:///Users/prakash/Documents/homework/unison/advanced/abilities.u)**: Algebraic effects for side effects and control flow.
+- **[Abilities](./advanced/abilities.u)**: Algebraic effects for side effects and control flow.
 
 ## 💡 Quick Tips
 

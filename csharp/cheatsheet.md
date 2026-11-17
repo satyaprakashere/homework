@@ -25,13 +25,13 @@ A modern guide for **C# 10 – C# 13/14** and **.NET 10** highlighting language 
 
 | Module | File | Key Highlights & Concepts Demonstrated |
 | :--- | :--- | :--- |
-| **CLI Runner Hub** | **[Program.cs](file:///Users/prakash/Documents/homework/csharp/Program.cs)** | Interactive ANSI colored CLI menu, parameter routing (`--modern`, `--perf`, `--async`, `--linq`, `--json`, `--web`), clean exit handling. |
-| **Modern C# Language** | **[Features/01_ModernLanguageFeatures.cs](file:///Users/prakash/Documents/homework/csharp/Features/01_ModernLanguageFeatures.cs)** | Primary constructors, relational/property/list pattern matching, records, `with` non-destructive mutation, collection expressions `[..odds]`, raw strings `"""`, UTF-8 byte literals `"..."u8`. |
-| **High Performance & Memory** | **[Features/02_HighPerformanceAndMemory.cs](file:///Users/prakash/Documents/homework/csharp/Features/02_HighPerformanceAndMemory.cs)** | `Span<T>` zero-allocation tokenization and parsing, `stackalloc` buffers, `ref struct`, `ArrayPool<T>.Shared` buffer recycling, SIMD hardware acceleration with `Vector<T>`. |
-| **Async & Concurrency** | **[Features/03_AsyncAndConcurrency.cs](file:///Users/prakash/Documents/homework/csharp/Features/03_AsyncAndConcurrency.cs)** | Modern `System.Threading.Lock` (.NET 9+), `IAsyncEnumerable<T>` async streaming, `System.Threading.Channels` backpressured producer-consumer, `Parallel.ForEachAsync` concurrency bounding. |
-| **LINQ & Functional C#** | **[Features/04_LinqAndFunctional.cs](file:///Users/prakash/Documents/homework/csharp/Features/04_LinqAndFunctional.cs)** | .NET 9 `CountBy`, `AggregateBy`, and `Index()`, `Chunk`, `Zip`, `DistinctBy`, `MaxBy`, declarative query comprehension syntax, function currying and composition pipelines. |
-| **Serialization & JSON** | **[Features/05_SerializationAndJson.cs](file:///Users/prakash/Documents/homework/csharp/Features/05_SerializationAndJson.cs)** | Polymorphic JSON with `[JsonPolymorphic]` & `[JsonDerivedType]`, `JsonDocument` lightweight DOM traversal, `JsonNode` mutations, high-throughput `Utf8JsonWriter`. |
-| **Minimal API & Web Dashboard** | **[Features/06_MinimalApiAndWeb.cs](file:///Users/prakash/Documents/homework/csharp/Features/06_MinimalApiAndWeb.cs)** | Self-contained ASP.NET Core web server, route groups, endpoint filters (timing/logging), typed results, Server-Sent Events (SSE) live streaming, embedded dark-mode HTML dashboard. |
+| **CLI Runner Hub** | **[Program.cs](./Program.cs)** | Interactive ANSI colored CLI menu, parameter routing (`--modern`, `--perf`, `--async`, `--linq`, `--json`, `--web`), clean exit handling. |
+| **Modern C# Language** | **[Features/01_ModernLanguageFeatures.cs](./Features/01_ModernLanguageFeatures.cs)** | Primary constructors, relational/property/list pattern matching, records, `with` non-destructive mutation, collection expressions `[..odds]`, raw strings `"""`, UTF-8 byte literals `"..."u8`. |
+| **High Performance & Memory** | **[Features/02_HighPerformanceAndMemory.cs](./Features/02_HighPerformanceAndMemory.cs)** | `Span<T>` zero-allocation tokenization and parsing, `stackalloc` buffers, `ref struct`, `ArrayPool<T>.Shared` buffer recycling, SIMD hardware acceleration with `Vector<T>`. |
+| **Async & Concurrency** | **[Features/03_AsyncAndConcurrency.cs](./Features/03_AsyncAndConcurrency.cs)** | Modern `System.Threading.Lock` (.NET 9+), `IAsyncEnumerable<T>` async streaming, `System.Threading.Channels` backpressured producer-consumer, `Parallel.ForEachAsync` concurrency bounding. |
+| **LINQ & Functional C#** | **[Features/04_LinqAndFunctional.cs](./Features/04_LinqAndFunctional.cs)** | .NET 9 `CountBy`, `AggregateBy`, and `Index()`, `Chunk`, `Zip`, `DistinctBy`, `MaxBy`, declarative query comprehension syntax, function currying and composition pipelines. |
+| **Serialization & JSON** | **[Features/05_SerializationAndJson.cs](./Features/05_SerializationAndJson.cs)** | Polymorphic JSON with `[JsonPolymorphic]` & `[JsonDerivedType]`, `JsonDocument` lightweight DOM traversal, `JsonNode` mutations, high-throughput `Utf8JsonWriter`. |
+| **Minimal API & Web Dashboard** | **[Features/06_MinimalApiAndWeb.cs](./Features/06_MinimalApiAndWeb.cs)** | Self-contained ASP.NET Core web server, route groups, endpoint filters (timing/logging), typed results, Server-Sent Events (SSE) live streaming, embedded dark-mode HTML dashboard. |
 
 ---
 
@@ -180,7 +180,7 @@ await app.RunAsync();
 ## 🚀 How to Run the Showcase
 
 ```bash
-cd /Users/prakash/Documents/homework/csharp
+cd ./csharp
 
 # Run all CLI examples sequentially
 dotnet run -- all

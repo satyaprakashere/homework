@@ -8,7 +8,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Proof Engineering](file:///Users/prakash/Documents/homework/fstar/advanced/Proof.fst)**: Refinement types and automated verification.
+- **[Proof Engineering](./advanced/Proof.fst)**: Refinement types and automated verification.
 
 ## 💡 Quick Tips
 

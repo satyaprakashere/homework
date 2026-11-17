@@ -54,7 +54,7 @@ go run clean.go -dry-run
 go run clean.go -lang rust
 go run clean.go -path csharp
 ```
-For complete flags and options, see [scripts/README.md](file:///Users/prakash/Documents/projects/homework/scripts/README.md).
+For complete flags and options, see [scripts/README.md](./scripts/README.md).
 
 ### Direct Language Toolchains
 

@@ -69,63 +69,63 @@ dotnet run -- help          # View command-line help
 
 ## Learning Curriculum
 
-### 1. [Basics.fs](file:///Users/prakash/Documents/projects/homework/fsharp/Basics.fs)
+### 1. [Basics.fs](./Basics.fs)
 - **Immutability by Default**: Values bound with `let` are immutable.
 - **Explicit Mutability**: Mutability requires the `mutable` keyword and `<-` assignment.
 - **Type Inference**: Automatic type deduction without sacrificing strong static typing.
 - **Expressions vs Statements**: In F#, almost everything is an expression that yields a value (`if ... then ... else ...`).
 - **Unit Type `()`**: First-class representation of operations with side effects and no return value.
 
-### 2. [Functions.fs](file:///Users/prakash/Documents/projects/homework/fsharp/Functions.fs)
+### 2. [Functions.fs](./Functions.fs)
 - **Currying & Partial Application**: Every multi-parameter function is automatically a chain of single-parameter functions.
 - **Pipe-Forward (`|>`)**: Eliminates nested parentheses, flowing data naturally from left to right (`data |> transform1 |> transform2`).
 - **Function Composition (`>>` / `<<`)**: Combines multiple functions into a new composite function without intermediate arguments.
 - **Lambdas**: Anonymous functions defined with `fun x -> ...`.
 - **Recursion & Tail Call Optimization**: Tail-recursive functions with accumulators are optimized into fast loops by the compiler.
 
-### 3. [Collections.fs](file:///Users/prakash/Documents/projects/homework/fsharp/Collections.fs)
+### 3. [Collections.fs](./Collections.fs)
 - **Lists (`'T list`)**: Immutable singly-linked lists with $O(1)$ prepending via `::` (cons).
 - **Arrays (`'T[]`)**: Mutable contiguous memory blocks with $O(1)$ indexed access.
 - **Sequences (`seq<'T>`)**: Lazy evaluation representing .NET `IEnumerable<'T>`, suitable for infinite streams.
 - **Maps & Sets**: Immutable dictionaries and unique collections with set algebra (`union`, `intersect`, `difference`).
 - **High-Order Functions**: `List.map`, `List.filter`, `List.fold`, `List.choose`, `List.groupBy`, `List.partition`.
 
-### 4. [DomainModeling.fs](file:///Users/prakash/Documents/projects/homework/fsharp/DomainModeling.fs)
+### 4. [DomainModeling.fs](./DomainModeling.fs)
 - **Tuples**: Lightweight ad-hoc grouping of heterogeneous values.
 - **Records**: Named property bags with automatic structural equality and copy-and-update syntax (`{ user with IsAdmin = true }`).
 - **Discriminated Unions (Sum Types)**: Values that can take one of several explicit choices.
 - **Single-Case Unions**: Strongly typed IDs (e.g., `CustomerId of int`) that eliminate "primitive obsession".
 - **Making Illegal States Unrepresentable**: Modeling domain workflows as state machines so invalid combinations cannot compile.
 
-### 5. [PatternMatching.fs](file:///Users/prakash/Documents/projects/homework/fsharp/PatternMatching.fs)
+### 5. [PatternMatching.fs](./PatternMatching.fs)
 - **Match Expressions**: Exhaustive pattern deconstruction with compiler warning if a case is missed.
 - **When Guards**: Additional condition clauses attached to patterns (`when x > 0`).
 - **Multi-Case Active Patterns**: Partitioning an input domain (e.g. `(|Even|Odd|)`, `(|Fizz|Buzz|FizzBuzz|Other|)`).
 - **Partial Active Patterns**: Parsing or matching on optional conditions (`(|Integer|_|)`).
 - **Type Testing**: Matching on runtime types via `:?`.
 
-### 6. [UnitsOfMeasure.fs](file:///Users/prakash/Documents/projects/homework/fsharp/UnitsOfMeasure.fs)
+### 6. [UnitsOfMeasure.fs](./UnitsOfMeasure.fs)
 - **Statically Checked Dimensional Analysis**: Annotating floats and integers with units (`float<m>`, `float<s>`).
 - **Derived Units**: Automatic dimension propagation (`m / s` becomes velocity, `kg * m / s^2` becomes Newtons).
 - **Zero Runtime Overhead**: Units are erased during compilation, providing high performance with complete type safety.
 
-### 7. [RailwayOrientedProgramming.fs](file:///Users/prakash/Documents/projects/homework/fsharp/RailwayOrientedProgramming.fs)
+### 7. [RailwayOrientedProgramming.fs](./RailwayOrientedProgramming.fs)
 - **Two-Track Model**: Modeling execution paths as either a Success track or Failure track using `Result<'TSuccess, 'TError>`.
 - **`Result.bind`**: Chaining operations that can fail, automatically short-circuiting on the first error.
 - **`Result.map`**: Applying normal pure functions to the success track.
 - **Kleisli Composition (`>=>`)**: Composing switch functions into end-to-end validation pipelines.
 
-### 8. [AsyncAndTasks.fs](file:///Users/prakash/Documents/projects/homework/fsharp/AsyncAndTasks.fs)
+### 8. [AsyncAndTasks.fs](./AsyncAndTasks.fs)
 - **`async { ... }` Workflows**: Native F# asynchronous programming with explicit scheduling, cancellation, and `Async.Parallel`.
 - **`task { ... }` Interoperability**: Seamless integration with C# Task-based Asynchronous Pattern (TAP) and modern .NET APIs.
 
-### 9. [ObjectOriented.fs](file:///Users/prakash/Documents/projects/homework/fsharp/ObjectOriented.fs)
+### 9. [ObjectOriented.fs](./ObjectOriented.fs)
 - **Classes & Constructors**: Object-oriented structures with primary constructors and properties.
 - **Interfaces**: Defining and explicitly implementing interfaces (`interface IShape with ...`).
 - **Object Expressions**: Instantiating ad-hoc interface implementations without defining classes.
 - **Type Extensions**: Adding methods to existing .NET classes (e.g., `System.String`).
 
-### 10. [ComputationExpressions.fs](file:///Users/prakash/Documents/projects/homework/fsharp/ComputationExpressions.fs)
+### 10. [ComputationExpressions.fs](./ComputationExpressions.fs)
 - **Monadic Syntax**: How F# provides syntactical sugar (`let!`, `return`) for complex computation wrappers.
 - **Custom `OptionBuilder`**: Implementing `Bind` and `Return` to flatten nested `Some`/`None` checking into clean imperative-looking pipelines.
 

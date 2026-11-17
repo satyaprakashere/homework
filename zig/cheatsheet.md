@@ -19,7 +19,7 @@
 - **Optionals**: `?T` for nullable values.
 
 ### Advanced Features
-- **[Comptime](file:///Users/prakash/Documents/homework/zig/advanced/comptime_demo.zig)**: Powerful compile-time metaprogramming.
+- **[Comptime](./advanced/comptime_demo.zig)**: Powerful compile-time metaprogramming.
 - **Generic Types**: Created using `comptime` functions.
 - **Custom Allocators**: Explicit memory management (no hidden allocations).
 - **Inline Loops/Ifs**: Unrolled/evaluated at compile-time.

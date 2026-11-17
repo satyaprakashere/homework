@@ -9,7 +9,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[SIMD](file:///Users/prakash/Documents/homework/mojo/advanced/simd_demo.mojo)**: Hardware-accelerated vector operations.
+- **[SIMD](./advanced/simd_demo.mojo)**: Hardware-accelerated vector operations.
 
 ## 💡 Quick Tips
 

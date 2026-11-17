@@ -10,12 +10,12 @@ Every project is written in **100% Pure JavaScript** (no TypeScript, no `.ts`/`.
 
 | Directory | Framework | Paradigm | Reactivity Engine | DOM Rendering Model | Best Suited For |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [`react-ui/`](file:///Users/prakash/Documents/projects/homework/web/javascript/react-ui/) | **React 18** | Functional Components + JSX | Hooks (`useState`, `useMemo`) | Virtual DOM Reconciliation | Large enterprise apps, enormous ecosystem, cross-platform |
-| [`vue-ui/`](file:///Users/prakash/Documents/projects/homework/web/javascript/vue-ui/) | **Vue 3** | Single-File Components (`.vue`) | ES6 Proxies (`ref`, `computed`) | Compiler-optimized Virtual DOM | Progressive development, rapid prototyping, clean separation |
-| [`svelte-ui/`](file:///Users/prakash/Documents/projects/homework/web/javascript/svelte-ui/) | **Svelte 5** | Compiler-First Templates | Runes (`$state`, `$derived`) | Direct DOM mutations (No VDOM) | High-performance dashboards, lightweight bundles, low latency |
-| [`solid-ui/`](file:///Users/prakash/Documents/projects/homework/web/javascript/solid-ui/) | **SolidJS** | Single-Execution JSX | Fine-Grained Signals | Direct DOM nodes, functions as subscribers | Extreme runtime performance, real-time telemetry, lean memory |
-| [`alpine-ui/`](file:///Users/prakash/Documents/projects/homework/web/javascript/alpine-ui/) | **Alpine.js** | In-DOM Declarative Directives | Vue-based reactivity in HTML | Direct DOM manipulation via attributes | Enhancing server-rendered HTML (PHP/Django/Rails), zero build |
-| [`htmx-ui/`](file:///Users/prakash/Documents/projects/homework/web/javascript/htmx-ui/) | **HTMX 2.x** | Hypermedia as State (HATEOAS) | Server-driven HTML swaps | Partial DOM replacement (`outerHTML`) | Fullstack web apps with minimal client JS, server-first systems |
+| [`react-ui/`](./react-ui) | **React 18** | Functional Components + JSX | Hooks (`useState`, `useMemo`) | Virtual DOM Reconciliation | Large enterprise apps, enormous ecosystem, cross-platform |
+| [`vue-ui/`](./vue-ui) | **Vue 3** | Single-File Components (`.vue`) | ES6 Proxies (`ref`, `computed`) | Compiler-optimized Virtual DOM | Progressive development, rapid prototyping, clean separation |
+| [`svelte-ui/`](./svelte-ui) | **Svelte 5** | Compiler-First Templates | Runes (`$state`, `$derived`) | Direct DOM mutations (No VDOM) | High-performance dashboards, lightweight bundles, low latency |
+| [`solid-ui/`](./solid-ui) | **SolidJS** | Single-Execution JSX | Fine-Grained Signals | Direct DOM nodes, functions as subscribers | Extreme runtime performance, real-time telemetry, lean memory |
+| [`alpine-ui/`](./alpine-ui) | **Alpine.js** | In-DOM Declarative Directives | Vue-based reactivity in HTML | Direct DOM manipulation via attributes | Enhancing server-rendered HTML (PHP/Django/Rails), zero build |
+| [`htmx-ui/`](./htmx-ui) | **HTMX 2.x** | Hypermedia as State (HATEOAS) | Server-driven HTML swaps | Partial DOM replacement (`outerHTML`) | Fullstack web apps with minimal client JS, server-first systems |
 
 ---
 

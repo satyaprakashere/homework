@@ -4,15 +4,15 @@ This directory contains a few introductory samples for the Mojo programming lang
 
 ## Files
 
-1.  **[hello_mojo.mojo](file:///Users/prakash/Documents/homework/mojo/hello_mojo.mojo)**:
+1.  **[hello_mojo.mojo](./hello_mojo.mojo)**:
     *   Demonstrates basic functions and variable declarations with `var`.
     *   Basic control flow.
 
-2.  **[performance.mojo](file:///Users/prakash/Documents/homework/mojo/performance.mojo)**:
+2.  **[performance.mojo](./performance.mojo)**:
     *   Shows how to use `SIMD` (Single Instruction, Multiple Data) types.
     *   Demonstrates Mojo's focus on hardware-level performance.
 
-3.  **[python_interop.mojo](file:///Users/prakash/Documents/homework/mojo/python_interop.mojo)**:
+3.  **[python_interop.mojo](./python_interop.mojo)**:
     *   Demonstrates how to import and use Python libraries like `numpy` directly within Mojo.
     *   Note: Requires the Python environment to have the libraries installed.
 

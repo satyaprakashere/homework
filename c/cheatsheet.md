@@ -10,7 +10,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Pointers](file:///Users/prakash/Documents/homework/c/advanced/pointers.c)**: Function pointers and memory addresses.
+- **[Pointers](./advanced/pointers.c)**: Function pointers and memory addresses.
 
 ## 💡 Quick Tips
 

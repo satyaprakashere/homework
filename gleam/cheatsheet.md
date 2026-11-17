@@ -10,7 +10,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Result Handling](file:///Users/prakash/Documents/homework/gleam/advanced/result_demo.gleam)**: Type-safe error handling.
+- **[Result Handling](./advanced/result_demo.gleam)**: Type-safe error handling.
 
 ## 💡 Quick Tips
 

@@ -24,11 +24,11 @@ Run `php -S localhost:8000` from this directory to launch the interactive apps i
 
 | Application | Entry File | Key Concepts Demonstrated |
 | :--- | :--- | :--- |
-| **Showcase Portal & Explorer** | **[index.php](file:///Users/prakash/Documents/homework/php/index.php)** | Central hub, telemetry inspection (Zend Engine, OPcache, memory limits), card navigation, dynamic in-browser source code viewer. |
-| **Enterprise Analytics** | **[dashboard.php](file:///Users/prakash/Documents/homework/php/dashboard.php)** | Dynamic analytics dashboard, search/filter pipeline, sorting, PHP 8 Enums driving visual status badges, computed KPIs. |
-| **Secure Form & Session Pipeline** | **[form_handling.php](file:///Users/prakash/Documents/homework/php/form_handling.php)** | Cryptographic CSRF defense via `hash_equals()`, sticky inputs, field-level validation error bags, flash notifications, session storage. |
-| **Interactive Task Manager** | **[todos.php](file:///Users/prakash/Documents/homework/php/todos.php)** | Session-backed CRUD state machine, completion toggles, priority tags (`Urgent`, `Medium`, `Low`), and view filter tabs (`all`, `active`, `completed`). |
-| **Component System & Sparklines** | **[components.php](file:///Users/prakash/Documents/homework/php/components.php)** | Component rendering functions in native PHP, dynamic SVG sparkline charts generated with pure PHP math, alert notifications. |
+| **Showcase Portal & Explorer** | **[index.php](../../php/index.php)** | Central hub, telemetry inspection (Zend Engine, OPcache, memory limits), card navigation, dynamic in-browser source code viewer. |
+| **Enterprise Analytics** | **[dashboard.php](../../php/dashboard.php)** | Dynamic analytics dashboard, search/filter pipeline, sorting, PHP 8 Enums driving visual status badges, computed KPIs. |
+| **Secure Form & Session Pipeline** | **[form_handling.php](../../php/form_handling.php)** | Cryptographic CSRF defense via `hash_equals()`, sticky inputs, field-level validation error bags, flash notifications, session storage. |
+| **Interactive Task Manager** | **[todos.php](../../php/todos.php)** | Session-backed CRUD state machine, completion toggles, priority tags (`Urgent`, `Medium`, `Low`), and view filter tabs (`all`, `active`, `completed`). |
+| **Component System & Sparklines** | **[components.php](../../php/components.php)** | Component rendering functions in native PHP, dynamic SVG sparkline charts generated with pure PHP math, alert notifications. |
 
 ---
 
@@ -36,14 +36,14 @@ Run `php -S localhost:8000` from this directory to launch the interactive apps i
 
 | File | Topic | Key Highlights |
 | :--- | :--- | :--- |
-| **[main.php](file:///Users/prakash/Documents/homework/php/main.php)** | Modern PHP Fundamentals | Named arguments, nullsafe operator `?->`, match expressions, first-class callables `strlen(...)`, short arrow functions. |
-| **[collections.php](file:///Users/prakash/Documents/homework/php/collections.php)** | Collections & Arrays | Positional & keyed destructuring, array unpacking, functional pipelines (`array_reduce`, `array_filter`), PHP 8.4+ utilities (`array_find`, `array_find_key`, `array_any`, `array_all`). |
-| **[oop.php](file:///Users/prakash/Documents/homework/php/oop.php)** | Modern OOP | Constructor property promotion, `readonly` classes, interfaces, traits, asymmetric visibility (`public private(set)`), property hooks. |
-| **[enums.php](file:///Users/prakash/Documents/homework/php/enums.php)** | First-Class Enums | Pure enums, backed enums (`string`/`int`), enum methods, interface implementation, `tryFrom()`, and exhaustive `match` handling. |
-| **[generators.php](file:///Users/prakash/Documents/homework/php/generators.php)** | Generators & Streaming | Infinite sequences (`yield`), delegation (`yield from`), memory benchmarking vs arrays, streaming data pipelines. |
-| **[fibers.php](file:///Users/prakash/Documents/homework/php/fibers.php)** | Concurrency & Fibers | Cooperative multitasking with `Fiber` (coroutines), bidirectional data passing (`suspend`/`resume`), and an event loop scheduler. |
-| **[advanced/Attributes.php](file:///Users/prakash/Documents/homework/php/advanced/Attributes.php)** | Attributes & Reflection | Native metadata attributes, target constraints, and dynamic reflection inspection for routing and validation. |
-| **[advanced/property_hooks.php](file:///Users/prakash/Documents/homework/php/advanced/property_hooks.php)** | PHP 8.4+ Property Hooks | Virtual computed properties, backed properties with custom `get`/`set` hooks, input sanitization, and asymmetric visibility. |
+| **[main.php](../../php/main.php)** | Modern PHP Fundamentals | Named arguments, nullsafe operator `?->`, match expressions, first-class callables `strlen(...)`, short arrow functions. |
+| **[collections.php](../../php/collections.php)** | Collections & Arrays | Positional & keyed destructuring, array unpacking, functional pipelines (`array_reduce`, `array_filter`), PHP 8.4+ utilities (`array_find`, `array_find_key`, `array_any`, `array_all`). |
+| **[oop.php](../../php/oop.php)** | Modern OOP | Constructor property promotion, `readonly` classes, interfaces, traits, asymmetric visibility (`public private(set)`), property hooks. |
+| **[enums.php](../../php/enums.php)** | First-Class Enums | Pure enums, backed enums (`string`/`int`), enum methods, interface implementation, `tryFrom()`, and exhaustive `match` handling. |
+| **[generators.php](../../php/generators.php)** | Generators & Streaming | Infinite sequences (`yield`), delegation (`yield from`), memory benchmarking vs arrays, streaming data pipelines. |
+| **[fibers.php](../../php/fibers.php)** | Concurrency & Fibers | Cooperative multitasking with `Fiber` (coroutines), bidirectional data passing (`suspend`/`resume`), and an event loop scheduler. |
+| **[advanced/Attributes.php](../../php/advanced/Attributes.php)** | Attributes & Reflection | Native metadata attributes, target constraints, and dynamic reflection inspection for routing and validation. |
+| **[advanced/property_hooks.php](../../php/advanced/property_hooks.php)** | PHP 8.4+ Property Hooks | Virtual computed properties, backed properties with custom `get`/`set` hooks, input sanitization, and asymmetric visibility. |
 
 ---
 

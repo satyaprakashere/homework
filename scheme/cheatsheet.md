@@ -9,7 +9,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Continuations](file:///Users/prakash/Documents/homework/scheme/advanced/continuations.scm)**: `call/cc` for custom control flow.
+- **[Continuations](./advanced/continuations.scm)**: `call/cc` for custom control flow.
 
 ## 💡 Quick Tips
 

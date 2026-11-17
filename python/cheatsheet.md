@@ -20,9 +20,9 @@
 - **Exceptions**: `try...except...finally` for error handling.
 
 ### Advanced Features
-- **[Decorators](file:///Users/prakash/Documents/homework/python/advanced/decorators.py)**: Modifying behavior of functions or classes.
-- **[AsyncIO](file:///Users/prakash/Documents/homework/python/advanced/async_io.py)**: Concurrency using `async/await`.
-- **[Advanced Typing](file:///Users/prakash/Documents/homework/python/advanced/typing_adv.py)**: Type hints, Generics, and Protocols.
+- **[Decorators](./advanced/decorators.py)**: Modifying behavior of functions or classes.
+- **[AsyncIO](./advanced/async_io.py)**: Concurrency using `async/await`.
+- **[Advanced Typing](./advanced/typing_adv.py)**: Type hints, Generics, and Protocols.
 - **Context Managers**: `with` statement for resource management.
 - **Generators**: Lazy iterators using `yield`.
 - **Metaprogramming**: Using `type()` or Metaclasses to customize class creation.

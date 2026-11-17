@@ -17,16 +17,16 @@ All example files are fully self-contained and runnable with `scala --server=fal
 
 | Topic | File | Highlights |
 | :--- | :--- | :--- |
-| **Basics** | [Basics.scala](file:///Users/prakash/Documents/projects/homework/scala/Basics.scala) | `val` vs `var`, string interpolators (`s`, `f`, `raw`), `if` expressions, for-comprehensions, tuples |
-| **Functions** | [Functions.scala](file:///Users/prakash/Documents/projects/homework/scala/Functions.scala) | Default/named args, lambdas, higher-order functions, currying, `@tailrec` recursion |
-| **Collections** | [Collections.scala](file:///Users/prakash/Documents/projects/homework/scala/Collections.scala) | `List`, `Vector`, `Set`, `Map`, `foldLeft`, `flatMap`, `groupBy`, `partition` |
-| **Data Modeling** | [DataModeling.scala](file:///Users/prakash/Documents/projects/homework/scala/DataModeling.scala) | `case class`, `.copy()`, Scala 3 `enum`, Algebraic Data Types (ADTs), Expression trees |
-| **Pattern Matching** | [PatternMatching.scala](file:///Users/prakash/Documents/projects/homework/scala/PatternMatching.scala) | Type patterns, pattern guards (`if`), case class destructuring, list matching (`head :: tail`) |
-| **Error Handling** | [ErrorHandling.scala](file:///Users/prakash/Documents/projects/homework/scala/ErrorHandling.scala) | Idiomatic functional errors: `Option` (`Some`/`None`), `Either` (`Left`/`Right`), `Try` |
-| **Traits & Classes** | [TraitsAndClasses.scala](file:///Users/prakash/Documents/projects/homework/scala/TraitsAndClasses.scala) | Traits with default implementations, mixins, companion objects, encapsulation |
-| **Contextual Abstractions** | [ContextualAbstractions.scala](file:///Users/prakash/Documents/projects/homework/scala/ContextualAbstractions.scala) | Modern Scala 3: `extension` methods, `given` instances, `using` parameters, type classes |
-| **Concurrency** | [Concurrency.scala](file:///Users/prakash/Documents/projects/homework/scala/Concurrency.scala) | Asynchronous `Future`, `ExecutionContext`, `Future.sequence`, composing with `for` |
-| **Algorithms** | [fib.scala](file:///Users/prakash/Documents/projects/homework/scala/fib.scala) | Fibonacci sequence: naive recursive, tail recursive, and infinite `LazyList` stream |
+| **Basics** | [Basics.scala](./Basics.scala) | `val` vs `var`, string interpolators (`s`, `f`, `raw`), `if` expressions, for-comprehensions, tuples |
+| **Functions** | [Functions.scala](./Functions.scala) | Default/named args, lambdas, higher-order functions, currying, `@tailrec` recursion |
+| **Collections** | [Collections.scala](./Collections.scala) | `List`, `Vector`, `Set`, `Map`, `foldLeft`, `flatMap`, `groupBy`, `partition` |
+| **Data Modeling** | [DataModeling.scala](./DataModeling.scala) | `case class`, `.copy()`, Scala 3 `enum`, Algebraic Data Types (ADTs), Expression trees |
+| **Pattern Matching** | [PatternMatching.scala](./PatternMatching.scala) | Type patterns, pattern guards (`if`), case class destructuring, list matching (`head :: tail`) |
+| **Error Handling** | [ErrorHandling.scala](./ErrorHandling.scala) | Idiomatic functional errors: `Option` (`Some`/`None`), `Either` (`Left`/`Right`), `Try` |
+| **Traits & Classes** | [TraitsAndClasses.scala](./TraitsAndClasses.scala) | Traits with default implementations, mixins, companion objects, encapsulation |
+| **Contextual Abstractions** | [ContextualAbstractions.scala](./ContextualAbstractions.scala) | Modern Scala 3: `extension` methods, `given` instances, `using` parameters, type classes |
+| **Concurrency** | [Concurrency.scala](./Concurrency.scala) | Asynchronous `Future`, `ExecutionContext`, `Future.sequence`, composing with `for` |
+| **Algorithms** | [fib.scala](./fib.scala) | Fibonacci sequence: naive recursive, tail recursive, and infinite `LazyList` stream |
 
 ---
 

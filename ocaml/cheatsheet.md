@@ -11,7 +11,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Variants](file:///Users/prakash/Documents/homework/ocaml/advanced/variants.ml)**: Sum types and pattern matching.
+- **[Variants](./advanced/variants.ml)**: Sum types and pattern matching.
 
 ## 💡 Quick Tips
 

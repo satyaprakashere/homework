@@ -32,7 +32,7 @@ flowchart LR
 
 ---
 
-## 📜 WIT Interface Specification ([wit/calculator.wit](file:///Users/prakash/Documents/homework/web/wasm/gorust/wit/calculator.wit))
+## 📜 WIT Interface Specification ([wit/calculator.wit](./wit/calculator.wit))
 
 ```wit
 package example:calculator@0.1.0;

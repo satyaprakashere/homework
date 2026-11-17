@@ -19,7 +19,7 @@
 - **When Expression**: Better version of `switch`.
 
 ### Advanced Features
-- **[Coroutines](file:///Users/prakash/Documents/homework/kotlin/advanced/Coroutines.kt)**: Lightweight concurrency with `suspend` functions.
+- **[Coroutines](./advanced/Coroutines.kt)**: Lightweight concurrency with `suspend` functions.
 - **Flow**: Reactive streams built on coroutines.
 - **Extension Functions**: Add methods to any class: `fun String.greet() { ... }`.
 - **Lambdas with Receivers**: Basis for Kotlin DSLs (e.g., `buildString { ... }`).

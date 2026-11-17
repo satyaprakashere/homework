@@ -10,7 +10,7 @@
 
 ## 🏗 Advanced Concepts
 
-- **[Macros](file:///Users/prakash/Documents/homework/racket/advanced/macros.rkt)**: Syntactic abstraction and DSL creation.
+- **[Macros](./advanced/macros.rkt)**: Syntactic abstraction and DSL creation.
 
 ## 💡 Quick Tips
 
