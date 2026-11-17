@@ -1,0 +1,42 @@
+fibonacci :: process
+	MEMORY_ARENA :: 32 Bytes // Bytes(32)
+	
+	calculate :: recieve(:msg, n)
+		fibonacci 0 1 n
+end(process)
+
+-- type signature
+fibonacci : (Int, Int, Int) -> Int
+fibonacci : (Int ** 3) -> Int
+
+//fibonacci (a Int, b Int, b Int) -> res:Int
+fibonacci :: (a, b, c Int) Int
+
+//(typeOf fibonacci (Int Int Int) Int)
+//(typeOf fibonacci (a:Int b:Int c:Int) Int)
+//(typeOf fibonacci (a b c:Int) Int)
+
+//(function fib (a, b, c)
+//(case base (is_positive? n) 	 a)
+//(case rec  _	    		 (recur b (add a b) (sub n 1))))
+//
+//(function fib (a, b, c)
+//(case fib_tail_case (guard n=0) 		a)
+//(case fib_tail_rec  else 		(recur a=b, a+=b, n-1)))
+
+//fibonacci :: function (a, b, n) {
+//	fib_tail_base      _ _ 0 	 = a
+//	fib_tail_recursive otherwise = fibonacci(a=b, b+=a, n-=1)
+//}
+
+fibonacci :: func a b n = recur(a=b, b=b+a, n=n-1) unless
+	case n is 0 : a
+end(func)
+
+//-- Hybrid approach
+//fibonacci :: function (a, b, n Int) Int {
+//	fib_tail_base      a _ 0 = a
+//	fib_tail_recursive a b n = fibonacci(a=b, b+=a, n-=1)
+//}
+
+-- C/Go/Odin -> Generics(haskell) -> Type theory(dependent type) -> Meta programming

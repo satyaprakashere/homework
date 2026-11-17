@@ -1,0 +1,3 @@
+(define Blank
+    (where
+        (func (isBlank a) bool)))

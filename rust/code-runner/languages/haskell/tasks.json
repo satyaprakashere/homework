@@ -1,0 +1,7 @@
+[
+  {
+    "label": "run Code",
+    "command": "runHaskell",
+    "args": ["$ZED_RELATIVE_FILE"]
+  }
+]

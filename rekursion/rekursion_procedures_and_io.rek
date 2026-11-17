@@ -1,0 +1,54 @@
+;; =============================================================================
+;; Example 5: Procedures, State Mutation & Sequential Execution
+;; File: 05_rekursion_procedures_and_io.rek
+;; Rules:
+;;   - Use 'procedure' or 'proc' for effectful/sequential code
+;;   - Pure functions use 'function'
+;;   - Sequential un-nested 'let' inside procedures
+;;   - Mutation as optimization using 'set_var'
+;; =============================================================================
+
+;; 1. Procedure with sequential let bindings
+(procedure compute_pipeline (initial)
+  (let step1 (add initial 15))
+  (let step2 (mul step1 2))
+  (let step3 (sub step2 10))
+  step3)
+
+(let pipeline_result (compute_pipeline 5))
+(assert (equal pipeline_result 30) "((5 + 15) * 2) - 10 == 30")
+
+;; 2. State accumulator procedure (mutation as optimization)
+(let transaction_count 0)
+(let total_balance 1000)
+
+(procedure process_transaction (amount is_deposit)
+  (if is_deposit
+      (set_var total_balance (add total_balance amount))
+      (set_var total_balance (sub total_balance amount)))
+  (set_var transaction_count (add transaction_count 1))
+  total_balance)
+
+;; Execute sequence of transactions
+(process_transaction 250 true)   ;; balance = 1250, count = 1
+(process_transaction 100 false)  ;; balance = 1150, count = 2
+(process_transaction 500 true)   ;; balance = 1650, count = 3
+
+(assert (equal total_balance 1650) "Balance should be 1650")
+(assert (equal transaction_count 3) "Transaction count should be 3")
+
+;; 3. Batch array processor procedure
+(procedure batch_audit (transactions)
+  (let len_tx (len transactions))
+  (print "Auditing ") (print len_tx) (print " transactions...\n")
+  (let i 0)
+  total_balance)
+
+(batch_audit (array 250 100 500))
+
+;; 4. Verification Output
+(print "=== 05: Procedures, State & Sequential I/O ===\n")
+(print "Pipeline Result:    ") (print pipeline_result) (newline)
+(print "Total Final Balance:") (print total_balance) (newline)
+(print "Transactions Done:  ") (print transaction_count) (newline)
+(print "Procedures and state mutation verified!\n")

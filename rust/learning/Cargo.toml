@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    #"guardrail",
+    "app"
+]
+resolver = "2"
+
+[build]
+# Pass rustc flags globally to every package in the project
+rustflags = [
+    "-D", "clippy::mut_-reference", # Deny mutable references (if caught by clippy flags)
+    "-F", "unsafe_code",            # Hard forbid unsafe code globally
+]

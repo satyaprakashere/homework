@@ -1,0 +1,46 @@
+module ListsAndArrays
+
+// Lists & Arrays in Grain 🌾
+
+from "list" include List
+from "array" include Array
+
+// 1. Lists (Immutable singly-linked lists: [a, b, c])
+let numbers = [1, 2, 3, 4, 5]
+
+// Prepended list using spread syntax
+let prepended = [0, ...numbers]
+
+// List transformations using the standard library
+let evens = List.filter(x => x % 2 == 0, numbers)
+let doubled = List.map(x => x * 10, evens)
+let sum = List.reduce((acc, x) => acc + x, 0, numbers)
+
+// Custom pipeline operator (|>)
+// Grain allows defining custom infix operators!
+let (|>) = (x, f) => f(x)
+
+let pipelineResult = numbers
+  |> (list => List.filter(x => x > 2, list))
+  |> (list => List.map(x => x * 100, list))
+
+// 2. Arrays (Fixed-size mutable sequences: [> a, b, c])
+let mutableArray = [> 10, 20, 30]
+
+// Reading and mutating array elements by index
+let firstElement = mutableArray[0]
+mutableArray[1] = 99
+
+let arrayLength = Array.length(mutableArray)
+
+print("=== Lists ===")
+print("Original list: " ++ toString(numbers))
+print("Prepended list: " ++ toString(prepended))
+print("Doubled evens: " ++ toString(doubled))
+print("Sum of numbers: " ++ toString(sum))
+print("Pipeline result: " ++ toString(pipelineResult))
+
+print("=== Arrays ===")
+print("First element: " ++ toString(firstElement))
+print("Modified array: " ++ toString(mutableArray))
+print("Array length: " ++ toString(arrayLength))

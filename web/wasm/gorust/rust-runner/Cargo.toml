@@ -1,0 +1,11 @@
+[package]
+name = "rust-runner"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "rust_runner"
+path = "src/main.rs"
+
+[dependencies]
+wit-bindgen = "0.36.0"

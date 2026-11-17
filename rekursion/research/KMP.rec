@@ -1,0 +1,78 @@
+record Pattern {
+    u32 wordSize;
+    char[wordSize] word;
+    i32[wordSize] partialMatch;
+}
+
+
+func kmp(u32 textSize, char[textSize] text, Pattern pattern, i32 textIndex = 0, i32 wordIndex = 0) {
+    if textIndex >= textSize
+    then goto notFound:
+    elif pattern.word[wordIndex] == text[textIndex]
+    then {
+        if wordIndex == pattern.wordSize - 1
+        then goto found:(textIndex - wordIndex)
+        else goto kmp(textIndex++, wordIndex++)
+    }
+    else {
+        let newWordIndex = pattern.partialMatch[wordIndex];
+        if newWordIndex < 0
+        then goto kmp(textIndex++, wordIndex = newWordIndex + 1)
+        else goto kmp(wordIndex = newWordIndex)
+    }
+}
+
+
+func kmp(u32 textSize, char[textSize] text, Pattern pattern, i32 textIndex = 0, i32 wordIndex = 0) {
+    if textIndex >= textSize then goto notFound:
+    if pattern.word[wordIndex] == text[textIndex] then {
+        if wordIndex == pattern.wordSize - 1 then goto found:(textIndex - wordIndex)
+        goto kmp(textIndex++, wordIndex++)
+    }
+    let newWordIndex = pattern.partialMatch[wordIndex];
+    if newWordIndex < 0 then goto kmp(textIndex++, wordIndex = newWordIndex + 1)
+    goto kmp(wordIndex = newWordIndex)
+}
+
+
+func kmp(u32 textSize, char[textSize] text, Pattern pattern, i32 textIndex = 0, i32 wordIndex = 0) {
+    if textIndex >= textSize then goto notFound:
+    elif wordIndex >= pattern.wordSize then goto found:(textIndex - wordIndex)
+    
+    elif pattern.word[wordIndex] == text[textIndex] then goto kmp(textIndex++, wordIndex++)
+    else {
+        let newWordIndex = pattern.partialMatch[wordIndex];
+        if newWordIndex < 0 then goto kmp(textIndex++, wordIndex = newWordIndex + 1)
+        else goto kmp(wordIndex = newWordIndex)
+    }
+}
+
+
+func kmp(u32 textSize, char[textSize] text, Pattern pattern) {
+    loop foo:(textIndex = 0, wordIndex = 0) {
+        if textIndex >= textSize then goto notFound:
+        if wordIndex >= pattern.wordSize then goto found:(textIndex - wordIndex)
+    
+        if pattern.word[wordIndex] == text[textIndex] then goto foo:(textIndex++, wordIndex++)
+        let newWordIndex = pattern.partialMatch[wordIndex];
+        if newWordIndex < 0 then goto foo:(textIndex++, wordIndex = newWordIndex + 1)
+        goto kmp(wordIndex = newWordIndex)
+    }
+}
+
+
+func stringMatch(u32 textSize, char[textSize] text, Pattern pattern) => kmp:(textIndex = 0, wordIndex = 0) {
+    if textIndex >= textSize then goto notFound:
+
+    do validTextIndex:(wordIndex) {
+        if wordIndex >= pattern.wordSize then goto found:(textIndex - wordIndex)
+        if pattern.word[wordIndex] == text[textIndex] then goto kmp:(textIndex++, wordIndex++)
+  
+
+        let newWordIndex = pattern.partialMatch[wordIndex];
+        
+        if newWordIndex == 10 then return partialMatch[2]
+        if newWordIndex < 0 then goto kmp:(textIndex++, wordIndex = newWordIndex + 1)
+        goto validTextIndex:(wordIndex = newWordIndex)
+    }
+}

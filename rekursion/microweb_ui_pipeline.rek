@@ -1,0 +1,72 @@
+;; =============================================================================
+;; Example 14: MicroWeb Data-Oriented UI Pipeline in Rekursion VM
+;; File: 14_microweb_ui_pipeline.rek
+;; Architecture:
+;;   - General recursion is forbidden by default (Kurt Gödel recursive model)
+;;   - Data-Oriented Programming (DOP) replaces nested trees with flat SoA arrays
+;;   - Traversal uses bounded tail recursion with 'recur'
+;; =============================================================================
+
+;; 1. Flat Struct-of-Arrays (SoA) Node Representation
+;; Node tuple: [tag class text width height]
+(function (make_element tag class text width height)
+  (array tag class text width height))
+
+(function (elem_tag e) (array_get e 0))
+(function (elem_class e) (array_get e 1))
+(function (elem_text e) (array_get e 2))
+(function (elem_width e) (array_get e 3))
+(function (elem_height e) (array_get e 4))
+
+;; 2. Populate flat arena containing navbar and action items
+(let dom_arena
+  (array
+    (make_element "row" "nav-bar" "" 1280 64)
+    (make_element "text" "brand-title" "Rekursion Studio" 180 32)
+    (make_element "spacer" "rek-spacer" "" 700 0)
+    (make_element "button" "btn-secondary" "Documentation" 140 40)
+    (make_element "button" "btn-primary" "Launch Studio" 140 40)))
+
+;; 3. Linear layout solver: accumulate total width using tail recursion 'recur'
+(function (compute_total_width_acc arena idx acc)
+  (if (greater_equal idx (len arena))
+      acc
+      (recur arena (add idx 1) (add acc (elem_width (array_get arena idx))))))
+
+(function (compute_total_width arena)
+  (compute_total_width_acc arena 1 0)) ;; skip root container at index 0
+
+;; 4. Linear HTML desugarer using bounded tail recursion 'recur'
+(function (serialize_node_html e)
+  (if (equal (elem_tag e) "spacer")
+      "<div class=\"rek-spacer\"></div>"
+      (if (equal (elem_tag e) "text")
+          (string_append "<span class=\"" (string_append (elem_class e) (string_append "\">" (string_append (elem_text e) "</span>"))))
+          (string_append "<button class=\"" (string_append (elem_class e) (string_append "\">" (string_append (elem_text e) "</button>")))))))
+
+(function (serialize_arena_acc arena idx acc)
+  (if (greater_equal idx (len arena))
+      acc
+      (recur arena
+             (add idx 1)
+             (string_append acc (string_append "  " (string_append (serialize_node_html (array_get arena idx)) "\n"))))))
+
+(function (serialize_arena arena)
+  (string_append "<div class=\"rek-row\" width=\"1280\" height=\"64\">\n"
+    (string_append (serialize_arena_acc arena 1 "") "</div>")))
+
+;; 5. Execute Pipeline
+(let content_width (compute_total_width dom_arena))
+(let html_markup (serialize_arena dom_arena))
+
+;; 6. Assertions
+(assert (equal (len dom_arena) 5) "DOM Arena has 5 elements")
+(assert (equal content_width 1160) "Total children width is 180+700+140+140 = 1160")
+
+;; 7. Verification Output
+(print "=== 14: MicroWeb Data-Oriented UI Pipeline ===\n")
+(print "Arena Node Count:      ") (print (len dom_arena)) (newline)
+(print "Computed Content Width:") (print content_width) (print "px\n")
+(print "Desugared HTML5:\n")
+(print html_markup) (newline)
+(print "Data-oriented UI pipeline verified successfully!\n")

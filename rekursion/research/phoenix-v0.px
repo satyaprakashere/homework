@@ -1,0 +1,18 @@
+module example1 where
+
+func randomList : Int -> IO [Int]
+func randomList 0 = return []
+func randomList n = randomRIO 1 2 :: randomList (n-1)
+
+
+val step = 0.001
+
+func solve l r a b = (area, volume) where
+  area = integrate (* step)
+  volume = integrate (pi * step * (^^2))
+  integrate dx = sum . map dx $ map (sum . zipWith (*) af (map (^^exp) b) limits)
+
+  lf = fromIntegral l
+  rf = fromIntegral r
+  af = map fromIntegral a
+  limits = [lf, (lf+step)..rf]

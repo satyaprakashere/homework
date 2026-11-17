@@ -1,0 +1,32 @@
+<div class="details-card fade-in">
+    <h3>Panchang for <%= date %></h3>
+    
+    <div class="details-grid">
+        <div class="detail-item">
+            <span class="label">Sunrise</span>
+            <span class="value"><%= panchang.sunrise || 'N/A' %></span>
+        </div>
+        <div class="detail-item">
+            <span class="label">Sunset</span>
+            <span class="value"><%= panchang.sunset || 'N/A' %></span>
+        </div>
+        <div class="detail-item full-width">
+            <span class="label">Tithi</span>
+            <span class="value"><%= panchang.tithi?.name || 'N/A' %></span>
+            <% if (panchang.tithi?.endTime) { %><span class="sub-text">ends at <%= panchang.tithi.endTime %></span><% } %>
+        </div>
+        <div class="detail-item full-width">
+            <span class="label">Nakshatra</span>
+            <span class="value"><%= panchang.nakshatra?.name || 'N/A' %></span>
+            <% if (panchang.nakshatra?.endTime) { %><span class="sub-text">ends at <%= panchang.nakshatra.endTime %></span><% } %>
+        </div>
+        <div class="detail-item">
+            <span class="label">Yoga</span>
+            <span class="value"><%= panchang.yoga?.name || 'N/A' %></span>
+        </div>
+        <div class="detail-item">
+            <span class="label">Karana</span>
+            <span class="value"><%= panchang.karana?.name || 'N/A' %></span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,96 @@
+fibonacci: (Int, Int, Int) -> Int
+fibonacci: (a, b, n Int) -> Int
+
+//fibonacci a b n = recur(a=b, b+=a, n-=1) unless {
+//	case n is 0 : a
+//}
+
+fibonacci : (Int) Int
+fibonacci = func a(0) b(1) n {
+	recur(a=b, b+=a, n-=1) unless {
+		n is 0 then return a
+	}
+}
+
+fibonacci :: func(a=0, b=1, n) {
+	recur(a=b, b+=a, n-=1) unless {
+		n is 0 then return a
+	}
+}
+
+//factorial res(1) n = recur(res*=n, n-=1) unless {
+//	case n is 1 : res
+//}
+//
+//factorial func(res=1, n) = recur(res*=n, n-=1) unless {
+//	case n is 1 : res
+//}
+
+// name :: Type
+// name (?) value
+
+
+main = proc {
+	n 	 = math.rand INT_MAX
+	fibn = fibonacci n
+	
+	fmt.printfln("Fibonacci %v : %v", n, fibn)
+}
+
+n = 100
+
+//result = res(0), i(0) do recur(res+=i, i+=1)
+//	unless i is n then return res
+//
+//result = res(0), i(0) {
+//	recur(res+=i, i+=1) unless
+//		i is n then return res
+//}
+//
+//result = res(0), i(0) {
+//	recur(res+=i, i+=1) unless {
+//		i is n then return res
+//		i >= n then return res
+//	}
+}
+
+//result = res(0), i(0) {
+//	recur(res+=i, i+=1)
+//	
+//	unless i is n then return res
+//}
+
+//result = res(0), i(0) {
+//	recur(res+=i, i+=1)
+//	
+//	unless {
+//		i is n then return res
+//		i >= n then return res
+//	}
+//}
+
+
+//result = res(0), i(0) {
+//	guard i < n otherwise return res
+//	
+//	// code
+//	temp = res + i
+//	
+//	recur(temp, i+1)
+//}
+
+//	unless i {
+//	case i >= n : res
+//	}
+
+//factorial : func(res(1), n) : recur(res*n, n-=1) unless {
+//	case n is 1 : res
+//}
+
+//main : proc()
+//main {
+//	n 	 = core.rand(INT_MAX)
+//	fibn = fibonacci(n)
+//	
+//	printfln("Fibonacci %v : %v", n, fibn)
+//}

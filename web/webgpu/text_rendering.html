@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGPU Devanagari Renderer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@700&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #333;
+            color: #eee;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        canvas {
+            border: 1px solid #444;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            background-color: #999;
+            /* Canvas background */
+        }
+
+        #status {
+            margin-bottom: 1rem;
+            color: #aaf;
+        }
+
+        .error {
+            color: #ff5555;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="status">Initializing WebGPU...</div>
+    <canvas id="gpuCanvas" width="800" height="400"></canvas>
+
+    <script type="module">
+        const statusDiv = document.getElementById("status");
+        function log(msg) {
+            console.log(msg);
+            const line = document.createElement("div");
+            line.innerText = msg;
+            statusDiv.appendChild(line);
+        }
+
+        async function init() {
+            try {
+                // 1. Check Support
+                if (!navigator.gpu) {
+                    log("WebGPU not supported.");
+                    return;
+                }
+
+                // 1.5 Wait for Fonts
+                log("Waiting for fonts...");
+                await document.fonts.ready;
+                log("Fonts loaded.");
+
+                // 2. Setup Device & Context
+                const adapter = await navigator.gpu.requestAdapter();
+                if (!adapter) throw new Error("No appropriate GPUAdapter found.");
+
+                const device = await adapter.requestDevice();
+                const canvas = document.getElementById("gpuCanvas");
+                const context = canvas.getContext("webgpu");
+                const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+
+                context.configure({
+                    device,
+                    format: presentationFormat,
+                    alphaMode: "premultiplied",
+                });
+
+                log("WebGPU configured.");
+
+                // =========================================================
+                // PART A: The "Hybrid" Text Generation (2D Canvas)
+                // =========================================================
+
+                const text = "नमस्ते दुनिया Hello World";
+                const fontSize = 80;
+                const font = `bold ${fontSize}px 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', sans-serif`;
+
+                const tempCanvas = document.createElement("canvas");
+                const tempCtx = tempCanvas.getContext("2d");
+                tempCtx.font = font;
+                const metrics = tempCtx.measureText(text);
+                const textWidth = Math.ceil(metrics.width) + 20;
+                const textHeight = Math.ceil(fontSize * 1.8);
+
+                const sourceCanvas = document.createElement("canvas");
+                sourceCanvas.width = textWidth;
+                sourceCanvas.height = textHeight;
+                const ctx = sourceCanvas.getContext("2d");
+
+                // Clear to transparent
+                ctx.clearRect(0, 0, textWidth, textHeight);
+
+                // Draw text
+                ctx.fillStyle = "white";
+                ctx.font = font;
+                ctx.textBaseline = "middle";
+                ctx.textAlign = "center";
+                ctx.fillText(text, textWidth / 2, textHeight / 2);
+
+                log(`Texture generated: ${textWidth}x${textHeight}`);
+
+                // =========================================================
+                // PART B: WebGPU Resource Creation
+                // =========================================================
+
+                const textTexture = device.createTexture({
+                    size: [textWidth, textHeight, 1],
+                    format: 'rgba8unorm',
+                    usage: GPUTextureUsage.TEXTURE_BINDING |
+                        GPUTextureUsage.COPY_DST |
+                        GPUTextureUsage.RENDER_ATTACHMENT,
+                });
+
+                device.queue.copyExternalImageToTexture(
+                    { source: sourceCanvas, flipY: false },
+                    { texture: textTexture },
+                    [textWidth, textHeight, 1]
+                );
+
+                // =========================================================
+                // PART C: Pipeline & Shaders
+                // =========================================================
+
+                const shaderModule = device.createShaderModule({
+                    code: `
+                        struct VertexOutput {
+                            @builtin(position) position : vec4f,
+                            @location(0) uv : vec2f,
+                        }
+
+                        @vertex
+                        fn vs_main(@builtin(vertex_index) vertexIndex : u32) -> VertexOutput {
+                            var pos = array<vec2f, 6>(
+                                vec2f(-0.9,  0.4), // Top-left
+                                vec2f(-0.9, -0.4), // Bottom-left
+                                vec2f( 0.9, -0.4), // Bottom-right
+                                vec2f(-0.9,  0.4), // Top-left
+                                vec2f( 0.9, -0.4), // Bottom-right
+                                vec2f( 0.9,  0.4)  // Top-right
+                            );
+                            
+                            var uv = array<vec2f, 6>(
+                                vec2f(0.0, 0.0), // Top-left
+                                vec2f(0.0, 1.0), // Bottom-left
+                                vec2f(1.0, 1.0), // Bottom-right
+                                vec2f(0.0, 0.0), // Top-left
+                                vec2f(1.0, 1.0), // Bottom-right
+                                vec2f(1.0, 0.0)  // Top-right
+                            );
+
+                            var output : VertexOutput;
+                            output.position = vec4f(pos[vertexIndex], 0.0, 1.0);
+                            output.uv = uv[vertexIndex];
+                            return output;
+                        }
+
+                        @group(0) @binding(0) var mySampler : sampler;
+                        @group(0) @binding(1) var myTexture : texture_2d<f32>;
+
+                        @fragment
+                        fn fs_main(@location(0) uv : vec2f) -> vec4f {
+                            let color = textureSample(myTexture, mySampler, uv);
+                            
+                            // PREMULTIPLIED ALPHA: Output color MUST be (r*a, g*a, b*a, a)
+                            // We use orange (1.0, 0.6, 0.2) as the base color
+                            let a = color.a;
+                            return vec4f(1.0 * a, 0.6 * a, 0.2 * a, a);
+                        }
+                    `
+                });
+
+                const pipeline = device.createRenderPipeline({
+                    layout: 'auto',
+                    vertex: {
+                        module: shaderModule,
+                        entryPoint: 'vs_main',
+                    },
+                    fragment: {
+                        module: shaderModule,
+                        entryPoint: 'fs_main',
+                        targets: [{
+                            format: presentationFormat,
+                            blend: {
+                                color: {
+                                    srcFactor: 'one', // Using 'one' because we already premultiplied in shader
+                                    dstFactor: 'one-minus-src-alpha',
+                                    operation: 'add',
+                                },
+                                alpha: {
+                                    srcFactor: 'one',
+                                    dstFactor: 'one-minus-src-alpha',
+                                    operation: 'add',
+                                },
+                            },
+                        }],
+                    },
+                    primitive: {
+                        topology: 'triangle-list',
+                    },
+                });
+
+                const sampler = device.createSampler({
+                    magFilter: 'linear',
+                    minFilter: 'linear',
+                });
+
+                const bindGroup = device.createBindGroup({
+                    layout: pipeline.getBindGroupLayout(0),
+                    entries: [
+                        { binding: 0, resource: sampler },
+                        { binding: 1, resource: textTexture.createView() },
+                    ],
+                });
+
+                log("Pipeline and binds ready. Rendering...");
+
+                function frame() {
+                    const commandEncoder = device.createCommandEncoder();
+                    const textureView = context.getCurrentTexture().createView();
+
+                    const renderPass = commandEncoder.beginRenderPass({
+                        colorAttachments: [{
+                            view: textureView,
+                            clearValue: { r: 0.05, g: 0.05, b: 0.07, a: 1.0 },
+                            loadOp: 'clear',
+                            storeOp: 'store',
+                        }],
+                    });
+
+                    renderPass.setPipeline(pipeline);
+                    renderPass.setBindGroup(0, bindGroup);
+                    renderPass.draw(6);
+                    renderPass.end();
+
+                    device.queue.submit([commandEncoder.finish()]);
+                    requestAnimationFrame(frame);
+                }
+
+                requestAnimationFrame(frame);
+
+            } catch (err) {
+                log(`ERROR: ${err.message}`);
+                console.error(err);
+            }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

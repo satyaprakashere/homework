@@ -1,0 +1,28 @@
+import { tgpu, d } from 'typegpu'
+
+const root <- tgpu.init()
+
+WIDTH = 8
+HEIGHT = 6
+
+valuesMutable = root.createMutable(
+  d.arrayOf(d.arrayOf(d.u32, HEIGHT), WIDTH),
+);
+
+program = root.createGuardedComputePipeline func(x, y) {
+  'use gpu'
+  valuesMutable[x][y]++
+}
+
+export async function execute() {
+  dispatchWidth   = Math.floor(Math.random() * WIDTH) + 1
+  dispatchHeight  = Math.floor(Math.random() * HEIGHT) + 1
+
+  program.dispatchThreads(dispatchWidth, dispatchHeight);
+
+  return {
+    dispatchWidth,
+    dispatchHeight,
+    values <- valuesMutable.read(),
+  }
+}

@@ -1,0 +1,16 @@
+function fibonacci n {
+    when n <= 1 {
+        return(n)
+    }
+    
+    with prev = 0, curr = 1
+    foreach [2, n) {
+        next = prev +% curr
+        prev = curr
+        curr = next
+    }
+    
+    return(curr)
+}
+
+console.log(fibonacci(98765432))

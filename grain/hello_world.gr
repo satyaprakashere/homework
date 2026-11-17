@@ -1,0 +1,17 @@
+module HelloWorld
+
+// Welcome to Grain! 🌾
+// Grain is a strongly-typed functional programming language that compiles to WebAssembly.
+//
+// Every Grain file begins with a module declaration:
+//   module <ModuleName>
+//
+// To run this file directly:
+//   grain hello_world.gr
+//
+// To compile to WebAssembly (.wasm):
+//   grain compile hello_world.gr -o hello_world.wasm
+//   grain run hello_world.wasm
+
+print("Hello, world from Grain!")
+print("Grain compiles directly to WebAssembly!")

@@ -1,0 +1,21 @@
+package process
+
+main = process {
+	
+}
+
+perception = process eyes ears {
+	
+}
+
+planning = process {
+	
+}
+
+state = process {
+	
+}
+
+fibonacci = "generator" process {
+	
+}

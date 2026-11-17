@@ -1,0 +1,70 @@
+;; =============================================================================
+;; Example 2: Data-Oriented Programming with Hardware Arrays
+;; File: 02_rekursion_data_oriented_arrays.rek
+;; Architecture: Cache-friendly contiguous arrays instead of linked lists
+;; Rules:
+;;   - Favor arrays for contiguous memory layout
+;;   - Immutability by default; mutation as optimization
+;;   - Tail-recursive traversals with 'recur'
+;; =============================================================================
+
+;; 1. Array creation and inspection
+(let scores (array 85 92 78 95 88))
+(let scores_len (len scores))
+
+(assert (equal scores_len 5) "Array length should be 5")
+(assert (equal (array_get scores 0) 85) "Index 0 should be 85")
+(assert (equal (array_get scores 4) 88) "Index 4 should be 88")
+
+;; 2. Tail-recursive array sum using index tracking
+(function (sum_array_acc arr idx acc)
+  (if (greater_equal idx (len arr))
+      acc
+      (recur arr (add idx 1) (add acc (array_get arr idx)))))
+
+(function (sum_array arr)
+  (sum_array_acc arr 0 0))
+
+;; 3. Tail-recursive maximum element finder
+(function (max_array_acc arr idx current_max)
+  (if (greater_equal idx (len arr))
+      current_max
+      (if (greater_than (array_get arr idx) current_max)
+          (recur arr (add idx 1) (array_get arr idx))
+          (recur arr (add idx 1) current_max))))
+
+(function (max_array arr)
+  (if (less_equal (len arr) 0)
+      0
+      (max_array_acc arr 1 (array_get arr 0))))
+
+;; 4. Array slicing
+(let top_three (array_slice scores 1 4)) ;; elements at indices 1, 2, 3 -> [92 78 95]
+(assert (equal (len top_three) 3) "Sliced array length should be 3")
+(assert (equal (array_get top_three 0) 92) "Slice element 0 should be 92")
+
+;; 5. Mutation as optimization: pre-allocated accumulator array
+(let buffer (array_make 4 0))
+(array_set buffer 0 10)
+(array_set buffer 1 20)
+(array_set buffer 2 30)
+(array_set buffer 3 40)
+
+(let total (sum_array scores))
+(let max_score (max_array scores))
+(let buf_total (sum_array buffer))
+
+(assert (equal total 438) "85+92+78+95+88 == 438")
+(assert (equal max_score 95) "Max score is 95")
+(assert (equal buf_total 100) "10+20+30+40 == 100")
+
+;; 6. Print verification
+(print "=== 02: Data-Oriented Arrays in Rekursion ===\n")
+(print "Original Scores Array: ") (print scores) (newline)
+(print "Length of Array:       ") (print scores_len) (newline)
+(print "Sum of Scores:         ") (print total) (newline)
+(print "Max Score:             ") (print max_score) (newline)
+(print "Slice [1..4]:          ") (print top_three) (newline)
+(print "Pre-allocated Buffer:  ") (print buffer) (newline)
+(print "Buffer Sum:            ") (print buf_total) (newline)
+(print "Array data-oriented tests passed!\n")

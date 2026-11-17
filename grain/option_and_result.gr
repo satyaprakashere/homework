@@ -1,0 +1,61 @@
+module OptionAndResult
+
+// Handling Nullability & Errors: Option & Result in Grain 🌾
+
+from "option" include Option
+from "result" include Result
+
+// 1. Option Type: Some(value) or None
+// Used when a value may or may not be present (no null/undefined!)
+let findUser = (id: Number) => {
+  if (id == 1) {
+    Some("Alice")
+  } else if (id == 2) {
+    Some("Bob")
+  } else {
+    None
+  }
+}
+
+let greetUser = (id) => {
+  match (findUser(id)) {
+    Some(name) => "Welcome back, " ++ name ++ "!",
+    None => "User not found.",
+  }
+}
+
+// 2. Result Type: Ok(value) or Err(error)
+// Used for computations that can fail with an explicit reason
+let safeDivide = (numerator: Number, denominator: Number) => {
+  if (denominator == 0) {
+    Err("Cannot divide by zero")
+  } else {
+    Ok(numerator / denominator)
+  }
+}
+
+let handleDivision = (a, b) => {
+  match (safeDivide(a, b)) {
+    Ok(quotient) => "Result: " ++ toString(quotient),
+    Err(message) => "Error: " ++ message,
+  }
+}
+
+// 3. Option & Result stdlib utilities
+let maybeNumber = Some(50)
+let hasValue = Option.isSome(maybeNumber)
+let unwrappedOrFallback = Option.unwrapWithDefault(0, maybeNumber)
+
+let successfulResult = Ok(100)
+let isSuccess = Result.isOk(successfulResult)
+
+print("=== Option Handling ===")
+print(greetUser(1))
+print(greetUser(42))
+print("Option has value: " ++ toString(hasValue))
+print("Unwrapped value: " ++ toString(unwrappedOrFallback))
+
+print("=== Result Handling ===")
+print(handleDivision(10, 2))
+print(handleDivision(10, 0))
+print("Is success: " ++ toString(isSuccess))

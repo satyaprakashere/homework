@@ -1,0 +1,48 @@
+;; =============================================================================
+;; Example 4: Kurt Gödel's Unbounded Minimization (μ-Operator)
+;; File: 04_rekursion_godel_mu_minimization.rek
+;; Model: Gödel Recursive Function Theory (PR + μ-minimization)
+;; Rules:
+;;   - Unbounded minimization with 'mu'
+;;   - Bounded search with 'bounded_search'
+;;   - Bounded existential and universal quantifiers: 'exists_bounded', 'forall_bounded'
+;; =============================================================================
+
+(import "recursion")
+
+;; 1. Gödel μ-operator: finds the smallest natural number n such that predicate(n) == 0 (or true)
+;; Finding exact integer square root: smallest n where n*n == 144
+(let root_144 (mu (n) (sub (mul n n) 144)))
+(assert (equal root_144 12) "mu finds smallest n where n^2 - 144 = 0 -> 12")
+
+;; 2. Finding factor via boolean predicate: smallest n where n * 7 == 91
+(let factor_91 (mu (n) (equal (mul n 7) 91)))
+(assert (equal factor_91 13) "mu finds smallest n where n * 7 == 91 -> 13")
+
+;; 3. Bounded Search: searches up to bound k
+;; Find n <= 20 such that n * n == 100
+(let root_100 (bounded_search 20 (lambda (n) (equal (mul n n) 100))))
+(assert (equal root_100 10) "bounded_search finds 10 within limit 20")
+
+;; Search that exceeds bound returns nil
+(let unfound (bounded_search 5 (lambda (n) (equal (mul n n) 100))))
+(assert (equal unfound nil) "bounded_search returns nil when limit exceeded")
+
+;; 4. Bounded Quantifiers
+;; Forall bounded: for all n in [0..10], 2*n >= n
+(let prop_forall (forall_bounded 10 (lambda (n) (greater_equal (mul n 2) n))))
+(assert (equal prop_forall true) "forall_bounded holds for 2n >= n")
+
+;; Exists bounded: there exists n in [0..10] such that n * n == 49
+(let prop_exists (exists_bounded 10 (lambda (n) (equal (mul n n) 49))))
+(assert (equal prop_exists true) "exists_bounded holds for 7^2 = 49")
+
+;; 5. Output Verification
+(print "=== 04: Gödel μ-Minimization and Recursive Theory ===\n")
+(print "Root of 144 via μ-operator:     ") (print root_144) (newline)
+(print "Factor of 91 (7 * n) via μ:     ") (print factor_91) (newline)
+(print "Root of 100 via bounded search: ") (print root_100) (newline)
+(print "Exceeded bound returns:         ") (print unfound) (newline)
+(print "Forall bounded check (2n >= n): ") (print prop_forall) (newline)
+(print "Exists bounded check (n^2=49):  ") (print prop_exists) (newline)
+(print "Gödel μ-minimization verified successfully!\n")

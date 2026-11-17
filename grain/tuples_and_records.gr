@@ -1,0 +1,50 @@
+module TuplesAndRecords
+
+// Tuples & Records in Grain 🌾
+
+// 1. Tuples
+// Fixed-length heterogeneous collections
+let userPair = ("Alice", 28)
+let coord = (10, 20, 30)
+
+// Destructuring tuples
+let (name, age) = userPair
+let (x, y, z) = coord
+
+// 2. Records
+// Structured data types with named fields
+record Book {
+  title: String,
+  author: String,
+  pages: Number,
+  mut isRead: Bool, // Mutable field in record!
+}
+
+let book = {
+  title: "The Grain Language Guide",
+  author: "Community",
+  pages: 250,
+  isRead: false,
+}
+
+// Accessing record fields
+let bookTitle = book.title
+
+// Updating mutable record fields
+book.isRead = true
+
+// Functional Record Update (spread / clone with updates)
+let sequel = {
+  ...book,
+  title: "Advanced Grain for WebAssembly",
+  pages: 320,
+  isRead: false,
+}
+
+print("=== Tuples ===")
+print("Name: " ++ name ++ ", Age: " ++ toString(age))
+print("Coordinates: (" ++ toString(x) ++ ", " ++ toString(y) ++ ", " ++ toString(z) ++ ")")
+
+print("=== Records ===")
+print("Original Book: " ++ book.title ++ " (Read: " ++ toString(book.isRead) ++ ")")
+print("Sequel Book: " ++ sequel.title ++ " (" ++ toString(sequel.pages) ++ " pages)")

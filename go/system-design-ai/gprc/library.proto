@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package library;
+
+// The service definition
+service Inventory {
+  // A Unary RPC: Sends a BookRequest, returns a BookResponse
+  rpc GetBookInfo (BookRequest) returns (BookResponse) {}
+}
+
+// The request message containing the ISBN
+message BookRequest {
+  string isbn = 1;
+}
+
+// The response message containing book details
+message BookResponse {
+  string title = 1;
+  string author = 2;
+  int32 year_published = 3;
+}

@@ -1,0 +1,7 @@
+\n :: Nat -> 
+let add = \x :: Nat -> \y :: Nat -> rec(x, y, \n :: Nat -> \p :: Nat -> S(p)) in
+let pair = \a :: Nat -> \b :: Nat -> \f :: (x :: Nat) -> (y :: Nat) -> Nat -> f a b in
+let fst = \p :: ((x :: Nat) -> (y :: Nat) -> Nat) -> Nat -> p (\a :: Nat -> \b :: Nat -> a) in
+let snd = \p :: ((x :: Nat) -> (y :: Nat) -> Nat) -> Nat -> p (\a :: Nat -> \b :: Nat -> b) in
+let step = \m :: Nat -> \p :: ((x :: Nat) -> (y :: Nat) -> Nat) -> Nat -> pair (add (fst p) (snd p)) (fst p) in
+snd (rec(n, pair S(0) 0, step))

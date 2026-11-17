@@ -1,0 +1,36 @@
+fibonacci = {
+	:0 1
+	:1 1
+	:2 2
+	:3 4
+	:4 6
+}
+
+fibonacci = {
+	0: 1
+	1: 1
+	2: 2
+	3: 4
+	4: 6
+}
+
+User = {
+	name: 	 String
+	age: 	 u8
+	address: String
+}
+
+User = record {
+	name 	 String
+	age 		 u8
+	address  String
+}
+
+u_age = user age
+
+x = 10
+
+x := 10
+
+x : i8
+y = x(10)

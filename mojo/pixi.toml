@@ -1,0 +1,20 @@
+[workspace]
+name = "mojo-homework"
+version = "0.1.0"
+authors = ["Prakash"]
+channels = ["https://conda.modular.com/max-nightly", "conda-forge"]
+platforms = ["osx-arm64"]
+
+[dependencies]
+numpy = ">=1.26.0"
+mojo = ">=1.2.0.dev2026101705,<2"
+max = ">=26.6.0.dev2026090905,<27"
+matplotlib = ">=3.11.1,<4"
+
+[tasks]
+hello = "mojo hello_mojo.mojo"
+perf = "mojo performance.mojo"
+interop = "mojo python_interop.mojo"
+
+[activation.env]
+SDKROOT = "$(xcrun --show-sdk-path)"

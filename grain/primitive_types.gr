@@ -1,0 +1,43 @@
+module PrimitiveTypes
+
+// Primitive Data Types in Grain 🌾
+
+// 1. Numbers
+// The default `Number` type can represent integers, floats, and rational numbers!
+let integer = 42
+let floatingPoint = 3.14159
+let rational = 1/3 // Exact rational representation!
+
+// Fixed-width integer and float types for WebAssembly performance:
+let explicitInt32: Int32 = 100l
+let explicitInt64: Int64 = 1000000L
+let explicitFloat32: Float32 = 1.5f
+let explicitFloat64: Float64 = 2.71828d
+
+// 2. Booleans
+let isGrainFun = true
+let isWasmSlow = false
+let logicAnd = isGrainFun && !isWasmSlow
+
+// 3. Characters & Strings
+let letter: Char = 'G'
+let emoji: Char = '🌾'
+let greeting: String = "Hello from WebAssembly!"
+
+// 4. Void
+// Represents absence of a value (similar to unit/void in other languages)
+let empty: Void = void
+
+print("=== Primitive Types ===")
+print("Integer: " ++ toString(integer))
+print("Float: " ++ toString(floatingPoint))
+print("Rational (1/3): " ++ toString(rational))
+print("Int32: " ++ toString(explicitInt32))
+print("Int64: " ++ toString(explicitInt64))
+print("Float32: " ++ toString(explicitFloat32))
+print("Float64: " ++ toString(explicitFloat64))
+print("Boolean: " ++ toString(logicAnd))
+print("Char: " ++ toString(letter))
+print("Emoji: " ++ toString(emoji))
+print("String: " ++ greeting)
+print("Void: " ++ toString(empty))

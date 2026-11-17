@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jyotishi — Daily Rashifal & Vedic Horoscope</title>
+    <meta name="description" content="Discover your daily Vedic horoscope based on your Rashi (moon sign). Powered by ancient Jyotish wisdom and modern astrology." />
+    <meta property="og:title" content="Jyotishi — Daily Rashifal" />
+    <meta property="og:description" content="Your personalised daily horoscope by Rashi." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- HTMX -->
+    <script src="/node_modules/htmx.org/dist/htmx.min.js" defer></script>
+
+    <!-- Vite entry -->
+    <script type="module" src="/src/main.js" defer></script>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+
+    <!-- ── CSS Starfield (GPU-friendly) ── -->
+    <div id="starfield" aria-hidden="true"></div>
+
+    <!-- ── Floating orbs ── -->
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+    <div class="orb orb-3" aria-hidden="true"></div>
+
+    <!-- ── App shell ── -->
+    <div class="app-shell">
+
+      <!-- Hero -->
+      <header class="hero">
+        <div class="hero-bg" style="background-image:url('/hero-bg.jpg')"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="om-symbol" aria-hidden="true">ॐ</div>
+          <h1 class="hero-title">
+            <span class="title-jyotishi">Jyotishi</span>
+            <span class="title-dot">·</span>
+            <span class="title-sub">ज्योतिषी</span>
+          </h1>
+          <p class="hero-tagline">Unveil the cosmic blueprint of your day through Vedic Jyotish wisdom</p>
+          <div class="scroll-hint" aria-label="Scroll down">
+            <span class="scroll-arrow">↓</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="main-content">
+
+        <!-- Graha Chakra — live positions, HTMX-polled every hour -->
+        <section class="chakra-section" aria-labelledby="chakra-heading">
+          <div class="section-label">Live Planetary Positions</div>
+          <h2 id="chakra-heading" class="section-title">Navagraha Sthiti</h2>
+          <div
+            id="graha-chakra"
+            hx-get="/api/grahas"
+            hx-trigger="load, every 3600s"
+            hx-swap="innerHTML"
+            hx-indicator="#chakra-loader"
+            class="chakra-htmx-target"
+          >
+            <!-- Skeleton loader shown before HTMX response -->
+            <div id="chakra-loader" class="chakra-skeleton htmx-indicator">
+              <div class="skel-topbar"></div>
+              <div class="skel-grid">
+                ${Array(12).fill('<div class="skel-cell"></div>').join("")}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dual-Mode Form Section: Quick Rashi vs Complete Janma Kundli -->
+        <section class="form-section" aria-labelledby="form-heading">
+          
+          <!-- Mode Tabs -->
+          <div class="mode-tabs" role="tablist" aria-label="Astrology modes">
+            <button
+              type="button"
+              id="tab-rashi"
+              class="mode-tab active"
+              role="tab"
+              aria-selected="true"
+              aria-controls="panel-rashi"
+              onclick="window.switchJyotishiMode('rashi')"
+            >
+              <span class="tab-icon">✨</span>
+              <span>Quick Rashi Reading</span>
+            </button>
+            <button
+              type="button"
+              id="tab-kundli"
+              class="mode-tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="panel-kundli"
+              onclick="window.switchJyotishiMode('kundli')"
+            >
+              <span class="tab-icon">🪔</span>
+              <span>Janma Kundli (Birth Chart)</span>
+            </button>
+          </div>
+
+          <!-- ── Panel 1: Quick Rashi Reading ── -->
+          <div id="panel-rashi" class="mode-panel active" role="tabpanel" aria-labelledby="tab-rashi">
+            <div class="section-label">Choose Your Rashi</div>
+            <h2 id="form-heading" class="section-title">What do the stars say for you today?</h2>
+
+            <form
+              id="rashi-form"
+              hx-post="/api/horoscope"
+              hx-target="#horoscope-result"
+              hx-swap="innerHTML transition:true"
+              hx-indicator="#loading-indicator"
+              class="rashi-form"
+              novalidate
+            >
+              <!-- Rashi grid picker -->
+              <div class="rashi-grid" role="radiogroup" aria-label="Select your Rashi">
+                <label class="rashi-tile" for="r-mesh">
+                  <input type="radio" id="r-mesh" name="rashi" value="mesh" required />
+                  <span class="tile-emoji">♈</span>
+                  <span class="tile-name">Mesh</span>
+                  <span class="tile-sub">Aries</span>
+                </label>
+                <label class="rashi-tile" for="r-vrishabh">
+                  <input type="radio" id="r-vrishabh" name="rashi" value="vrishabh" />
+                  <span class="tile-emoji">♉</span>
+                  <span class="tile-name">Vrishabh</span>
+                  <span class="tile-sub">Taurus</span>
+                </label>
+                <label class="rashi-tile" for="r-mithun">
+                  <input type="radio" id="r-mithun" name="rashi" value="mithun" />
+                  <span class="tile-emoji">♊</span>
+                  <span class="tile-name">Mithun</span>
+                  <span class="tile-sub">Gemini</span>
+                </label>
+                <label class="rashi-tile" for="r-kark">
+                  <input type="radio" id="r-kark" name="rashi" value="kark" />
+                  <span class="tile-emoji">♋</span>
+                  <span class="tile-name">Kark</span>
+                  <span class="tile-sub">Cancer</span>
+                </label>
+                <label class="rashi-tile" for="r-simha">
+                  <input type="radio" id="r-simha" name="rashi" value="simha" />
+                  <span class="tile-emoji">♌</span>
+                  <span class="tile-name">Simha</span>
+                  <span class="tile-sub">Leo</span>
+                </label>
+                <label class="rashi-tile" for="r-kanya">
+                  <input type="radio" id="r-kanya" name="rashi" value="kanya" />
+                  <span class="tile-emoji">♍</span>
+                  <span class="tile-name">Kanya</span>
+                  <span class="tile-sub">Virgo</span>
+                </label>
+                <label class="rashi-tile" for="r-tula">
+                  <input type="radio" id="r-tula" name="rashi" value="tula" />
+                  <span class="tile-emoji">♎</span>
+                  <span class="tile-name">Tula</span>
+                  <span class="tile-sub">Libra</span>
+                </label>
+                <label class="rashi-tile" for="r-vrishchik">
+                  <input type="radio" id="r-vrishchik" name="rashi" value="vrishchik" />
+                  <span class="tile-emoji">♏</span>
+                  <span class="tile-name">Vrishchik</span>
+                  <span class="tile-sub">Scorpio</span>
+                </label>
+                <label class="rashi-tile" for="r-dhanu">
+                  <input type="radio" id="r-dhanu" name="rashi" value="dhanu" />
+                  <span class="tile-emoji">♐</span>
+                  <span class="tile-name">Dhanu</span>
+                  <span class="tile-sub">Sagittarius</span>
+                </label>
+                <label class="rashi-tile" for="r-makar">
+                  <input type="radio" id="r-makar" name="rashi" value="makar" />
+                  <span class="tile-emoji">♑</span>
+                  <span class="tile-name">Makar</span>
+                  <span class="tile-sub">Capricorn</span>
+                </label>
+                <label class="rashi-tile" for="r-kumbh">
+                  <input type="radio" id="r-kumbh" name="rashi" value="kumbh" />
+                  <span class="tile-emoji">♒</span>
+                  <span class="tile-name">Kumbh</span>
+                  <span class="tile-sub">Aquarius</span>
+                </label>
+                <label class="rashi-tile" for="r-meen">
+                  <input type="radio" id="r-meen" name="rashi" value="meen" />
+                  <span class="tile-emoji">♓</span>
+                  <span class="tile-name">Meen</span>
+                  <span class="tile-sub">Pisces</span>
+                </label>
+              </div>
+
+              <!-- Day selector -->
+              <div class="day-row">
+                <label class="day-btn">
+                  <input type="radio" name="day" value="yesterday" />
+                  <span>Yesterday</span>
+                </label>
+                <label class="day-btn active">
+                  <input type="radio" name="day" value="today" checked />
+                  <span>Today</span>
+                </label>
+                <label class="day-btn">
+                  <input type="radio" name="day" value="tomorrow" />
+                  <span>Tomorrow</span>
+                </label>
+              </div>
+
+              <!-- Submit -->
+              <button id="reveal-btn" type="submit" class="reveal-btn">
+                <span class="btn-icon">🔮</span>
+                <span class="btn-text">Reveal My Rashifal</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- ── Panel 2: Complete Janma Kundli (Birth Details Form) ── -->
+          <div id="panel-kundli" class="mode-panel" role="tabpanel" aria-labelledby="tab-kundli" hidden>
+            <div class="section-label">Vedic Birth Blueprint</div>
+            <h2 class="section-title">Enter Your Birth Details</h2>
+            <p class="kundli-form-intro">
+              Calculates your <strong>Rising Lagna</strong>, exact <strong>Chandra Rashi</strong>, <strong>Nakshatra</strong>, all <strong>12 Bhavas</strong>, and overlays <strong>live transits</strong> onto your birth chart.
+            </p>
+
+            <form
+              id="kundli-form"
+              hx-post="/api/kundli"
+              hx-target="#horoscope-result"
+              hx-swap="innerHTML transition:true"
+              hx-indicator="#loading-indicator"
+              class="kundli-form"
+            >
+              <div class="form-row-grid">
+                <!-- Name -->
+                <div class="form-group">
+                  <label for="k-name" class="input-label">Your Name</label>
+                  <input type="text" id="k-name" name="name" class="text-input" placeholder="e.g. Prakash" value="Prakash" />
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="form-group">
+                  <label for="k-dob" class="input-label">Date of Birth *</label>
+                  <input type="date" id="k-dob" name="dob" class="text-input" required value="1995-10-15" />
+                </div>
+
+                <!-- Time of Birth -->
+                <div class="form-group">
+                  <label for="k-tob" class="input-label">Time of Birth *</label>
+                  <input type="time" id="k-tob" name="tob" class="text-input" required value="07:30" />
+                </div>
+              </div>
+
+              <!-- Location Section: Search + Quick Chips + Direct Editable Inputs -->
+              <div class="location-picker-block">
+                <div class="location-top-bar">
+                  <label class="input-label">Birth Location & Ephemeris Coordinates *</label>
+                  <button type="button" class="geo-btn" onclick="window.useCurrentLocation()" title="Detect GPS location">
+                    <span>📍</span> Use My Current Location
+                  </button>
+                </div>
+
+                <!-- Search input for Any City in India/Worldwide -->
+                <div class="location-search-wrap">
+                  <div class="search-input-box">
+                    <span class="search-icon">🔍</span>
+                    <input
+                      type="text"
+                      id="city-search-input"
+                      class="text-input city-search-field"
+                      placeholder="Type any city or town worldwide (e.g. Patna, Varanasi, Lucknow, Dallas, Bristol)..."
+                      autocomplete="off"
+                      oninput="window.handleCitySearchInput(this.value)"
+                    />
+                    <span id="loc-spinner" class="loc-spinner" style="display:none">⏳</span>
+                  </div>
+                  <!-- Autocomplete results dropdown -->
+                  <div id="city-results-dropdown" class="city-results-dropdown" style="display:none"></div>
+                </div>
+
+                <!-- Quick Popular City Chips -->
+                <div class="popular-cities-row">
+                  <span class="pc-label">Quick select:</span>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('New Delhi, India', 28.6139, 77.2090, 5.5)">Delhi</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Mumbai, India', 19.0760, 72.8777, 5.5)">Mumbai</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Bengaluru, India', 12.9716, 77.5946, 5.5)">Bengaluru</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Patna, Bihar, India', 25.5941, 85.1356, 5.5)">Patna</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Kolkata, India', 22.5726, 88.3639, 5.5)">Kolkata</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Chennai, India', 13.0827, 80.2707, 5.5)">Chennai</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Hyderabad, India', 17.3850, 78.4867, 5.5)">Hyderabad</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Lucknow, Uttar Pradesh, India', 26.8467, 80.9462, 5.5)">Lucknow</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('London, United Kingdom', 51.5074, -0.1278, 0.0)">London</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('New York, USA', 40.7128, -74.0060, -5.0)">New York</button>
+                  <button type="button" class="pc-chip" onclick="window.setCityValues('Dubai, UAE', 25.2048, 55.2708, 4.0)">Dubai</button>
+                </div>
+
+                <!-- Direct, Fully Visible, and Editable Coordinate Inputs -->
+                <div class="active-coords-container">
+                  <div class="coords-header-row">
+                    <span class="acc-badge">Coordinates Used for Calculations:</span>
+                    <span class="acc-hint">Directly editable below</span>
+                  </div>
+                  <div class="coords-inputs-grid">
+                    <div class="form-group">
+                      <label for="k-city" class="sub-label">City / Place Name *</label>
+                      <input type="text" id="k-city" name="city" class="text-input" value="New Delhi, India" required placeholder="Place of birth" />
+                    </div>
+                    <div class="form-group">
+                      <label for="k-lat" class="sub-label">Latitude (°N is +, °S is -) *</label>
+                      <input type="number" step="any" id="k-lat" name="lat" class="text-input" value="28.6139" required placeholder="e.g. 25.5941" />
+                    </div>
+                    <div class="form-group">
+                      <label for="k-lon" class="sub-label">Longitude (°E is +, °W is -) *</label>
+                      <input type="number" step="any" id="k-lon" name="lon" class="text-input" value="77.2090" required placeholder="e.g. 85.1356" />
+                    </div>
+                    <div class="form-group">
+                      <label for="k-tz" class="sub-label">Timezone (Hours from UTC) *</label>
+                      <input type="number" step="any" id="k-tz" name="tz" class="text-input" value="5.5" required placeholder="e.g. 5.5 for IST" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button id="kundli-submit-btn" type="submit" class="reveal-btn kundli-btn">
+                <span class="btn-icon">🪔</span>
+                <span class="btn-text">Compute Janma Kundli & Transits</span>
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- Loading indicator -->
+        <div id="loading-indicator" class="loading-indicator htmx-indicator" aria-live="polite" aria-label="Loading horoscope">
+          <div class="loader-ring"></div>
+          <div class="loader-ring loader-ring-2"></div>
+          <div class="loader-ring loader-ring-3"></div>
+          <p class="loader-text">Consulting the stars…</p>
+        </div>
+
+        <!-- Horoscope result (HTMX target) -->
+        <section id="horoscope-result" aria-live="polite" class="result-section">
+          <!-- Filled by HTMX -->
+        </section>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>🪐 Jyotishi &mdash; Vedic wisdom meets modern stargazing</p>
+        <p class="footer-note">Horoscopes are for entertainment. Trust your own intuition.</p>
+      </footer>
+    </div>
+
+  </body>
+</html>

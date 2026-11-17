@@ -1,0 +1,17 @@
+procedure read_utf8(path) url, err {
+	line <- read_line()
+}
+
+function fibonacci(n uint64, a, b uint64 = 0, 1) {
+	recur(n-1, b, a+b) unless n {
+		0 -> a
+	}
+}
+
+html dashboard() {
+	<h1></h1>
+}
+
+<html>
+
+</html>

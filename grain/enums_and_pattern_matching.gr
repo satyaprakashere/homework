@@ -1,0 +1,59 @@
+module EnumsAndPatternMatching
+
+// Enums & Pattern Matching in Grain 🌾
+
+// 1. Simple Enum
+enum Direction {
+  North,
+  South,
+  East,
+  West,
+}
+
+// 2. Algebraic Data Type (Enum with variant arguments)
+enum Shape {
+  Circle(Number),            // radius
+  Rectangle(Number, Number), // width, height
+  Point,
+}
+
+// 3. Pattern Matching with `match`
+let describeDirection = (dir) => {
+  match (dir) {
+    North => "Heading North ⬆️",
+    South => "Heading South ⬇️",
+    East => "Heading East ➡️",
+    West => "Heading West ⬅️",
+  }
+}
+
+let area = (shape) => {
+  match (shape) {
+    Circle(r) => 3.14159265 * r * r,
+    Rectangle(w, h) => w * h,
+    Point => 0,
+  }
+}
+
+// 4. Pattern Matching with `when` guards & wildcard `_`
+let classifyScore = (score) => {
+  match (score) {
+    s when s >= 90 => "Grade: A (Excellent)",
+    s when s >= 75 => "Grade: B (Good)",
+    s when s >= 50 => "Grade: C (Pass)",
+    _ => "Grade: F (Try again)",
+  }
+}
+
+let myCircle = Circle(10)
+let myRect = Rectangle(4, 7)
+let myPoint = Point
+
+print("=== Enums & Pattern Matching ===")
+print(describeDirection(North))
+print("Circle area: " ++ toString(area(myCircle)))
+print("Rectangle area: " ++ toString(area(myRect)))
+print("Point area: " ++ toString(area(myPoint)))
+print(classifyScore(95))
+print(classifyScore(60))
+print(classifyScore(40))

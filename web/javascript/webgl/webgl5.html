@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Zeta(1/2 + x i) WebGL</title>
+<style>
+  body { margin: 0; background: #111; color: #eee; font-family: sans-serif; }
+  #ui { position: absolute; top: 10px; left: 10px; z-index: 10; }
+  #slider { width: 300px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <label for="slider">x (imag part): <span id="xval">0.0</span></label><br>
+  <input id="slider" type="range" min="1" max="100" step="1" value="0">
+</div>
+<canvas id="glcanvas" width="1920" height="600"></canvas>
+
+<script>
+// ----- Basic WebGL setup -----
+const canvas = document.getElementById('glcanvas');
+const gl = canvas.getContext('webgl');
+if (!gl) { alert('WebGL not supported'); }
+
+// Vertex shader: takes positions in clip space
+const vsSource = `
+attribute vec2 a_position;
+uniform vec2 u_scale;
+void main() {
+  vec2 scaled = a_position * u_scale;
+  gl_Position = vec4(scaled, 0.0, 1.0);
+}
+`;
+
+// Fragment shader: simple color
+const fsSource = `
+precision mediump float;
+uniform vec4 u_color;
+void main() {
+  gl_FragColor = u_color;
+}
+`;
+
+function createShader(gl, type, source) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, source);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    console.error(gl.getShaderInfoLog(s));
+    gl.deleteShader(s);
+    return null;
+  }
+  return s;
+}
+
+function createProgram(gl, vsSource, fsSource) {
+  const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+  const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+  const p = gl.createProgram();
+  gl.attachShader(p, vs);
+  gl.attachShader(p, fs);
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+    console.error(gl.getProgramInfoLog(p));
+    return null;
+  }
+  return p;
+}
+
+const program = createProgram(gl, vsSource, fsSource);
+gl.useProgram(program);
+
+const a_position = gl.getAttribLocation(program, 'a_position');
+const u_scale    = gl.getUniformLocation(program, 'u_scale');
+const u_color    = gl.getUniformLocation(program, 'u_color');
+
+const positionBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+gl.enableVertexAttribArray(a_position);
+gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
+
+// ----- Simple complex helpers -----
+function cAdd(a, b) { 
+  return { re: a.re + b.re, im: a.im + b.im };
+}
+  
+function cMul(a, b) {
+  return { re: a.re*b.re - a.im*b.im, im: a.re*b.im + a.im*b.re };
+}
+  
+function cExp(a) {
+  const e = Math.exp(a.re);
+  return { re: e * Math.cos(a.im), im: e * Math.sin(a.im) };
+}
+
+// Compute n^{-s} = exp(-s log n)
+function nPowMinusS(n, s) {
+  const ln = Math.log(n);
+  const z = { re: -s.re * ln, im: -s.im * ln };
+  return cExp(z);
+}
+
+// Truncated Dirichlet sum approximation: zeta(s) ≈ Σ_{n=1}^N 1/n^s
+function zetaApprox(s, N) {
+  let sum = { re: 0, im: 0 };
+  for (let n = 1; n <= N; n++) {
+    sum = cAdd(sum, nPowMinusS(n, s));
+  }
+  return sum;
+}
+
+// ----- Build polyline for t in [0, x] -----
+function buildZetaCurve(x, Nterms, Nsamples) {
+  const points = [];
+  const sRe = 0.5;
+  const tMax = x;
+  const sign = (tMax >= 0) ? 1 : -1;
+  for (let i = 0; i <= Nsamples; i++) {
+    const t = (i / Nsamples) * Math.abs(tMax) * sign;
+    const s = { re: sRe, im: t };
+    const z = zetaApprox(s, Nterms);
+    points.push(z.re, z.im);
+  }
+  return new Float32Array(points);
+}
+
+// ----- Drawing -----
+function drawScene(x) {
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.clearColor(0.07, 0.07, 0.07, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // Build curve data
+  const Nterms   = 200;   // number of terms in Dirichlet series
+  const Nsamples = 400;   // number of sample points along t
+  const curve = buildZetaCurve(x, Nterms, Nsamples);
+
+  // Determine scale so curve fits nicely
+  let maxAbs = 1e-6;
+  for (let i = 0; i < curve.length; i++) {
+    const v = Math.abs(curve[i]);
+    if (v > maxAbs) maxAbs = v;
+  }
+  const margin = 1.2;
+  const sx = 1.0 / (maxAbs * margin);
+  const sy = 1.0 / (maxAbs * margin);
+  gl.uniform2f(u_scale, sx, sy);
+
+  // Draw curve as line strip
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, curve, gl.DYNAMIC_DRAW);
+  gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
+
+  gl.uniform4f(u_color, 0.2, 0.7, 1.0, 1.0);
+  gl.drawArrays(gl.LINE_STRIP, 0, curve.length / 2);
+
+  // Draw current endpoint as a point (small line strip)
+  const lastRe = curve[curve.length - 2];
+  const lastIm = curve[curve.length - 1];
+  const dot = new Float32Array([
+    lastRe - 0.01, lastIm,
+    lastRe + 0.01, lastIm
+  ]);
+  gl.bufferData(gl.ARRAY_BUFFER, dot, gl.DYNAMIC_DRAW);
+  gl.uniform4f(u_color, 1.0, 0.4, 0.2, 1.0);
+  gl.drawArrays(gl.LINES, 0, 2);
+}
+
+// ----- Slider control for x -----
+const slider = document.getElementById('slider');
+const xval   = document.getElementById('xval');
+
+function updateFromSlider() {
+  // Map slider [0,100] to x in [0,40] for example
+  const t = parseFloat(slider.value);
+  const x = (t / 100) * 400.0;
+  xval.textContent = x.toFixed(2);
+  drawScene(x);
+}
+
+slider.addEventListener('input', updateFromSlider);
+updateFromSlider();
+</script>
+</body>
+</html>

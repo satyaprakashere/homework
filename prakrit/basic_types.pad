@@ -1,0 +1,68 @@
+package main
+-- ==========================================================
+-- Rekursion Polyglot: Padini Dialect (Go + Haskell Ergonomics)
+-- ==========================================================
+-- Approachable Go-like structs and dot-access combined with
+-- Haskell's mathematical pipelines, equational matching, and Gödel recursion.
+
+type Point record where
+  x Int
+  y Int
+
+pt = Point 12 18
+pt = Point x(12) y(18)
+pt = Point { x: 12, y: 18 }
+point_sum = pt.x + pt.y
+
+-- 2. Pure Functions, Pipelines, and Where Clauses
+plus :: (Int, Int) -> Int
+plus x y = x + y
+
+plus(x Int, y Int) Int = x + y
+
+double of Int -> Int
+double :: Int -> Int
+double x = x*2
+
+func double :: Int -> Int
+func double x = x *2
+
+double = *2
+
+
+func double(x Int) Int = x * 2
+
+proc read_line(res):
+  x = read_char
+  recur(res++x) unless x:
+    case "n" => return res
+
+piped_val = 5 |> double |> plus(10)
+
+calc(a Int, b Int) Int = sq_a + sq_b where
+  sq_a = a * a
+  sq_b = b * b
+
+-- 3. Sum Types & Dependent Vectors
+type Option a union Type where
+  None Option a
+  Some a Option(a)
+
+opt_val = Some(42)
+
+-- 4. Gödel Primitive Tail Recursion
+fact_nat(0, acc) = acc
+fact_nat(n, acc) = recur(n - 1, acc * n)
+
+factorial(n Int) Int = fact_nat(n, 1)
+
+-- 5. Execution Output
+println("=== Padini Dialect Showcase ===")
+println("Point coordinates sum:")
+println(point_sum)
+println("Pipeline (5 |> double |> plus 10):")
+println(piped_val)
+println("Where clause (calc 3 4):")
+println(calc(3, 4))
+println("Factorial (5!):")
+println(factorial(5))

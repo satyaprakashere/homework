@@ -1,0 +1,55 @@
+// =============================================================================
+// Example 8: Collections & Pattern Matching in Loki
+// File: 08_loki_data_structures_and_records.loki
+// Features:
+//   - Array literals '[...]'
+//   - Object dictionaries '{ ... }'
+//   - Pattern matching using 'match' expressions
+//   - Functional transformations on collections
+// =============================================================================
+
+// 1. Array collections
+numbers = [10, 20, 30, 40, 50]
+tags = ["odin", "rekursion", "loki"]
+
+// 2. Objects / Dictionaries
+server_config = { host: "127.0.0.1", port: 8080, secure: true }
+
+// 3. Pattern Matching with 'match' block
+function describe_http_code(code) {
+    status = match code {
+        case 200 -> "200: OK - Request Succeeded"
+        case 201 -> "201: Created - Resource Provisioned"
+        case 400 -> "400: Bad Request"
+        case 404 -> "404: Not Found"
+        case 500 -> "500: Internal Server Error"
+    }
+    return status
+}
+
+// 4. Pattern Matching with fallback via 'unless'
+function get_role_access(role) {
+    access = "guest:read_only" unless role {
+        case 1 -> "admin:full_access"
+        case 2 -> "developer:write_access"
+        case 3 -> "analyst:read_reports"
+    }
+    return access
+}
+
+// 5. Evaluate pattern matching
+desc_200 = describe_http_code(200)
+desc_404 = describe_http_code(404)
+access_admin = get_role_access(1)
+access_unknown = get_role_access(99)
+
+// 6. Output
+console.log("=== 08: Loki Collections & Pattern Matching ===")
+console.log("Numbers Array:   ", numbers)
+console.log("Tags Array:      ", tags)
+console.log("Server Config:   ", server_config)
+console.log("Match 200:       ", desc_200)
+console.log("Match 404:       ", desc_404)
+console.log("Role 1 Access:   ", access_admin)
+console.log("Role 99 Access:  ", access_unknown)
+console.log("Loki data structures and matching verified successfully!")

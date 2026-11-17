@@ -1,0 +1,32 @@
+<server>
+(type fact (Int) Int)
+(define (fact n)
+	(define (loop i acc)
+		(if (eq i 0)
+			acc
+			(recur (sub i 1) (mul i acc))))
+	(loop n 1))
+</server>
+
+<html>
+
+	<p>
+		<server>(fmt.sprintf "Fib 9: {}" (fib 9)) </server>
+	</p>
+<html>
+
+<html>
+	<server> fib a(0) b(1) n = recur b (a+b) (n-1) unless n is 1 then b </server>
+	
+	<p>
+		<client> (fib 1234) </client>
+	</p>
+<html>
+
+<server>
+(function)
+
+#html
+#server
+#p
+#client

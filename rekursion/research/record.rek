@@ -1,0 +1,32 @@
+
+User = record T {
+	name String
+	age  u8
+	data T
+}
+
+user_age = user age
+
+maybe_x = x or nil
+maybe_y = y | nil
+
+// Vibhakti Syntax
+
+young_users = select "*" from table Users where age < 18
+
+young_users = select "*" from table Users where {
+	age < 18
+	starts_with name "small"
+}
+
+for x from list {
+	send x to y
+}
+
+for x in list {
+	x = 10
+}
+
+procedure getValue x {
+
+}

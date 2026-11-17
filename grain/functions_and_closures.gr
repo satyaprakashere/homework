@@ -1,0 +1,45 @@
+module FunctionsAndClosures
+
+// Functions, Closures & Recursion in Grain 🌾
+
+// 1. Basic Function Syntax
+// Grain uses arrow syntax `(args) => expression`
+let add = (a, b) => a + b
+
+// 2. Multi-line Function with Block Body
+// The value of the last expression in the block is returned implicitly
+let circleArea = (radius) => {
+  let pi = 3.141592653589793
+  pi * radius * radius
+}
+
+// 3. Closures / Returning Functions
+// Functions can return other functions, capturing lexical state
+let makeMultiplier = (factor) => {
+  (value) => value * factor
+}
+let double = makeMultiplier(2)
+let triple = makeMultiplier(3)
+
+// 4. Recursive Functions
+// Recursive functions MUST use `let rec`
+let rec factorial = (n) => {
+  if (n <= 1) {
+    1
+  } else {
+    n * factorial(n - 1)
+  }
+}
+
+// 5. Higher-Order Functions
+// Functions can be passed as parameters to other functions
+let applyTwice = (fn, x) => fn(fn(x))
+let increment = (x) => x + 1
+
+print("=== Functions and Closures ===")
+print("add(5, 7): " ++ toString(add(5, 7)))
+print("circleArea(5.0): " ++ toString(circleArea(5.0)))
+print("double(21): " ++ toString(double(21)))
+print("triple(10): " ++ toString(triple(10)))
+print("factorial(6): " ++ toString(factorial(6)))
+print("applyTwice(increment, 10): " ++ toString(applyTwice(increment, 10)))

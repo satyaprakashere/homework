@@ -1,0 +1,38 @@
+// =============================================================================
+// Example 6: Loki Fundamentals
+// File: 06_loki_fundamentals.loki
+// Frontend: Modern functional JavaScript-like syntax compiling to Rekursion AST
+// =============================================================================
+
+// 1. Bare top-level bindings (immutable by default in pure context)
+base_salary = 50000
+bonus = 12500
+
+// 2. Pure function definitions
+function calculate_gross(base, extra) {
+    return base + extra
+}
+
+function calculate_tax(gross, rate) {
+    return (gross * rate) / 100
+}
+
+function calculate_net(base, extra, tax_rate) {
+    gross = calculate_gross(base, extra)
+    tax = calculate_tax(gross, tax_rate)
+    return gross - tax
+}
+
+// 3. Execution
+gross_pay = calculate_gross(base_salary, bonus)
+tax_deduction = calculate_tax(gross_pay, 20)
+net_pay = calculate_net(base_salary, bonus, 20)
+
+// 4. Output via Loki console
+console.log("=== 06: Loki Language Fundamentals ===")
+console.log("Base Salary:    ", base_salary)
+console.log("Bonus:          ", bonus)
+console.log("Gross Pay:      ", gross_pay)
+console.log("Tax (20%):      ", tax_deduction)
+console.log("Net Take-Home:  ", net_pay)
+console.log("Loki fundamentals executed successfully!")

@@ -1,0 +1,15 @@
+protocol Blank a where
+    blank? : a -> bool
+end
+
+protocol Point a d where
+end
+
+3.times do i in
+  spawn do
+    3.times do j in
+      sleep rand(100).milliseconds # add non-determinism for fun
+        channel.send 10 * (i + 1) + j
+    end
+  end
+end

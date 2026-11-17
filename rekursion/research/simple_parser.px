@@ -1,0 +1,263 @@
+;  phoenix version 1.00
+;  file version 1.00
+;  creted at 31-01-2016 at IIT Kharagur
+;
+;  Created by Satya Prakash.
+;  Copyright (c) 2015 Satya Prakash. All rights reserved.
+
+import Text.ParserCombinators.Parsec except (spaces)
+import System.Environment
+import Control.Monad.Error
+import Control.Monad
+
+module Main
+
+func main : IO()
+func main = do
+      args <- getArgs
+      let evaled = args.head.readExpr.bind.eval.liftM(show)
+      let evaled = args |> head |> readExpr |> bind |> eval |> leftM show |> haha
+        in evaled.trapError.extractValue.putStrLn
+        in evaled |> trapError |> extractValue |> putStrLn
+end
+
+--------------------------------------------------------
+
+val symbol : Parser Char
+val symbol = Parsec.oneOf("!#$%&|*+-/:<=>?@^_~")
+
+val spaces : Parser ()
+val spaces = Parsec.skipMany1(space)
+
+func readExpr : String -> ThrowsError LispVal
+func readExpr input = parseExpr.parse("lisp", input) match
+                        Left err  -> Parser err |> throwError
+                        Right v   -> v
+                      end
+
+data LispVal = Atom String
+              | List [LispVal]
+              | DottedList [LispVal] LispVal
+              | Number Integer
+              | String String
+              | Bool Bool
+
+val parseExpr : Parser LispVal
+val parseExpr = parseAtom
+          <|> parseString
+          <|> parseNumber
+          <|> parseQuoted
+          <|> do char '('
+                x <- try parseList <|> parseDottedList
+                char ')'
+                return x
+              end
+
+val parseString : Parser LispVal
+val parseString = do
+  char '"'
+  x <- many (noneOf "\"")
+  char '"'
+  return String x
+end
+
+val parseAtom : Parser LispVal
+val parseAtom = do
+  first <- letter <|> symbol
+  rest <- many (letter <|> digit <|> symbol)
+  val atom = first :: rest
+  return atom match
+      "true" -> Bool True
+      "$f"   -> Bool False
+      otherwise -> Atom atom
+  end
+end
+
+val parseNumber : Parser LispVal
+val parseNumber = Parsec.many1(digit).liftM(read.Number)
+
+val parseList : Parser LispVal
+val parseList = parseExpr.sepBy(spaces).liftM(List)
+
+val parseDottedList : Parser LispVal
+val parseDottedList = do
+  head <- parseExpr.endBy(spaces)
+  tail <- char '.' >> spaces >> parseExpr
+  return DottedList head tail
+end
+
+val parseQuoted : Parser LispVal
+val parseQuoted = do
+  char '\''
+  x <- parseExpr
+  return List [Atom "quote", x]
+end
+
+func showVal : LispVal -> String where
+     showVal (String contents) = "\"" ++ contents ++ "\""
+     showVal (Atom name) = name
+     showVal (Number contents) = show contents
+     showVal (Bool True) = "true"
+     showVal (Bool False) = "false"
+     showVal (List contents) = "(" ++ unwordsList contents ++ ")"
+     showVal (DottedList head tail) = "(" ++ unwordsList head ++ " . " ++ showVal tail ++ ")"
+
+func unwordsList : [LispVal] -> String
+func unwordsList = unwords . map showVal
+
+instance Show LispVal where show = showVal
+
+func eval : LispVal -> ThrowsError LispVal
+func eval val@(String _) = return val
+func eval val@(Number _) = return val
+func eval val@(Bool _) = return val
+
+func eval (List [Atom "quote", val]) = return val
+func eval (List [Atom "if", pred, conseq, alt]) = do
+                     result <- eval pred
+                     case result of
+                       Bool False -> eval alt
+                       otherwise -> eval conseq
+                end
+func eval (List (Atom func : args)) = mapM eval args >>= apply func
+func eval badForm = throwError $ BadSpecialForm "Unrecognized special form" badForm
+
+
+func apply : String -> [LispVal] -> ThrowsError LispVal
+func apply args = maybe (throwError $ NotFunction "Unrecognized primitive function args" func)
+                        ($ args)
+                        (lookup func primitives)
+
+func primitives : [(String, [LispVal] -> ThrowsError LispVal)]
+func primitives = [("+", numberBinop (+)),
+                    ("-", numberBinop (-)),
+                    ("*", numberBinop (*)),
+                    ("/", numberBinop div),
+                    ("mod", numberBinop mod),
+                    ("%", numberBinop mod),
+                    ("quotient", numberBinop quot),
+                    ("div", numberBinop quot),
+                    ("remainder", numberBinop rem),
+                    ("%", numberBinop rem),
+                    ("=", numBoolBinop (==)),
+                    ("<", numBoolBinop (<)),
+                    (">", numBoolBinop (>)),
+                    ("/=", numBoolBinop (/=)),
+                    (">=", numBoolBinop (>=)),
+                    ("<=", numBoolBinop (<=)),
+                    ("&&", boolBoolBinop (&&)),
+                    ("||", boolBoolBinop (||)),
+                    ("string=?" , strBoolBinop (==)),
+                    ("string?" , strBoolBinop (>)) ,
+                    ("string<=?", strBoolBinop (<=)),
+                    ("string>=?", strBoolBinop (>=)),
+                    ("head", car),
+                    ("tail", cdr),
+                    ("cons", cons),
+                    ("eq?", eqv),
+                    ("eqv?", eqv)]
+
+func car : [LispVal] -> ThrowsError LispVal
+func car [List (x : xs)] = return x
+func car [DottedList (x : xs) _] = return x
+func car [badArg] = throwError $ TypeMismatch "pair" badArg
+func car badArgList = throwError $ NumArgs 1 badArgList
+
+func cdr : [LispVal] -> ThrowsError LispVal
+func cdr [List (x : xs)] = return $ List xs
+func cdr [DottedList (_ : xs) x] = return $ DottedList xs x
+func cdr [DottedList [xs] x] = return x
+func cdr [badArg] = throwError $ TypeMismatch "pair" badArg
+func cdr badArgList = throwError $ NumArgs 1 badArgList
+
+func cons : [LispVal] -> ThrowsError LispVal
+func cons [x1, List []] = return $ List [x1]
+func cons [x, List xs] = return $ List $ x : xs
+func cons [x, DottedList xs xlast] = return $ DottedList (x : xs) xlast
+func cons [x1, x2] = return $ DottedList [x1] x2
+func cons badArgList = throwError $ NumArgs 2 badArgList
+
+
+func eqv : [LispVal] -> ThrowsError LispVal
+func eqv [_, _] = return $ Bool False
+func eqv badArgList = throwError $ NumArgs 2 badArgList
+func eqv [Atom arg1, Atom arg2] = return $ Bool $ arg1 == arg2
+func eqv [Bool arg1, Bool arg2] = return $ Bool $ arg1 == arg2
+func eqv [Number arg1, Number arg2] = return $ Bool $ arg1 == arg2
+func eqv [String arg1, String arg2] = return $ Bool $ arg1 == arg2
+func eqv [DottedList xs x, DottedList ys y] = eqv [List $ xs ++ [x], List $ ys ++ [y]]
+func eqv [List arg1, List arg2] = return $ Bool $ (length arg1 == length arg2)
+                              && all eqvPair (zip arg1 arg2) where
+                              eqvPair (x1, x2) = case eqv [x1, x2] of
+                                                    Left err -> False
+                                                    Right (Bool val) -> val
+
+func numberBinop : (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
+func numberBinop op singleVal@[_] = throwError $ NumArgs 2 singleVal
+func numberBinop op params = liftM (Number . foldl1 op) (mapM unpackNum params)
+
+func boolBinop : (LispVal -> ThrowsError a) -> (a -> a -> Bool) -> [LispVal] ->ThrowsError LispVal
+func boolBinop unpacker op args = if length args /= 2
+                                then throwError $ NumArgs 2 args
+                                else do left <- unpacker $ head args
+                                        right <- unpacker $ args !! 1
+                                        return $ Bool $ left `op` right
+
+func numBoolBinop = boolBinop unpackNum
+func strBoolBinop = boolBinop unpackStr
+func boolBoolBinop = boolBinop unpackBool
+
+func unpackNum : LispVal -> ThrowsError Integer
+func unpackNum (Number n) = return n
+func unpackNum (String n) = let parsed = reads n in
+                           if null parsed
+                              then throwError $ TypeMismatch "number" $ String n
+                              else return $ fst $ head parsed
+
+func unpackNum (List [n]) = unpackNum n
+func unpackNum notNum = throwError $ TypeMismatch "number" notNum
+
+func unpackStr : LispVal -> ThrowsError String
+func unpackStr (String s) = return s
+func unpackStr (Number s) = return $ show s
+func unpackStr (Bool s) = return $ show s
+func unpackStr notString = throwError $ TypeMismatch "string" notString
+
+func unpackBool : LispVal -> ThrowsError Bool
+func unpackBool (Bool b) = return b
+func unpackBool notBool = throwError $ TypeMismatch "boolean" notBool
+
+data LispError = NumArgs Integer [LispVal]
+                | TypeMismatch String LispVal
+                | Parser ParseError
+                | BadSpecialForm String LispVal
+                | NotFunction String String
+                | UnboundVar String String
+                | Default String
+
+func showError : LispError -> String
+func showError (UnboundVar message varname) = message ++ ": " ++ varname
+func showError (BadSpecialForm message form) = message ++ ": " ++ show form
+func showError (NotFunction message fun) = message ++ ": " ++ show fun
+func showError (Parser parseErr) = "Parse error at " ++ show parseErr
+func showError (TypeMismatch expected found) = "Invalid type: expected " ++ expected
+                                                                    ++ ", found "
+                                                                    ++ show found
+func showError (NumArgs expected found) = "Expected " ++ show expected
+                                                ++ "args: found values "
+                                                ++ unwordsList found
+
+
+instance Show LispError where
+  show = showError
+
+instance Error LispError where
+  noMsg = Default "An error has occurred"
+  strMsg = Default
+
+alias ThrowsError = Either LispError
+
+func trapError action = catchError action (return . show)
+
+func extractValue : ThrowsError a -> a
+func extractValue (Right val) = val

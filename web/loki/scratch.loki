@@ -1,0 +1,6 @@
+function fib(n, a, b) = recur(n-1, b, a+b) unless n {
+	case 0 -> a
+}
+
+console.log("Hello from Loki!")
+console.log(fib(10, 0, 1))

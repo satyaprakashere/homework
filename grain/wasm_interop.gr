@@ -1,0 +1,38 @@
+module WasmInterop
+
+// Grain to WebAssembly (WASM) 🌾
+//
+// Grain is designed from the ground up to compile directly to WebAssembly!
+//
+// Any binding or type marked with `provide` is exported from the module.
+// When compiled with `grain compile`, exported functions become accessible
+// to WebAssembly runtimes (Node.js, browsers, Wasmtime, Wasmer, or other Grain modules).
+
+// Exported pure math functions
+provide let add = (a: Number, b: Number) => {
+  a + b
+}
+
+provide let multiply = (a: Number, b: Number) => {
+  a * b
+}
+
+provide let isEven = (n: Number) => {
+  n % 2 == 0
+}
+
+provide let rec fibonacci = (n: Number) => {
+  if (n <= 0) {
+    0
+  } else if (n == 1) {
+    1
+  } else {
+    fibonacci(n - 1) + fibonacci(n - 2)
+  }
+}
+
+// Module execution entry point (runs on start)
+print("=== WebAssembly Module Initialized ===")
+print("add(15, 27) = " ++ toString(add(15, 27)))
+print("fibonacci(10) = " ++ toString(fibonacci(10)))
+print("isEven(42) = " ++ toString(isEven(42)))

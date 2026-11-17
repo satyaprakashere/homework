@@ -1,0 +1,29 @@
+
+main = process {
+	
+}
+
+perception = process eyes ears {
+	
+}
+
+planning = process {
+	
+}
+
+state = process {
+	
+}
+
+fibonacci = process "generator" {
+	
+}
+
+fib = function a b n {
+	recur b (a+b) (n-1)
+	
+	unless n is 0 then return a
+}
+
+x = 10
+

@@ -1,0 +1,29 @@
+#(import (lone print lambda control transfer) (math +))
+#
+#(print
+# (+ 1
+#   (control
+#     (+ 98 (transfer 41))
+#     (lambda (value continuation)
+#       (continuation 1)))))
+
+num = 1 + control do
+  try 98 + throw(10)
+  catch e do
+    continue 1
+  end
+end
+
+def f x = throw (10)
+
+num = 1 + try 98 + f(6) catch e do
+    continue 1
+  end
+end
+
+print num // 100
+
+num <- 98 + f(6) catch e do
+    continue 1
+  end
+end

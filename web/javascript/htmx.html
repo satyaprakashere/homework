@@ -1,0 +1,9 @@
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
+<!-- have a button POST a click via AJAX -->
+<button hx-post="/clicked" hx-swap="outerHTML">
+  Click Me
+</button>
+
+<div hx-get="/clicked" hx-trigger="load" hx-swap="innerHTML">
+  Loading...
+</div>

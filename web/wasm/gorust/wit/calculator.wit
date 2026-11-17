@@ -1,0 +1,40 @@
+package example:calculator@0.1.0;
+
+interface types {
+    enum operation {
+        add,
+        subtract,
+        multiply,
+        divide,
+    }
+
+    record compute-request {
+        op: operation,
+        a: f64,
+        b: f64,
+    }
+
+    record stats {
+        count: u32,
+        min: f64,
+        max: f64,
+        mean: f64,
+        sum: f64,
+    }
+}
+
+interface engine-api {
+    use types.{operation, compute-request, stats};
+
+    calculate: func(req: compute-request) -> result<f64, string>;
+    compute-stats: func(numbers: list<f64>) -> result<stats, string>;
+    format-report: func(title: string, data: stats) -> string;
+}
+
+world engine {
+    export engine-api;
+}
+
+world runner {
+    import engine-api;
+}

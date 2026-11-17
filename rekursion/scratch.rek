@@ -1,0 +1,38 @@
+;; 1. Simple Values
+42
+(println "Hello from Rekursion Playground!")
+true
+nil
+
+;; 2. Arithmetic Primitives (No operators like + or * in core)
+(add 10 32)
+(sub 100 42)
+(mul 7 8)
+(div 144 12)
+(rem 17 5)
+(println (rem 17 5))
+
+;; 3. Immutable Bindings
+(define pi 3.14159)
+(define radius 5)
+(function (area_of r)
+    (mul pi r r))
+(define area
+    (mul pi radius radius))
+(println area)
+(println (area_of 10))
+
+;; 4. First-Class Arrays / Vectors (Using [...] brackets)
+(let arr [1 2 3 4 5])
+(first [10 20 30])
+(rest [10 20 30])
+(append [1 2] 3)
+(array_get [100 200 300] 1)
+(println (rest arr))
+
+;; 5. Hash Maps
+;(define user (make_map))
+;(map_set user 'name "Ada Lovelace")
+;(map_set user 'role "Computing Pioneer")
+;(map_get user 'name)
+

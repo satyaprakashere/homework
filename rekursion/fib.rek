@@ -1,0 +1,7 @@
+(function (fib n) (fibH 0 1 n) (where
+    (function (fibH a b n) (if (eq n 0)
+        a
+        (recur b (add a b) (sub n 1))))))
+
+(let res (fib 23))
+(println "fib of 23:" res)

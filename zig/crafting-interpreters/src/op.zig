@@ -1,0 +1,4 @@
+pub const CODE = enum {
+    RETURN, CONSTANT, NIL,
+    ADD, SUB, MUL, DIV, RECUR, BASE, IF, ELSE, WHEN, WHERE, DO
+};

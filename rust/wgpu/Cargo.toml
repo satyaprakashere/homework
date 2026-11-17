@@ -1,0 +1,9 @@
+[package]
+name = "webgpu"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+wgpu = "24.0" # Use the latest stable release
+winit = { version = "0.29", features = ["rwh_06"] } # Handles windowing
+pollster = "0.3" # Allows running async wgpu functions natively

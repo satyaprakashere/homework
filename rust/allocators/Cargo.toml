@@ -1,0 +1,12 @@
+[package]
+name = "allocators"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# We don't need external dependencies since we're writing allocators from scratch.
+
+[[bin]]
+name = "allocators"
+path = "src/main.rs"
+test = false

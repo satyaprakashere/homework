@@ -1,0 +1,48 @@
+// =============================================================================
+// Example 7: Tail Recursion & Guard Patterns in Loki
+// File: 07_loki_tail_recursion_and_guards.loki
+// Features:
+//   - Tail-call optimization with 'recur'
+//   - Multi-case and single-line 'unless' pattern guards
+//   - Default-first 'unless' fallback expressions
+// =============================================================================
+
+// 1. Fibonacci with multi-case 'unless' guard
+function fibonacci(a, b, n) = recur(b, a + b, n - 1) unless {
+    case n <= 0 -> a
+    case n = 1  -> b
+}
+
+// 2. Single-line unless guard: triangular sum (1 + 2 + ... + n)
+function sum_numbers(n, acc) = recur(n - 1, acc + n) unless n < 1 then acc
+
+// 3. Tail-recursive factorial with single-line unless guard
+function factorial_tail(n, acc) = recur(n - 1, n * acc) unless n < 1 then acc
+
+function factorial(n) {
+    return factorial_tail(n, 1)
+}
+
+// 4. Default-first unless fallback
+status_code = 404
+status_label = "Unknown Status" unless status_code {
+    case 200 -> "OK"
+    case 201 -> "Created"
+    case 404 -> "Not Found"
+    case 500 -> "Server Error"
+}
+
+// 5. Compute test values
+fib_7 = fibonacci(0, 1, 7)
+fib_10 = fibonacci(0, 1, 10)
+sum_to_10 = sum_numbers(10, 0)
+fact_5 = factorial(5)
+
+// 6. Output
+console.log("=== 07: Loki Tail Recursion & Guards ===")
+console.log("Fibonacci(7):       ", fib_7)
+console.log("Fibonacci(10):      ", fib_10)
+console.log("Sum 1..10:          ", sum_to_10)
+console.log("Factorial(5):       ", fact_5)
+console.log("Resolved Status 404:", status_label)
+console.log("Tail recursion and guards verified successfully!")

@@ -1,0 +1,61 @@
+<!-- ======================================================================= -->
+<!-- Example 12: MicroWeb Declarative Spatial UI Component                   -->
+<!-- File: 12_microweb_spatial_component.html                                -->
+<!-- Engine: Rekursion SoA DOM Arena (lang/html) & Metal SDF Renderer       -->
+<!-- Features:                                                               -->
+<!--   - First-class spatial primitives: <row>, <col>, <spacer>, <stack>     -->
+<!--   - Directional box attributes: px, py, width, height, gap, align       -->
+<!--   - Can be transpiled to HTML5 or parsed directly into Rekursion AST    -->
+<!-- ======================================================================= -->
+
+<div id="app" class="app-root" width="1280" height="720">
+  <!-- Top Navigation Bar utilizing MicroWeb <row> & <spacer> -->
+  <row id="navbar" class="nav-bar" height="64" px="24" py="12" gap="16" align="center">
+    <span class="brand-title">Rekursion Studio</span>
+    <span class="pill-badge">v2.4 Core</span>
+    
+    <!-- MicroWeb <spacer>: automatically absorbs available flex space (flex: 1) -->
+    <spacer />
+    
+    <button class="nav-btn secondary" width="90" height="36">Benchmarks</button>
+    <button class="nav-btn secondary" width="90" height="36">Docs</button>
+    <button class="nav-btn primary" width="110" height="36">Launch Studio</button>
+  </row>
+
+  <!-- Main Hero Viewport -->
+  <row class="hero-container" px="40" py="48" gap="32" align="center">
+    <!-- Left Column: Information and Action -->
+    <col class="hero-left" width="580" gap="20">
+      <h1 class="hero-heading">Data-Oriented Declarative UI</h1>
+      <p class="hero-desc">
+        MicroWeb eliminates pointer-heavy DOM node trees in favor of a contiguous
+        Struct-of-Arrays (SoA) topology arena, solving flexbox layouts in microseconds
+        and rendering analytic SDF rounded quads with Apple Metal shaders.
+      </p>
+      
+      <row class="action-row" gap="14" align="center">
+        <button class="action-btn primary" width="160" height="44">Get Started</button>
+        <button class="action-btn outline" width="160" height="44">Architecture Spec</button>
+      </row>
+    </col>
+
+    <spacer />
+
+    <!-- Right Column: Interactive Code Card -->
+    <col class="code-card" width="480" px="24" py="20" gap="12">
+      <row class="window-controls" gap="8" align="center">
+        <span class="dot red" width="12" height="12"></span>
+        <span class="dot yellow" width="12" height="12"></span>
+        <span class="dot green" width="12" height="12"></span>
+        <spacer />
+        <span class="file-name">matrix_transform.rek</span>
+      </row>
+      
+      <div class="code-body">
+        <p class="code-line comment">;; Native Rekursion Tail Recursion</p>
+        <p class="code-line">(function (compute_frame dt)</p>
+        <p class="code-line indent">  (recur (sub dt 1)))</p>
+      </div>
+    </col>
+  </row>
+</div>

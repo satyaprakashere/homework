@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Editor | Premium Text Experience</title>
+    <meta name="description" content="A high-performance text editor built with HTML5 Canvas, featuring multi-cursor support and word-wrapping.">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon"></div>
+            Canvas Editor
+        </div>
+        <div id="cursor-info">Line 1, Col 1</div>
+    </header>
+
+    <main>
+        <div class="editor-container" id="editor-host">
+            <canvas id="editor-canvas"></canvas>
+            <textarea id="hidden-input" autocomplete="off" spellcheck="false" autofocus></textarea>
+            <div class="instructions">
+                <kbd>Alt</kbd> + Click for Multi-Cursor
+            </div>
+        </div>
+    </main>
+
+    <footer class="status-bar">
+        <div id="char-count">0 characters</div>
+        <div id="word-count">0 words</div>
+        <div id="zoom-level">100%</div>
+    </footer>
+
+    <script src="editor.js"></script>
+</body>
+</html>

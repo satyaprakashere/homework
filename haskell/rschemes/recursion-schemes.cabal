@@ -1,0 +1,16 @@
+cabal-version: 2.4
+name: recursion-schemes
+version: 0.1.0.0
+license: MIT
+build-type: Simple
+author: "Satya Prakash"
+maintainer: "satyaprakashere@gmail.com"
+synopsis: Recursion Schemes
+description: This is a simple recursion scheme library created from a single file.
+
+library
+  exposed-modules: Schemes
+  hs-source-dirs: src
+  build-depends:
+    base >=4.7 && <5
+  default-language: Haskell2010

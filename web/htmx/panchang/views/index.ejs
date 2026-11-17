@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindu Panchang Calendar</title>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Panchang</h1>
+            <p>Vedic Timekeeping</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Calendar Section: Loads immediately using hx-get -->
+            <section class="calendar-section" 
+                     hx-get="/calendar?year=<%= year %>&month=<%= month %>" 
+                     hx-trigger="load" 
+                     hx-swap="innerHTML">
+                <!-- Loading state -->
+                <div class="loading">Loading calendar...</div>
+            </section>
+
+            <!-- Details Section: Target for day clicks -->
+            <section class="details-section" id="panchang-details">
+                <div class="empty-state">
+                    Select a date to view Panchang details.
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

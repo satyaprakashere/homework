@@ -1,0 +1,132 @@
+(import phoenix.collection (Set
+                            Vect
+                            (as (Queue Q)))
+
+(function name arg1 .. argn body)
+(macro name arg1 .. argn body)
+
+(typeOf a Int64)
+(val a 5)
+
+(typeOf b Float64)
+(val b 1.5)
+
+(typeOf list (List a) where (a Int))
+(typeOf list (List Int))
+(val list (List 1 2 3 4))
+
+(typeOf str String)
+(val str "srting")
+
+(+ 1 2 3 4)
+(add 1 2 3 4)
+
+(- 4 5 7)
+(subtract 4 5 7)
+
+(if (= 1 2)
+(if (equal? 1 2)
+    (List 1 2 3)
+    (List 3 4 5))
+
+(and true false true)
+
+(lambda arg (+ arg 1))
+
+(val num ((lambda arg (+ arg 1)) 5))
+
+(defunc incr (lamda arg (+ arg 1)))
+
+(type SomeType () (* Int Long) (Float) (Long))
+
+(typeOf add (-> a a a))
+(func (add x y) (+ x y))
+(func add (x y) (+ x y))
+
+(func map (-> (-> a b) (f a) (f b)))
+(func map f x ())
+
+(data Tree a Empty (Tree a (Tree a) (Tree a)))
+
+(typeOf Tree (-> Type Type))
+(data (Tree a) Empty (Node a (Tree a) (Tree a)))
+
+(record (Tree a) Empty (Mode key left right))
+
+; dynamic lang
+; data literals
+"String", 1, 1.5, 'a'
+; r"Sôring", 1.5lf
+
+(val str "String")
+
+; function literals
+(lambda (x) (* 2 x))
+(\ (x) (* 2 x))
+(\ x (* 2 x))
+(-> (x) (* 2 x))
+
+(func (add x y) (+ x y)); this is better I guess
+(func add (x y) (+ x y))
+
+(func (square x) (* x x))
+
+(func (factorial n)
+  (if (< n 0)
+      (throw "Negative Argument")
+      (recFact n 1))
+  (func (recFact n res)
+    (match (n 1) (res)
+          (n n) (recFact (n-1) (res * n)))))
+
+(func (factorial n)
+  (match n
+         (n (>= 0)) (recFact n a))
+         (_)        (throw "Negative Arguement")
+  (func (recFact n res)
+    (match (n 1) (res)
+          (n n) (recFact (n-1) (res * n)))))
+
+(func (factorial n)
+  (recFact n 1)
+  (where
+    (func (recFact n res)
+      (match (n 1) (res)
+            (n n) (recFact (n-1) (res * n))))))
+
+(func factorial (n)
+  (recFact n 1)
+  (func recFact (n res)
+    (match (n)
+      (1 res)
+      (n (recFact (n-1) (res * n))))))
+
+; data type literals
+(a, b)
+(* a b)
+(| a b)
+(| (* a b) (* c d))
+
+(type IntList (List Int))
+(data (List a)
+      Nil
+      (:: a (List a)))
+
+(type Number
+      (Int)
+      (Float)
+      (* Int Float))
+(type Random
+      (| Int Float))
+
+(data Number ()
+      (Fixed Int)
+      (Real Float)
+      (Complex Int * Float))
+
+(data Vect (Nat a)
+      (Nil)
+      (Vect a (Vect n a) (Vect (S n) a)))
+
+
+

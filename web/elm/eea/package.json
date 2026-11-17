@@ -1,0 +1,15 @@
+{
+  "name": "elm-electron-template",
+  "version": "1.0.0",
+  "description": "An Electron app template using Elm",
+  "main": "main.js",
+  "scripts": {
+    "start": "npm run build && electron .",
+    "build": "elm make src/Main.elm --output=elm.js",
+    "dev": "electron ."
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "elm": "^0.19.1-6"
+  }
+}

@@ -1,0 +1,25 @@
+procedure fetch(url) http/get {
+	
+}
+
+procedure fetch url {
+	
+}
+
+data <- fetch url
+
+quickSort [] 	= []
+quickSort x:xs 	= quickSort left ++ [x] ++ quickSort right where
+	left = [a where a <- xs and a <= x]
+	right =[b where b <- xs and b > x]
+
+type Array a n union {
+	Nil   :: Array _ 0
+	Array :: Array x -- undefined
+}
+
+
+(quick-sort [] 			 [])
+(quick-sort (Cons x xs)  (concat quick-sort(left) x quick-sort(right)) where
+	(define left  (filter (< x) xs)
+			right (filter (>= x) xs)))

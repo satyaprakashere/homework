@@ -1,0 +1,22 @@
+module Main
+
+data FormatString : List Char -> Type -> Type where
+  Empty : FormatString [] String
+  InsertNumber : FormatString s t -> FormatString ('%' :: 'd' :: s) (Int -> t)
+  InsertString : FormatString s t -> FormatString ('%' :: 's' :: s) (String -> t)
+  Other : (x /= '%' = True) -> FormatString s t -> FormatString (x :: s) t
+
+printf' : List Char -> FormatString format ty -> ty
+printf' = match
+  Empty                 => s.reverse.pack
+  Other _ {x=c} next    => printf' (c::s) next
+  InsertNumber next     => (\x => printf' (reverse (unpack (show x)) ++ s) next)
+  InsertString next     => (\x => printf' (reverse (unpack x) ++ s) next)
+
+printf' s Empty = pack (reverse s)
+printf' s (Other _ {x=c} next) = printf' (c :: s) next
+printf' s (InsertNumber next) = (\x => printf' (reverse (unpack (show x)) ++ s) next)
+printf' s (InsertString next) = (\x => printf' (reverse (unpack x) ++ s) next)
+
+printf : (format : String) -> {auto ok : FormatString (unpack format) ty} -> ty
+printf format {ok} = printf' [] ok

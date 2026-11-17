@@ -1,0 +1,23 @@
+{
+  "name": "jyotishi",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "bun --watch server.ts",
+    "dev:all": "concurrently -n \"vite,hono\" -c \"cyan,magenta\" \"bun run dev\" \"bun run dev:server\"",
+    "start": "bun run server.ts",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "hono": "^4.13.13",
+    "htmx.org": "^2.0.11"
+  }
+}

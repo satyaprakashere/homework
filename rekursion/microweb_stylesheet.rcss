@@ -1,0 +1,140 @@
+/* ========================================================================== */
+/* Example 13: MicroWeb Design System Stylesheet                              */
+/* File: 13_microweb_stylesheet.css                                           */
+/* Engine: Rekursion CSS Parser & Style Cascade (lang/css/cascade.odin)       */
+/* Features:                                                                  */
+/*   - CSS Custom Properties (:root { --var: ... }) & var(--var) resolution  */
+/*   - Directional Box Shorthands: px, py, mx, my                             */
+/*   - Native rule nesting (& .child, &:hover) without preprocessors          */
+/*   - Linear specificity calculation: (Inline:1000, ID:100, Class:10, Type:1)*/
+/* ========================================================================== */
+
+:root {
+  --bg-dark: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-card: #243048;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --accent: #38bdf8;
+  --text-white: #ffffff;
+  --text-muted: #94a3b8;
+  --border-muted: #334155;
+  --radius-sm: 6;
+  --radius-md: 10;
+  --radius-lg: 16;
+}
+
+/* Root Layout Container */
+.app-root {
+  background: var(--bg-dark);
+  font-family: Inter, system-ui, sans-serif;
+  color: var(--text-white);
+  px: 32;
+  py: 24;
+}
+
+/* Navigation Bar with MicroWeb Shorthands and Nesting */
+.nav-bar {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border-color: var(--border-muted);
+  px: 24;
+  py: 12;
+  
+  & .brand-title {
+    color: var(--text-white);
+    font-size: 18;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  
+  & .pill-badge {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent);
+    font-size: 11;
+    font-weight: 600;
+    border-radius: 9999;
+    px: 8;
+    py: 3;
+  }
+}
+
+/* Reusable Button Component with Nesting */
+.nav-btn {
+  border-radius: var(--radius-sm);
+  font-size: 13;
+  font-weight: 600;
+  cursor: pointer;
+  
+  &.primary {
+    background: var(--primary);
+    color: var(--text-white);
+    
+    &:hover {
+      background: var(--primary-hover);
+    }
+  }
+  
+  &.secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border-muted);
+    
+    &:hover {
+      color: var(--text-white);
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+}
+
+/* Hero Section */
+.hero-container {
+  px: 40;
+  py: 48;
+  
+  & .hero-heading {
+    font-size: 38;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text-white);
+  }
+  
+  & .hero-desc {
+    font-size: 16;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+}
+
+/* Interactive Code Card */
+.code-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border-color: var(--border-muted);
+  px: 24;
+  py: 20;
+  
+  & .window-controls {
+    border-bottom: 1px solid var(--border-muted);
+    py: 8;
+  }
+  
+  & .file-name {
+    font-size: 12;
+    color: var(--text-muted);
+  }
+  
+  & .code-body {
+    py: 12;
+  }
+  
+  & .code-line {
+    font-family: monospace;
+    font-size: 13;
+    line-height: 1.5;
+    
+    &.comment {
+      color: var(--text-muted);
+    }
+  }
+}

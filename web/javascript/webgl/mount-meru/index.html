@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TOVP Cosmic Chandelier - Mount Meru</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: radial-gradient(circle at center, #0a0a2a 0%, #000 100%); }
+        #info {
+            position: absolute; top: 20px; width: 100%; text-align: center;
+            color: #ffd700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-size: 24px; letter-spacing: 2px;
+            text-shadow: 0px 0px 10px rgba(255, 215, 0, 0.5); pointer-events: none;
+            text-transform: uppercase;
+        }
+        #subtitle {
+            font-size: 14px; color: #aaa; margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        TOVP Cosmic Chandelier
+        <div id="subtitle">Evolution of the Mount Meru Model</div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Using TWEEN for smooth evolution animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+    <script>
+        // --- CONSTANTS & SETTINGS ---
+        const COLORS = {
+            GOLD: 0xffd700,
+            DEEP_BLUE: 0x001f3f,
+            OCEAN: 0x0077be,
+            ISLAND: 0x228b22,
+            SKY: 0x87ceeb,
+            SUN: 0xffaa00,
+            MOON: 0xeeeeee
+        };
+
+        // --- SCENE SETUP ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.001);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.set(0, 100, 200);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- LIGHTING ---
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambLight);
+
+        const mainLight = new THREE.PointLight(0xffffff, 2, 500);
+        mainLight.position.set(50, 100, 50);
+        scene.add(mainLight);
+
+        const rimLight = new THREE.PointLight(COLORS.GOLD, 1, 300);
+        rimLight.position.set(-50, -50, -50);
+        scene.add(rimLight);
+
+        // --- MATERIALS ---
+        const goldMaterial = new THREE.MeshPhysicalMaterial({
+            color: COLORS.GOLD,
+            metalness: 1.0,
+            roughness: 0.1,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1,
+            reflectivity: 1.0
+        });
+
+        // --- GEOMETRY FACTORY ---
+
+        const chandelierGroup = new THREE.Group();
+        scene.add(chandelierGroup);
+
+        function createMountMeru() {
+            const meruGroup = new THREE.Group();
+            
+            // Central Peak
+            const mainPeakGeo = new THREE.ConeGeometry(10, 40, 32);
+            const mainPeak = new THREE.Mesh(mainPeakGeo, goldMaterial);
+            mainPeak.position.y = 20;
+            meruGroup.add(mainPeak);
+
+            // Base Disk
+            const baseGeo = new THREE.CylinderGeometry(15, 12, 2, 32);
+            const base = new THREE.Mesh(baseGeo, goldMaterial);
+            base.position.y = 0;
+            meruGroup.add(base);
+
+            // 4 Side Peaks
+            const sidePeakGeo = new THREE.ConeGeometry(4, 20, 16);
+            const dist = 10;
+            for(let i = 0; i < 4; i++) {
+                const sidePeak = new THREE.Mesh(sidePeakGeo, goldMaterial);
+                const angle = (i / 4) * Math.PI * 2;
+                sidePeak.position.set(Math.cos(angle) * dist, 10, Math.sin(angle) * dist);
+                meruGroup.add(sidePeak);
+            }
+
+            return meruGroup;
+        }
+
+        function createBhumandala() {
+            const bhumandalaGroup = new THREE.Group();
+            const ringCount = 7;
+            const ringWidth = 10;
+            
+            for(let i = 0; i < ringCount; i++) {
+                const inner = 15 + (i * (ringWidth + 2));
+                const outer = inner + ringWidth;
+                
+                // Ring Geometry (Island/Ocean)
+                const geo = new THREE.TorusGeometry((inner + outer)/2, ringWidth/2, 16, 128);
+                const mat = new THREE.MeshPhysicalMaterial({
+                    color: i % 2 === 0 ? COLORS.ISLAND : COLORS.OCEAN,
+                    metalness: 0.2,
+                    roughness: 0.8,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                
+                const ring = new THREE.Mesh(geo, mat);
+                ring.rotation.x = Math.PI / 2;
+                ring.scale.z = 0.1; // Make it look like a flat disk
+                
+                bhumandalaGroup.add(ring);
+            }
+            
+            return bhumandalaGroup;
+        }
+
+        function createPlanets() {
+            const planetGroup = new THREE.Group();
+            
+            // Sun
+            const sunGeo = new THREE.SphereGeometry(3, 32, 32);
+            const sunMat = new THREE.MeshStandardMaterial({ color: COLORS.SUN, emissive: COLORS.SUN, emissiveIntensity: 2 });
+            const sun = new THREE.Mesh(sunGeo, sunMat);
+            const sunPivot = new THREE.Group();
+            sun.position.x = 80;
+            sun.position.y = 40;
+            sunPivot.add(sun);
+            
+            // Moon
+            const moonGeo = new THREE.SphereGeometry(2, 32, 32);
+            const moonMat = new THREE.MeshStandardMaterial({ color: COLORS.MOON, emissive: COLORS.MOON, emissiveIntensity: 1 });
+            const moon = new THREE.Mesh(moonGeo, moonMat);
+            const moonPivot = new THREE.Group();
+            moon.position.x = -70;
+            moon.position.y = 35;
+            moonPivot.add(moon);
+            
+            planetGroup.add(sunPivot);
+            planetGroup.add(moonPivot);
+            
+            return { group: planetGroup, sunPivot, moonPivot };
+        }
+
+        function createUpperLokas() {
+            const lokasGroup = new THREE.Group();
+            const lokaCount = 3;
+            for(let i = 0; i < lokaCount; i++) {
+                const geo = new THREE.TorusGeometry(10 + i * 15, 0.5, 16, 64);
+                const mat = new THREE.MeshPhysicalMaterial({
+                    color: COLORS.GOLD,
+                    metalness: 1.0,
+                    roughness: 0.2,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const disk = new THREE.Mesh(geo, mat);
+                disk.rotation.x = Math.PI / 2;
+                disk.position.y = 80 + i * 30;
+                lokasGroup.add(disk);
+            }
+            return lokasGroup;
+        }
+
+        function createSuspension() {
+            const group = new THREE.Group();
+            const wireMat = new THREE.MeshBasicMaterial({ color: 0x333333 });
+            const wireGeo = new THREE.CylinderGeometry(0.2, 0.2, 200, 8);
+            
+            for(let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const dist = 60;
+                const wire = new THREE.Mesh(wireGeo, wireMat);
+                wire.position.set(Math.cos(angle) * dist, 100, Math.sin(angle) * dist);
+                group.add(wire);
+            }
+            return group;
+        }
+
+        function createStarfield() {
+            const count = 5000;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i = 0; i < count * 3; i++) {
+                pos[i] = (Math.random() - 0.5) * 1000;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5, transparent: true, opacity: 0.8 });
+            return new THREE.Points(geo, mat);
+        }
+
+        // --- INITIALIZATION ---
+        const meru = createMountMeru();
+        const bhumandala = createBhumandala();
+        const stars = createStarfield();
+        const suspension = createSuspension();
+        const planets = createPlanets();
+        const upperLokas = createUpperLokas();
+
+        scene.add(stars);
+        chandelierGroup.add(meru);
+        chandelierGroup.add(bhumandala);
+        chandelierGroup.add(suspension);
+        chandelierGroup.add(planets.group);
+        chandelierGroup.add(upperLokas);
+
+        // --- ANIMATION LOOP ---
+        function animate(time) {
+            requestAnimationFrame(animate);
+            TWEEN.update(time);
+            controls.update();
+            
+            // Gentle rotation
+            chandelierGroup.rotation.y += 0.001;
+            stars.rotation.y += 0.0002;
+            
+            // Planet orbits
+            planets.sunPivot.rotation.y += 0.01;
+            planets.moonPivot.rotation.y += 0.015;
+            
+            // Differential rotation for Bhumandala rings
+            bhumandala.children.forEach((ring, idx) => {
+                ring.rotation.z += 0.002 * (idx + 1);
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // --- RESIZE HANDLER ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- EVOLUTION SEQUENCE (Intro) ---
+        function startEvolution() {
+            // Initial state: Tiny and hidden
+            chandelierGroup.scale.set(0, 0, 0);
+            meru.position.y = -100;
+            planets.group.scale.set(0, 0, 0);
+            upperLokas.scale.set(0, 0, 0);
+            
+            // 1. Chandelier Scale Up
+            new TWEEN.Tween(chandelierGroup.scale)
+                .to({ x: 1, y: 1, z: 1 }, 2500)
+                .easing(TWEEN.Easing.Quadratic.Out)
+                .start();
+
+            // 2. Meru Grows Up
+            new TWEEN.Tween(meru.position)
+                .to({ y: 0 }, 4000)
+                .delay(500)
+                .easing(TWEEN.Easing.Cubic.Out)
+                .start();
+
+            // 3. Planets Appear
+            new TWEEN.Tween(planets.group.scale)
+                .to({ x: 1, y: 1, z: 1 }, 2000)
+                .delay(2000)
+                .easing(TWEEN.Easing.Back.Out)
+                .start();
+
+            // 4. Upper Lokas Appear
+            new TWEEN.Tween(upperLokas.scale)
+                .to({ x: 1, y: 1, z: 1 }, 2000)
+                .delay(2500)
+                .easing(TWEEN.Easing.Quadratic.Out)
+                .start();
+        }
+
+        startEvolution();
+        animate();
+    </script>
+</body>
+</html>

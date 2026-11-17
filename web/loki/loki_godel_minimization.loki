@@ -1,0 +1,38 @@
+// =============================================================================
+// Example 9: Kurt Gödel's Unbounded Minimization in Loki
+// File: 09_loki_godel_minimization.loki
+// Model: Gödel Recursive Function Model (mu n { ... })
+// Features:
+//   - First-class 'mu' unbounded minimization block
+//   - Computes mathematical inverses and roots without general while loops
+// =============================================================================
+
+// 1. Find the integer square root of 144
+// Finds the smallest natural number n >= 0 where (n * n) - 144 == 0
+root_144 = mu n {
+    (n * n) - 144
+}
+
+// 2. Find the integer square root of 81
+root_81 = mu n {
+    (n * n) - 81
+}
+
+// 3. Find the factor n such that 7 * n == 91
+// (n * 7) - 91 == 0
+factor_91 = mu n {
+    (n * 7) - 91
+}
+
+// 4. Cube root: smallest n where n^3 == 64
+cube_root_64 = mu n {
+    (n * n * n) - 64
+}
+
+// 5. Output results
+console.log("=== 09: Kurt Gödel μ-Minimization in Loki ===")
+console.log("Integer sqrt(144) via mu: ", root_144)
+console.log("Integer sqrt(81) via mu:  ", root_81)
+console.log("Factor of 91 (7*n) via mu:", factor_91)
+console.log("Cube root of 64 via mu:   ", cube_root_64)
+console.log("Gödel unbounded minimization in Loki executed successfully!")

@@ -1,0 +1,37 @@
+module VariablesAndMutability
+
+// Variables & Mutability in Grain 🌾
+
+// 1. Immutable Bindings
+// Variables declared with `let` are immutable by default.
+let language = "Grain"
+let target = "WebAssembly"
+
+// 2. Explicit Type Annotations (optional, inferred automatically)
+let frameworkVersion: Number = 1
+let isAwesome: Bool = true
+
+// 3. Mutable Variables
+// Add `mut` to allow reassignment with `=` or operator-assignment like `+=`
+let mut score = 10
+score += 5
+score = score * 2
+
+// 4. Shadowing
+// You can re-bind a variable name in the same scope or inner block
+let greeting = "Hello"
+let greeting = greeting ++ ", Grain Developer!"
+
+// 5. Block Scoping
+let computed = {
+  let a = 10
+  let b = 20
+  a + b // Last expression in a block is returned automatically
+}
+
+print("=== Variables and Mutability ===")
+print(language)
+print(target)
+print(score)
+print(greeting)
+print(computed)

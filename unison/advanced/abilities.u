@@ -1,0 +1,7 @@
+ability Stream a where
+  emit : a -> {Stream a} ()
+
+streamToList : '{Stream a} r -> [a]
+streamToList s = 
+  -- Ability handler implementation
+  []

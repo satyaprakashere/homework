@@ -1,0 +1,18 @@
+[package]
+name = "learning"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tailcall="~1"
+#guardrail = { path = "../guardrail" }
+
+[build-dependencies]
+syn = { version = "2.0", features = ["full", "visit"] }
+walkdir = "2.5"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort" # Strips unwinding code for speed and smaller binaries

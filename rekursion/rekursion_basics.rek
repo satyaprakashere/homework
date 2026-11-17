@@ -1,0 +1,68 @@
+;; =============================================================================
+;; Example 1: Rekursion Core Fundamentals
+;; File: 01_rekursion_basics.rek
+;; Model: Kurt Gödel Recursive Theory Model of Computation
+;; Rules:
+;;   - Pure functions with 'function'
+;;   - Bounded tail recursion with 'recur'
+;;   - No mathematical operators in core (use 'add', 'sub', 'mul', 'div', etc.)
+;;   - Strict snake_case naming and lowercase primitive types
+;; =============================================================================
+
+;; 1. Pure function declarations
+(function (square x)
+  (mul x x))
+
+(function (sum_of_squares a b)
+  (add (square a) (square b)))
+
+;; 2. Bounded Tail Recursion using 'recur'
+;; Bounded recursion guarantees termination adhering to Gödel primitive recursion
+(function (fibonacci_acc n a b)
+  (if (less_than n 1)
+      a
+      (recur (sub n 1) b (add a b))))
+
+(function (fibonacci n)
+  (fibonacci_acc n 0 1))
+
+;; 3. Tail-recursive factorial with accumulator
+(function (factorial_acc n acc)
+  (if (less_equal n 1)
+      acc
+      (recur (sub n 1) (mul n acc))))
+
+(function (factorial n)
+  (factorial_acc n 1))
+
+;; 4. Tail-recursive power function (base^exp)
+(function (power_acc base exp acc)
+  (if (less_equal exp 0)
+      acc
+      (recur base (sub exp 1) (mul acc base))))
+
+(function (power base exp)
+  (power_acc base exp 1))
+
+;; 5. Value bindings with 'let'
+(let x 10)
+(let y 20)
+(let sq_sum (sum_of_squares x y))
+(let fib_10 (fibonacci 10))
+(let fact_6 (factorial 6))
+(let pow_2_8 (power 2 8))
+
+;; 6. Assertions verifying correctness
+(assert (equal sq_sum 500) "10^2 + 20^2 == 500")
+(assert (equal fib_10 55) "fibonacci(10) == 55")
+(assert (equal fact_6 720) "factorial(6) == 720")
+(assert (equal pow_2_8 256) "2^8 == 256")
+
+;; 7. Program Output
+(print "=== 01: Rekursion Core Fundamentals ===\n")
+(print "Square of 10:          ") (print (square 10)) (newline)
+(print "Sum of squares(10,20): ") (print sq_sum) (newline)
+(print "Fibonacci(10):         ") (print fib_10) (newline)
+(print "Factorial(6):          ") (print fact_6) (newline)
+(print "Power(2, 8):           ") (print pow_2_8) (newline)
+(print "All assertions passed successfully!\n")

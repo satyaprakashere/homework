@@ -1,0 +1,10 @@
+[workspace]
+authors = ["Satya Prakash <satyapr93@gmail.com>"]
+channels = ["https://conda.modular.com/max-nightly", "conda-forge"]
+name = "life"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]

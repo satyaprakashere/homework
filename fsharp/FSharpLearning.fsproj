@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net11.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Basics.fs" />
+    <Compile Include="Functions.fs" />
+    <Compile Include="Collections.fs" />
+    <Compile Include="DomainModeling.fs" />
+    <Compile Include="PatternMatching.fs" />
+    <Compile Include="UnitsOfMeasure.fs" />
+    <Compile Include="RailwayOrientedProgramming.fs" />
+    <Compile Include="AsyncAndTasks.fs" />
+    <Compile Include="ObjectOriented.fs" />
+    <Compile Include="ComputationExpressions.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+
+</Project>

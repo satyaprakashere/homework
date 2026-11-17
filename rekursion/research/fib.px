@@ -1,0 +1,38 @@
+fib n = fibH(0, 1, n) where
+	fibH a b 0 = a
+	fibH a b n = fibH(b, a+b, n-1) where
+		fibH1
+		fibH2
+
+func fib n = fibH 0 1 n where
+	fibH a b n = fibH(b, a+b, n-1) when n > 0 otherwise a
+
+func fib n = fibH 0 1 n where
+	fibH a b n = fibH(a = b, b += a, n -= 1) when n > 0 otherwise a
+
+func fib n = fibH 0 1 n where
+	fibH a _ 0 = a
+	fibH a b n = fibH(a = b, b += a, n -= 1)
+
+func fib n = fibH 0 1 n where
+	fibH a _ 0 = a
+	fibH a b n = recur(a = b, b += a, n -= 1)
+end
+
+func fib n = fibH 0 1 n where
+	fibH a _ 0 = a
+	fibH a b n = recur do
+		a <- b
+		b <- a + b
+		n <- n - 1
+	end
+end
+
+func fib n = fibH 0 1 n {
+	fibH1 a _ 0 = a
+	fibH2 a b n = recur {
+		a <- b
+		b <- a + b
+		n <- n - 1
+	}
+}
